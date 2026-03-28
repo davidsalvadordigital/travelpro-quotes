@@ -39,3 +39,33 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ============================================
+# PLAYWRIGHT ARTIFACTS (NUNCA versionar)
+# ============================================
+playwright-report/
+test-results/
+playwright-*.txt
+*.log
+
+# ============================================
+# EXPERIMENTOS EXTERNOS (testsprite)
+# ============================================
+testsprite_tests/
+*.py  # Python scripts no parte del proyecto
+
+# ============================================
+# CLAUDE/AGENT ARTIFACTS
+# ============================================
+.agent/
+.opencode/
+*.output
+.claude/projects/*/memory/
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
+.DS_Store
+Thumbs.db
+*.tmp
+files.md

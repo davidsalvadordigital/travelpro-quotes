@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Enforce exhaustive deps in useEffect/useCallback/useMemo
+      "react-hooks/exhaustive-deps": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;

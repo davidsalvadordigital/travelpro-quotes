@@ -1,26 +1,211 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* === Typography === */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* === Premium SaaS B2B Tokens (Tailwind v4) === */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-action: var(--brand-action);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  /* Elevaciones de Cristal (Diamond Standard) */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+
+  /* Feedback Semántico */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* === Sidebar Colors === */
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* === Refined Border Radius === */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.85rem;
+  --radius-xl: 1.25rem;
+
+  /* === Diamond Elevation Shadows (Clean Code) === */
+  --shadow-sm: 0 2px 4px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.08);
+  --shadow-lg: 0 12px 24px -4px oklch(0 0 0 / 0.12);
+  --shadow-xl: 0 20px 40px -8px oklch(0 0 0 / 0.15);
+  --shadow-premium: 0 0 0 1px var(--glass-border), 0 20px 50px oklch(var(--brand-primary) / 0.1);
+
+  /* === Pro Max Micro-Animations === */
+  --animate-fade-in: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slide-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pulse-subtle: pulse-subtle 3s infinite ease-in-out;
+  --animate-shimmer: shimmer 2s infinite linear;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Modo Claro: Aireado y Energético */
+    --background: oklch(0.99 0.01 220);
+    --foreground: oklch(0.15 0.05 240);
+
+    /* Trappvel Brand Colors - VIVOS */
+    --brand-primary: oklch(0.62 0.25 350); /* Rosa Destino (Principal) */
+    --brand-secondary: oklch(0.65 0.18 210); /* Cian Vibrante (Acción/Soporte) */
+    --brand-action: oklch(0.75 0.15 190); /* Azul Cielo */
+    --brand-accent: oklch(0.55 0.15 280);
+
+    --muted: oklch(0.96 0.02 220);
+    --muted-foreground: oklch(0.40 0.05 240);
+
+    /* Glassmorphism Standard */
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.15 0.05 240);
+    --glass: oklch(1 0 0 / 0.8);
+    --glass-border: oklch(0.15 0.05 240 / 0.08);
+
+    --border: oklch(0.15 0.05 240 / 0.08);
+    --input: oklch(0.15 0.05 240 / 0.05);
+    --ring: oklch(0.65 0.18 210 / 0.3);
+
+    --success: oklch(0.70 0.18 145);
+    --warning: oklch(0.80 0.18 70);
+    --danger: oklch(0.60 0.22 25);
+
+    --primary: var(--brand-primary);
+    --primary-foreground: oklch(1 0 0);
+
+    --accent: oklch(0.65 0.18 210 / 0.1);
+    --accent-foreground: var(--brand-primary);
+
+    --destructive: oklch(0.60 0.22 25);
+    --destructive-foreground: oklch(1 0 0);
+
+    --sidebar-background: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.15 0.05 240);
+    --sidebar-primary: var(--brand-primary);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.96 0.02 220);
+    --sidebar-accent-foreground: var(--brand-primary);
+    --sidebar-border: oklch(0.15 0.05 240 / 0.08);
+    --sidebar-ring: var(--ring);
+  }
+
+  .dark {
+    /* Modo Oscuro: Azul Noche Vibrante (NO NEGRO) */
+    --background: oklch(0.18 0.04 250); 
+    --foreground: oklch(0.98 0.02 220);
+
+    /* Trappvel Brand Colors - Luminosos */
+    --brand-primary: oklch(0.72 0.18 210); 
+    --brand-secondary: oklch(0.78 0.12 190);
+    --brand-action: oklch(0.68 0.25 350);
+    --brand-accent: oklch(0.65 0.15 280);
+
+    --muted: oklch(1 0 0 / 0.07);
+    --muted-foreground: oklch(0.75 0.05 220);
+
+    /* Glassmorphism for Dark Mode */
+    --card: oklch(1 0 0 / 0.04);
+    --card-foreground: oklch(0.98 0.02 220);
+    --glass: oklch(0.18 0.04 250 / 0.5);
+    --glass-border: oklch(1 0 0 / 0.12);
+
+    --border: oklch(1 0 0 / 0.1);
+    --input: oklch(1 0 0 / 0.08);
+    --ring: oklch(0.72 0.18 210 / 0.4);
+
+    --success: oklch(0.70 0.18 145);
+    --warning: oklch(0.80 0.18 70);
+    --danger: oklch(0.60 0.22 25);
+
+    --primary: var(--brand-primary);
+    --primary-foreground: oklch(0.18 0.04 250);
+
+    --accent: oklch(1 0 0 / 0.08);
+    --accent-foreground: var(--brand-primary);
+
+    --destructive: oklch(0.45 0.18 25);
+    --destructive-foreground: oklch(0.98 0.02 220);
+
+    --sidebar-background: oklch(0.15 0.04 250);
+    --sidebar-foreground: oklch(0.98 0.02 220);
+    --sidebar-primary: var(--brand-primary);
+    --sidebar-primary-foreground: oklch(0.15 0.04 250);
+    --sidebar-accent: oklch(1 0 0 / 0.05);
+    --sidebar-accent-foreground: oklch(0.98 0.02 220);
+    --sidebar-border: oklch(1 0 0 / 0.1);
+    --sidebar-ring: var(--ring);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    @apply antialiased;
+    /* Fondo Claro: Halo de luz cian */
+    background-image: radial-gradient(circle at 100% 0%, oklch(0.65 0.18 210 / 0.07) 0%, transparent 40%),
+      radial-gradient(circle at 0% 100%, oklch(0.62 0.25 350 / 0.05) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  /* Fondo Oscuro: Vibrante y Profundo */
+  .dark body {
+    background-image:
+      radial-gradient(circle at 80% 0%, oklch(0.72 0.18 210 / 0.12) 0%, transparent 45%),
+      radial-gradient(circle at 20% 100%, oklch(0.68 0.25 350 / 0.1) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
 }
+
+/* Base Keyframes */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* Staggered Entrance Utilities */
+.stagger-enter > * {
+  opacity: 0;
+  animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-enter > *:nth-child(1) { animation-delay: 50ms; }
+.stagger-enter > *:nth-child(2) { animation-delay: 100ms; }
+.stagger-enter > *:nth-child(3) { animation-delay: 150ms; }
+.stagger-enter > *:nth-child(4) { animation-delay: 200ms; }
+.stagger-enter > *:nth-child(5) { animation-delay: 250ms; }
+.stagger-enter > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-enter > *:nth-child(7) { animation-delay: 350ms; }
+.stagger-enter > *:nth-child(8) { animation-delay: 400ms; }

@@ -1,0 +1,40 @@
+# Visión a Futuro: Arquitectura de Catálogo Público (Sanity + TravelPro)
+
+> ⚠️ **ATENCIÓN: BORRADOR AISLADO / NO APLICAR AL PROYECTO ACTUAL**
+> Este documento representa una visión técnica a largo plazo acordada en el roadmap estratégico. Su propósito es **exclusivamente informativo** para escalar la plataforma hacia un modelo B2B/B2C en el futuro. 
+> 
+> **La IA o el equipo de desarrollo NO DEBEN APLICAR estas reglas en la fase de desarrollo actual.** El proyecto sigue utilizando exclusivamente Supabase como única fuente de la verdad para el CRM interno.
+
+## 1. El Problema a Resolver (A Futuro)
+Cuando la Agencia requiera exponer paquetes turísticos complejos al público general o a agencias extranjeras (B2B):
+- No es escalable ni óptimo que los creadores de contenido escriban descripciones de viajes, itinerarios foto por foto y listas de inclusiones desde Supabase (o un formulario crudo atado a una Base de Datos SQL).
+- Se necesita una interfaz de edición visual amigable para marketing, con optimización avanzada de activos multimedia.
+
+## 2. La Solución Arquitectónica (Estrategia de Doble Base)
+El Monolito actual de Next.js 16 se transformará en un **Multi-tenant Híbrido**, separando el Contenido Editorial (Marketing) de las Transacciones Sensibles (Cotizaciones/CRM).
+
+*   **Pilar 1: El Portal Público (Catálogo)**
+    *   **Tecnología:** Next.js 16 App Router (Rutas `app/(catalog)/*`).
+    *   **Fuente de Datos:** **Sanity CMS (Headless CMS)**.
+    *   **Proceso:** Sanity Studio es usado por el equipo de Marketing para crear destinos, subir fotos optimizadas y detallar itinerarios en "Rich Text". Next.js lee esto usando GROQ y SSR (Server-Side Rendering) fusionado con `cacheComponents: true` para lograr cargas ultra-rápidas, SEO y latencia menor a 50ms (Edge Caching).
+    *   **Beneficio:** Máxima conversión, cero estrés en la base de datos de Supabase ante picos de tráfico.
+
+*   **Pilar 2: El CRM Principal (TravelPro Quotes - Actual)**
+    *   **Tecnología:** Next.js 16 Server Actions (Rutas `app/(main)/dashboard/*`).
+    *   **Fuente de Datos:** **Supabase (PostgreSQL)**.
+    *   **Proceso:** Manejo estricto con RLS de Leads, Transacciones, Asesoras, y Cotizaciones (Dual-Currency COP/USD).
+    *   **Beneficio:** Velocidad, integridad referencial y control granular de seguridad.
+
+## 3. El Puente (La Integración Mágica)
+Ambos sistemas coexisten en el mismo repositorio (Monolito). La única interacción entre ellos ocurre en la "Captación":
+1.  Una agencia extranjera visualiza un paquete en el dominio público (`tudominio.com/catalog/destinos/paris`).
+2.  La agencia llena un formulario "Solicitar Cotización".
+3.  Ese formulario dispara un **Server Action** tradicional de nuestra arquitectura actual.
+4.  El Server Action inserta los datos (junto a un tag oculto de referenciador, ej: `origen: san_cat`) en la tabla `leads` de **Supabase**.
+5.  La asesora abre su Dashboard en TravelPro Quotes y atiende a la nueva agencia extranjera. Todo bajo el mismo techo.
+
+## 4. Opciones de Despliegue (Libertad Total)
+Dado que la arquitectura mantiene el código visual y las consultas separados (DAL), si en el futuro Vercel dejase de ser rentable, la aplicación (Next.js) podría ser contenida en Docker y desplegada bajo cualquier infraestructura (AWS, DigitalOcean, Hetzner), conservando tanto a Sanity como a Supabase en sus respectivas nubes SaaS como servicios de base de datos puros.
+
+---
+*(Fin del Borrador)*
