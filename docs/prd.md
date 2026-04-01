@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD) | TravelPro Quotes
 
 > **Estado:** Activo / En Producción  
-> **Versión:** 1.2.0  
-> **Fecha de Actualización:** 2026-03-26  
+> **Versión:** 1.3.0  
+> **Fecha de Actualización:** 2026-03-31  
 > **Autor:** Equipo de Producto / Antigravity AI Engineering
 
 ---
@@ -49,28 +49,53 @@
 
 ## 5. Requisitos Funcionales Especificados
 
-### 5.1 Gestión de Cotizaciones (Wizard Flow)
-*   El sistema debe guiar al usuario a través de un asistente paso a paso (Wizard) intuitivo.
-*   Secciones requeridas: Datos del Viajero, Destino/Fechas, Vuelos & Hotel, Itinerario (día a día), Inclusiones/Exclusiones, y Finanzas.
-*   Debe permitir guardar "Borradores" autoguardados para evitar pérdida de progreso.
+### 5.1 Gestión de Cotizaciones (Wizard Flow) ✅ IMPLEMENTADO
+*   El sistema guía al usuario a través de un asistente de **6 pasos** (Storytelling Flow):
+    1.  **Inicio:** Datos del viajero + destino + fechas + imagen de portada
+    2.  **El Viaje:** Itinerario día a día con experiencias
+    3.  **Hospedaje:** Opciones de hotel con categorías (3*, 4*, 5*, Boutique)
+    4.  **Transporte:** Vuelos y traslados
+    5.  **Condiciones:** Inclusiones, exclusiones, términos legales
+    6.  **Inversión:** Resumen financiero + opciones de diseño/branding
+*   Sistema de autoguardado de borradores para evitar pérdida de progreso.
 
-### 5.2 Motor Financiero Bimonetario
+### 5.2 Motor Financiero Bimonetario ✅ IMPLEMENTADO
 *   **Ingreso de Costos:** Soporte para Costo Neto Nacional (COP) o Internacional (USD).
-*   **TRM Integrada:** Consumo de API para obtener la Tasa Representativa del Mercado oficial.
-*   **Cálculos Automáticos:** El sistema debe calcular: `Costo Total = Costo Neto * (1 + (Fee % / 100)) * TRM`.
-*   Toda cotización enviada debe fijar ("congelar") la TRM usada en ese momento para fines de auditoría.
+*   **Modelo de Agencia (Comisión Cedida):**
+    *   `comision = PVP × (feePercent / 100)` — cedida por el mayorista
+    *   `costoNeto = PVP - comision` — lo que se paga al proveedor
+    *   `extraAmount = PVP × (extraPercent / 100)` — margen adicional de la agencia
+    *   `precioCliente = PVP + extraAmount` — lo que paga el viajero
+    *   `utilidadAgencia = comision + extraAmount` — ganancia total
+*   **TRM Integrada:** API datos.gov.co con cache en memoria de 1 hora.
+*   **Idempotencia:** `transaction_id` previene duplicados por mala conexión.
 
-### 5.3 Extracción Inteligente (IA)
-*   Al pegar un bloque de texto no estructurado (ej. correo de una aerolínea), la IA debe parsearlo y rellenar automáticamente el itinerario y los campos de vuelo del formulario.
+### 5.3 Extracción Inteligente (IA) ✅ IMPLEMENTADO
+*   Endpoint `/api/extract-lead` usando Vercel AI SDK + OpenAI `gpt-4o-mini`.
+*   Parsea texto desestructurado (correos, flyers, WhatsApp) y rellena:
+    *   Datos del viajero
+    *   Destino y tipo (nacional/internacional)
+    *   Itinerario completo
+    *   Vuelos, hoteles, inclusiones/exclusiones
+    *   Costos estimados
+*   Mock para E2E tests (`E2E-TEST-TURKEY`) para evitar consumo de tokens.
 
-### 5.4 Exportación a PDF
-*   Generación de un documento PDF on-the-fly con la imagen corporativa de la agencia (Logo, colores).
-*   El PDF debe incluir: Resumen del viaje, precio claro, condiciones legales y el itinerario detallado.
+### 5.4 Exportación a PDF ✅ IMPLEMENTADO
+*   Generación client-side con `@react-pdf/renderer`.
+*   Diseño premium (Diamond Standard): portada oscura, fuentes Outfit, layout profesional.
+*   Incluye: resumen del viaje, precio claro, itinerario detallado, términos legales.
 
-### 5.5 Dashboard de Analítica
-*   Vista consolidada de: Cotizaciones Creadas, Enviadas, Aprobadas, Rechazadas.
-*   Cálculo de Tasa de Conversión (Aprobadas / Total).
-*   Ingresos Totales proyectados en COP (convirtiendo las ventas en USD a COP de manera virtual para la métrica global).
+### 5.5 Dashboard de Analítica ✅ IMPLEMENTADO
+*   **Dashboard Asesora:** KPIs personales (cotizaciones, conversiones, borradores).
+*   **Dashboard Admin:** Métricas agregadas por asesora, tendencia semanal, embudo de leads.
+*   Gráficos interactivos (Recharts) con lazy loading.
+*   Cache agresivo con `cacheTag` + `revalidateTag` para performance.
+
+### 5.6 Leads y CRM 🔄 EN PROGRESO
+*   CRUD completo de leads (`lib/dal/leads.ts`).
+*   Status: `nuevo`, `cotizado`, `en_proceso`, `ganado`, `perdido`.
+*   Vista de lista en dashboard (`RecentLeads`).
+*   **Pendiente:** Vista Kanban para gestión visual del pipeline.
 
 ---
 
@@ -78,65 +103,84 @@
 
 ### 6.1 Rendimiento (Performance)
 *   **Carga Inicial:** Time To First Byte (TTFB) < 100ms. Renderizado principal en componentes de servidor (RSC).
-*   **Interacciones:** Cero re-renders innecesarios en el formulario gigante de cotizaciones (uso de selectores granulares).
+*   **Interacciones:** Cero re-renders innecesarios en el formulario (Zustand con selectores granulares).
+*   **Cache Strategy:** `cacheTag` + `cacheLife` con invalidación manual via `revalidateTag`.
 
 ### 6.2 Seguridad y Aislamiento (Multi-Tenant)
-*   Todo acceso a datos debe estar protegido por **Row Level Security (RLS)** en la base de datos (Supabase).
-*   Aislamiento estricto: Una agencia (Tenant A) no puede acceder a datos, perfiles ni URLs generadas de otra agencia (Tenant B).
-*   Las inserciones y actualizaciones críticas (como "Aprobar cotización") deben ser idempotentes para evitar transacciones duplicadas por mala conexión.
+*   Todo acceso a datos protegido por **Row Level Security (RLS)** en PostgreSQL.
+*   Aislamiento estricto: Una agencia (Tenant A) no puede acceder a datos de otra (Tenant B).
+*   Función `withTenantIsolation()` en DAL para queries seguras.
+*   `transaction_id` UUID para operaciones idempotentes.
 
 ### 6.3 Escalabilidad
-*   Preparado para el "Free Tier" actual: Manejo agresivo del almacenamiento limitando imágenes a JPEG (<2MB) y purgando borradores huérfanos vía _cron jobs_.
-*   Arquitectura "Serverless" desplegada en la red Edge (Vercel) capaz de escalar automáticamente ante picos de uso.
+*   Arquitectura "Serverless" en Edge (Vercel).
+*   Imágenes limitadas a JPEG <2MB.
+*   Purga de borradores huérfanos via cron jobs (futuro).
 
 ---
 
 ## 7. Arquitectura Técnica (Stack)
 *   **Framework:** Next.js 16.2.1 (App Router, Turbopack, React 19).
 *   **Base de Datos & Auth:** Supabase (PostgreSQL 15+) con SSR Auth.
-*   **Estado Cliente:** Zustand v5 + React Hook Form + Zod.
+*   **Estado Cliente:** Zustand v5 (selectores granulares) + React Hook Form + Zod.
 *   **UI/UX:** Tailwind CSS v4 + Shadcn/ui + Framer Motion v12.
-*   **Testing:** Vitest (Unitario) + Playwright (E2E).
+*   **IA:** Vercel AI SDK + OpenAI `gpt-4o-mini`.
+*   **PDF:** @react-pdf/renderer (client-side).
+*   **Testing:** Vitest (Unitario) + Playwright (E2E — suspendido temporalmente).
 
 ---
 
 ## 8. Diseño y Experiencia de Usuario (UX/UI)
-*   **Estándar de Diamante:** Interfaces limpias, uso del sistema de color OKLCH para accesibilidad, micro-animaciones al realizar acciones destructivas o de éxito.
-*   **Accesibilidad:** Cumplimiento WCAG 2.2 (navegación por teclado, contraste alto).
+*   **Estándar de Diamante:** Interfaces limpias, glassmorphism (`backdrop-blur-3xl`), sistema OKLCH para colores, micro-animaciones.
+*   **Wizard Flow (Storytelling):** 6 pasos narrativos en lugar de formulario técnico.
+*   **Accesibilidad:** WCAG 2.2 (navegación por teclado, contraste).
 
 ---
 
 ## 9. Métricas de Éxito (KPIs del Producto)
-Para considerar que el producto es exitoso en su adopción, se medirán:
 1.  **Adopción:** Número de asesoras activas diarias (DAU).
 2.  **Uso Core:** Cantidad de cotizaciones generadas a PDF por semana.
-3.  **Valor:** Reducción del tiempo promedio por cotización (medido por telemetría desde inicio hasta exportación).
+3.  **Valor:** Reducción del tiempo promedio por cotización (medido por telemetría).
 4.  **Estabilidad:** Tasa de errores en cálculos financieros y generación de PDF < 0.1%.
 
 ---
 
 ## 10. Roadmap (Fases del Producto)
 
-### FASE 1: MVP Funcional (Completada)
-*   Flujo básico de cotización.
-*   Autenticación multi-agencia.
+### FASE 1: MVP Funcional ✅ COMPLETADA
+*   Flujo básico de cotización (wizard).
+*   Autenticación multi-agencia (Supabase Auth + RLS).
 *   Motor financiero con TRM.
+*   Generación de PDF básico.
 
-### FASE 2: Inteligencia y Rendimiento (En progreso)
-*   Integración Vercel AI SDK para autocompletado de itinerarios.
-*   Migración a Next.js 16 (Caching agresivo y RSC).
-*   Endurecimiento de pruebas E2E (Playwright) y seguridad de base de datos.
+### FASE 2: Inteligencia y Rendimiento ✅ COMPLETADA
+*   Integración Vercel AI SDK para extracción automática.
+*   Migración a Next.js 16 (App Router + RSC + Caching).
+*   Rediseño del Wizard a 6 pasos (Storytelling Flow).
+*   Estándar de Diamante aplicado a toda la UI.
+*   Tests unitarios del motor financiero.
 
-### FASE 3: CRM y Pagos (Futuro)
-*   Módulo de embudo de ventas avanzado (Kanban de Leads).
-*   Integración pasarela de pagos / Generación de links de pago automáticos en el PDF.
-*   Envío automatizado por WhatsApp o Correo mediante Resend.
+### FASE 3: CRM y Pagos 🔄 EN PROGRESO
+*   Módulo de leads (CRUD básico implementado).
+*   **Kanban de Leads (pendiente).**
+*   **Integración pasarela de pagos (pendiente).**
+*   **Envío automatizado WhatsApp/Resend (pendiente).**
 
 ---
 
 ## 11. Fuera del Alcance (Out of Scope - Actual)
 *   Reservas automáticas con Sistemas de Distribución Global (GDS como Amadeus o Sabre).
 *   Manejo de contabilidad profunda (Nómina, impuestos, facturación electrónica final de la DIAN). (TravelPro Quote es estrictamente pre-venta).
+
+---
+
+## 12. Notas Técnicas Importantes
+
+### Tests E2E
+Los tests E2E de Playwright fueron archivados temporalmente en `e2e_archive/` debido a race conditions en el flujo de autenticación. Ver `docs/tech-debt/01-race-conditions-and-locking.md` para detalles. El comando `test:e2e` fue reemplazado por `test:e2e:off` que solo ejecuta tests unitarios.
+
+### Wizard Redesign
+El wizard pasó de 7 pasos a 6 pasos siguiendo el spec en `docs/superpowers/specs/2026-03-29-wizard-redesign-design.md`. Los pasos `step-destination.tsx` y `step-design.tsx` fueron fusionados en otros componentes.
 
 ---
 *Fin del Documento de Requisitos de Producto (PRD).*

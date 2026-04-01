@@ -81,8 +81,8 @@ function toDbRow(
         itinerary: quote.itinerary ?? [],
         inclusions: quote.inclusions ?? [],
         exclusions: quote.exclusions ?? [],
-        net_cost_usd: quote.netCostUSD ?? 0,
-        net_cost_cop: quote.netCostCOP ?? 0,
+        net_cost_usd: quote.pvpUSD ?? 0,          // DB col kept as-is; frontend renamed to pvpUSD
+        net_cost_cop: quote.pvpCOP ?? 0,           // DB col kept as-is; frontend renamed to pvpCOP
         fee_percentage: quote.feePercentage ?? 15,
         trm_used: quote.trmUsed ?? null,
         status: quote.status ?? "borrador",
@@ -112,8 +112,9 @@ function fromDbRow(
         itinerary: (row.itinerary as { day: number; title: string; description: string; activities: string[]; image?: string }[]) ?? [],
         inclusions: row.inclusions ?? [],
         exclusions: row.exclusions ?? [],
-        netCostUSD: Number(row.net_cost_usd) || 0,
-        netCostCOP: Number(row.net_cost_cop) || 0,
+        pvpUSD: Number(row.net_cost_usd) || 0,    // DB col net_cost_usd → frontend pvpUSD
+        pvpCOP: Number(row.net_cost_cop) || 0,     // DB col net_cost_cop → frontend pvpCOP
+        extraMarginPercent: 0,                      // Not yet in DB; defaults to 0 on load
         feePercentage: Number(row.fee_percentage) || 15,
         trmUsed: row.trm_used ? Number(row.trm_used) : undefined,
         status: row.status,

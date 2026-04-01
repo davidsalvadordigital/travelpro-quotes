@@ -22,8 +22,8 @@ export function QuoteTemplate() {
     const fee = activeQuote.feePercentage ?? 15;
     const trm = activeQuote.trmUsed || 4200;
 
-    const calcNac = isNacional ? calculateNacional(activeQuote.netCostCOP || 0, fee) : null;
-    const calcInt = !isNacional ? calculateInternacional(activeQuote.netCostUSD || 0, fee, trm) : null;
+    const calcNac = isNacional ? calculateNacional(activeQuote.pvpCOP || 0, fee, activeQuote.extraMarginPercent ?? 0) : null;
+    const calcInt = !isNacional ? calculateInternacional(activeQuote.pvpUSD || 0, fee, trm, activeQuote.extraMarginPercent ?? 0) : null;
 
     // Helper for rendering sections to prevent reference errors and ensure clean scoping
     const renderSection = (sectionId: string) => {
@@ -206,7 +206,7 @@ export function QuoteTemplate() {
                                         <p className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500">Valor Neto de la Experiencia</p>
                                         <div className="flex items-baseline gap-4">
                                             <div className="text-9xl font-black text-white tracking-tighter tabular-nums italic leading-none drop-shadow-2xl">
-                                                {formatCOP(calcNac.totalCOP)}
+                                                {formatCOP(calcNac.precioClienteCOP)}
                                             </div>
                                             <div className="text-3xl font-black uppercase text-[#E33A7A] tracking-widest opacity-80">COP</div>
                                         </div>
@@ -225,7 +225,7 @@ export function QuoteTemplate() {
                                             <div className="text-[12px] font-black uppercase tracking-[0.4em] text-slate-500">Inversión en Divisa (USD)</div>
                                             <div className="flex items-baseline gap-4">
                                                 <div className="text-8xl font-black text-white tracking-tighter tabular-nums italic leading-none drop-shadow-xl">
-                                                    {formatUSD(calcInt.totalUSD)}
+                                                    {formatUSD(calcInt.precioClienteUSD)}
                                                 </div>
                                                 <div className="text-2xl font-black uppercase text-[#E33A7A] tracking-widest opacity-80">USD</div>
                                             </div>
@@ -234,7 +234,7 @@ export function QuoteTemplate() {
                                             <div className="text-[12px] font-black uppercase tracking-[0.4em] text-[#E33A7A]">Costo Estimado en COP</div>
                                             <div className="flex items-baseline gap-4">
                                                 <div className="text-6xl font-black text-[#E33A7A] tracking-tighter tabular-nums italic leading-none">
-                                                    {formatCOP(calcInt.totalCOP)}
+                                                    {formatCOP(calcInt.precioClienteCOP)}
                                                 </div>
                                                 <div className="text-sm font-black uppercase text-white/20 tracking-widest">Pesos</div>
                                             </div>
@@ -323,13 +323,24 @@ export function QuoteTemplate() {
                         )}
 
                         {activeQuote.cancellationPolicy && (
-                            <div className="space-y-6 bg-[#0F172A] text-slate-400 rounded-[3rem] p-16 border border-slate-800 relative overflow-hidden group">
+                            <div className="space-y-6 bg-[#0F172A] text-slate-400 rounded-[3rem] p-16 border border-slate-800 relative overflow-hidden group mb-8">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#E33A7A]/5 blur-3xl rounded-full" />
                                 <div className="text-[11px] font-black uppercase tracking-[0.5em] text-slate-600 flex items-center gap-4 mb-4">
                                     <FileText className="h-5 w-5 text-[#E33A7A]" /> Protocolo de Cancelación
                                 </div>
-                                <p className="text-xs font-medium leading-loose italic max-w-4xl opacity-80 group-hover:opacity-100 transition-opacity">
+                                <p className="text-xs font-medium leading-loose italic max-w-4xl opacity-80 group-hover:opacity-100 transition-opacity whitespace-pre-wrap">
                                     {activeQuote.cancellationPolicy}
+                                </p>
+                            </div>
+                        )}
+
+                        {activeQuote.legalConditions && (
+                            <div className="space-y-6 bg-slate-50 border border-slate-200 text-slate-500 rounded-[3rem] p-16 relative overflow-hidden group">
+                                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-400 flex items-center gap-4 mb-4">
+                                    <ShieldCheck className="h-4 w-4 text-slate-400" /> Condiciones Generales y Legales
+                                </div>
+                                <p className="text-[11px] font-medium leading-loose text-justify max-w-5xl opacity-80 whitespace-pre-wrap">
+                                    {activeQuote.legalConditions}
                                 </p>
                             </div>
                         )}

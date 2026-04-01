@@ -32,7 +32,7 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                         </h3>
                     </div>
                     <p className="text-sm font-medium text-slate-400 max-w-md">
-                        Define las conexiones que darán vida al viaje. Configura rutas de primer nivel para una experiencia sin interrupciones.
+                        Define las conexiones previstas del viaje. Configura rutas de primer nivel para una experiencia sin interrupciones.
                     </p>
                 </div>
                 <Button
@@ -58,8 +58,8 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                     </div>
                 ) : (
                     flights.map((flight, index) => (
-                        <div 
-                            key={index} 
+                        <div
+                            key={index}
                             className="group relative bg-white border border-slate-100 rounded-[3.5rem] p-10 transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.05)] hover:border-[#E33A7A]/30"
                         >
                             <div className="absolute -top-4 left-12 px-6 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl flex items-center gap-3 z-10">
@@ -71,32 +71,41 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                                 {/* Ruta y Aerolínea */}
                                 <div className="space-y-8">
                                     <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">
-                                            <ArrowRightLeft className="h-3.5 w-3.5 text-[#E33A7A]" />
+                                        <Label className={cn(
+                                            "flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-2",
+                                            showErrors && (!flight.origin || !flight.destination) ? "text-destructive" : "text-slate-400"
+                                        )}>
+                                            <ArrowRightLeft className={cn("h-3.5 w-3.5", showErrors && (!flight.origin || !flight.destination) ? "text-destructive" : "text-[#E33A7A]")} />
                                             Corredor Aéreo (Origen ↔ Destino)
                                         </Label>
-                                        <div className="grid grid-cols-2 gap-4 p-2 bg-slate-50 rounded-3xl">
+                                        <div className={cn(
+                                            "grid grid-cols-2 gap-4 p-2 bg-slate-50 rounded-3xl",
+                                            showErrors && (!flight.origin || !flight.destination) && "ring-2 ring-destructive/40 bg-destructive/5"
+                                        )}>
                                             <Input
                                                 data-testid={`quote-flight-origin-${index}`}
-                                                placeholder="Origen (Ej: BOG)"
+                                                placeholder="BOG"
                                                 value={flight.origin || ""}
                                                 onChange={(e) => updateFlight(index, { ...flight, origin: e.target.value.toUpperCase() })}
-                                                className="h-14 rounded-2xl border-none bg-white font-black text-lg text-slate-900 placeholder:text-slate-200 text-center shadow-sm"
+                                                className="h-14 rounded-2xl border-none bg-white font-black text-lg text-slate-900 placeholder:text-slate-200 text-center shadow-sm focus-visible:ring-2 focus-visible:ring-brand-primary"
                                             />
                                             <Input
                                                 data-testid={`quote-flight-target-${index}`}
-                                                placeholder="Destino (Ej: LIM)"
+                                                placeholder="LIM"
                                                 value={flight.destination || ""}
                                                 onChange={(e) => updateFlight(index, { ...flight, destination: e.target.value.toUpperCase() })}
-                                                className="h-14 rounded-2xl border-none bg-white font-black text-lg text-slate-900 placeholder:text-slate-200 text-center shadow-sm"
+                                                className="h-14 rounded-2xl border-none bg-white font-black text-lg text-slate-900 placeholder:text-slate-200 text-center shadow-sm focus-visible:ring-2 focus-visible:ring-brand-primary"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                         <div className="space-y-3">
-                                            <Label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">
-                                                <Sparkles className="h-3.5 w-3.5 text-[#E33A7A]" />
+                                            <Label className={cn(
+                                                "flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-2",
+                                                showErrors && !flight.airline ? "text-destructive" : "text-slate-400"
+                                            )}>
+                                                <Sparkles className={cn("h-3.5 w-3.5", showErrors && !flight.airline ? "text-destructive" : "text-[#E33A7A]")} />
                                                 Aerolínea
                                             </Label>
                                             <Input
@@ -104,7 +113,10 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                                                 placeholder="Ej: Emirates"
                                                 value={flight.airline || ""}
                                                 onChange={(e) => updateFlight(index, { ...flight, airline: e.target.value })}
-                                                className="h-14 rounded-2xl border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 font-bold text-slate-700 placeholder:text-slate-300"
+                                                className={cn(
+                                                    "h-14 rounded-2xl border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 font-bold text-slate-700 placeholder:text-slate-300",
+                                                    showErrors && !flight.airline && "ring-2 ring-destructive/40 bg-destructive/5"
+                                                )}
                                             />
                                         </div>
                                         <div className="space-y-3">
@@ -140,11 +152,17 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">
-                                            <Clock className="h-3.5 w-3.5 text-[#E33A7A]" />
+                                        <Label className={cn(
+                                            "flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-2",
+                                            showErrors && (!flight.departureTime || !flight.arrivalTime) ? "text-destructive" : "text-slate-400"
+                                        )}>
+                                            <Clock className={cn("h-3.5 w-3.5", showErrors && (!flight.departureTime || !flight.arrivalTime) ? "text-destructive" : "text-[#E33A7A]")} />
                                             Cronograma (Salida / Llegada)
                                         </Label>
-                                        <div className="grid grid-cols-2 gap-8 bg-slate-900 rounded-[2.5rem] p-4 shadow-xl">
+                                        <div className={cn(
+                                            "grid grid-cols-2 gap-8 bg-slate-900 rounded-[2.5rem] p-4 shadow-xl",
+                                            showErrors && (!flight.departureTime || !flight.arrivalTime) && "ring-2 ring-destructive/40 shadow-destructive/10"
+                                        )}>
                                             <div className="space-y-1 text-center">
                                                 <span className="text-[8px] font-black uppercase tracking-widest text-slate-500">Take OFF</span>
                                                 <Input
@@ -171,7 +189,7 @@ export function StepFlights({ showErrors = false }: StepFlightsProps) {
                             </div>
 
                             <Button
-                                                data-testid={`quote-flight-remove-${index}`}
+                                data-testid={`quote-flight-remove-${index}`}
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => removeFlight(index)}

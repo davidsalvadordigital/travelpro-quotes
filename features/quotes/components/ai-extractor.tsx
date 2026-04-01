@@ -45,8 +45,8 @@ export function AIExtractor() {
             if (data.exclusions) updates.exclusions = data.exclusions;
             if (data.hotelInfo) updates.hotelInfo = data.hotelInfo;
             if (data.airlineInfo) updates.airlineInfo = data.airlineInfo;
-            if (data.netCostUSD) updates.netCostUSD = data.netCostUSD;
-            if (data.netCostCOP) updates.netCostCOP = data.netCostCOP;
+            if (data.pvpUSD) updates.pvpUSD = data.pvpUSD;
+            if (data.pvpCOP) updates.pvpCOP = data.pvpCOP;
 
             // Date parsing (safely)
             if (data.departureDate) updates.departureDate = new Date(data.departureDate);

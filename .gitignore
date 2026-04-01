@@ -69,3 +69,9 @@ testsprite_tests/
 Thumbs.db
 *.tmp
 files.md
+
+# ============================================
+# AI TOOLING ARTIFACTS
+# ============================================
+.gga
+.superpowers/

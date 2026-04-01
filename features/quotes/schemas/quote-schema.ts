@@ -9,7 +9,7 @@ export const itineraryDaySchema = z.object({
 });
 
 export const flightSchema = z.object({
-    date: z.date({ message: "La fecha del vuelo es requerida" }),
+    date: z.coerce.date({ message: "La fecha del vuelo es requerida" }),
     origin: z.string().min(1, "Origen requerido (ej. BOG)"),
     destination: z.string().min(1, "Destino requerido (ej. LIM)"),
     airline: z.string().min(1, "La aerolínea es requerida"),
@@ -32,9 +32,11 @@ export const hotelOptionSchema = z.object({
 /**
  * Quote Schema
  *
- * Lógica de moneda según tipo de destino:
- * - "nacional"        → netCostCOP → +fee% → totalCOP  (sin TRM, todo en COP)
- * - "internacional"  → netCostUSD → +fee% → totalUSD → ×TRM → totalCOP
+ * Modelo de Agencia (Comisión Cedida por Proveedor):
+ * - "nacional"        → pvpCOP  - fee% = netCostCOP (pago mayorista) | +extraPercent% = precioCliente
+ * - "internacional"  → pvpUSD  - fee% = netCostUSD | +extraPercent% = precioClienteUSD → ×TRM → COP
+ *
+ * El viajero NUNCA ve el desglose interno. Solo ve el precioCliente final.
  */
 export const quoteSchema = z.object({
     // Lead / Traveler Info
@@ -46,8 +48,8 @@ export const quoteSchema = z.object({
     destination: z.string().min(1, "El destino es requerido"),
     destinationImage: z.string().optional(), // Nueva URL de imagen (Storage)
     destinationType: z.enum(["nacional", "internacional"]).default("internacional"),
-    departureDate: z.date({ message: "La fecha de salida es requerida" }),
-    returnDate: z.date({ message: "La fecha de regreso es requerida" }),
+    departureDate: z.coerce.date({ message: "La fecha de salida es requerida" }),
+    returnDate: z.coerce.date({ message: "La fecha de regreso es requerida" }),
     numberOfTravelers: z.number().int().positive().default(1),
 
     // Detailed Content
@@ -61,14 +63,19 @@ export const quoteSchema = z.object({
     airlineInfo: z.string().optional(), // Retained for backwards compatibility or simple quotes
 
     // Financials — Nacional (COP directo)
-    netCostCOP: z.coerce.number().nonnegative().default(0),
+    /** PVP oficial del proveedor en COP */
+    pvpCOP: z.coerce.number().nonnegative().default(0),
 
     // Financials — Internacional (USD + TRM)
-    netCostUSD: z.coerce.number().nonnegative().default(0),
+    /** PVP oficial del proveedor en USD */
+    pvpUSD: z.coerce.number().nonnegative().default(0),
     trmUsed: z.coerce.number().positive().optional(),
 
     // Comunes
+    /** Comisión cedida por el mayorista en % (ej: 15). Se extrae del PVP. */
     feePercentage: z.coerce.number().min(0).max(100).default(15),
+    /** Margen extra que la agencia suma encima del PVP (ej: 3). Invisible al cliente. Default 0. */
+    extraMarginPercent: z.coerce.number().min(0).max(100).default(0),
 
     // Terms & Conditions
     paymentTerms: z.string().optional(),
@@ -77,7 +84,7 @@ export const quoteSchema = z.object({
     legalConditions: z.string().optional(), // Retained for backwards compatibility
 
     // Meta
-    validUntil: z.date().optional(),
+    validUntil: z.coerce.date().optional(),
     status: z.enum(["borrador", "enviada", "aprobada", "rechazada"]).default("borrador"),
 });
 

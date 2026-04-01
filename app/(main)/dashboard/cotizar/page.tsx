@@ -4,16 +4,16 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowRight, ArrowLeft, Save, Send, Loader2, Trash2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase";
 
 import { Progress } from "@/components/ui/progress";
 import { useQuoteStore } from "@/features/quotes/store/quote-store";
 import { StepTraveler } from "@/features/quotes/components/step-traveler";
-import { StepDestination } from "@/features/quotes/components/step-destination";
 import { StepFlights } from "@/features/quotes/components/step-flights";
 import { StepHotels } from "@/features/quotes/components/step-hotels";
 import { StepItinerary } from "@/features/quotes/components/step-itinerary";
-import { StepDesign } from "@/features/quotes/components/step-design";
 import { StepFinances } from "@/features/quotes/components/step-finances";
+import { StepTerms } from "@/features/quotes/components/step-terms";
 import { QuotePreview } from "@/features/quotes/components/quote-preview";
 import { toast } from "sonner";
 
@@ -24,62 +24,69 @@ import { cn } from "@/lib/utils";
 
 const STEP_COMPONENTS = [
     StepTraveler, 
-    StepDestination, 
-    StepFlights, 
-    StepHotels, 
     StepItinerary, 
-    StepDesign, 
+    StepHotels, 
+    StepFlights, 
+    StepTerms, 
     StepFinances
 ];
 
 export default function QuotePage() {
     const router = useRouter();
-    const [currentStep, setCurrentStep] = useState(0);
-    const [isSaving, setIsSaving] = useState(false);
+    const isSaving = useQuoteStore(s => s.isSyncing);
     const [hasAttemptedNext, setHasAttemptedNext] = useState(false);
-    const { activeQuote, resetQuote, saveQuote, syncToSupabase } = useQuoteStore();
+    const { activeQuote, resetQuote, saveQuote, syncToSupabase, currentStep, setCurrentStep, setUserId } = useQuoteStore();
     const hasInitialized = useRef(false);
 
-    // 🚀 Fresh start: Only reset if it's a completely new session, exactly once on mount
+    // 🚀 Sync User Identity with the store
     useEffect(() => {
-        if (!hasInitialized.current) {
-            const isNew = !(activeQuote as { id?: string }).id;
-            if (isNew) {
-                resetQuote();
+        const fetchUser = async () => {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user?.id) {
+                setUserId(user.id);
             }
-            setCurrentStep(0);
-            hasInitialized.current = true;
-        }
-    }, [activeQuote, resetQuote]);
+        };
+        fetchUser();
+    }, [setUserId]);
 
-    const steps = ["Viajero", "Destino", "Transporte", "Hospedaje", "Itinerario", "Diseño", "Finanzas"];
-    const progress = ((currentStep + 1) / steps.length) * 100;
+    // 🚀 Session management
+    useEffect(() => {
+        hasInitialized.current = true;
+    }, []);
 
-    const CurrentStepComponent = STEP_COMPONENTS[currentStep];
+    const steps = ["Inicio", "El Viaje", "Hospedaje", "Transporte", "Condiciones", "Inversión"];
+    const safeStep = typeof currentStep === 'number' && currentStep >= 0 && currentStep < steps.length ? currentStep : 0;
+    const progress = ((safeStep + 1) / steps.length) * 100;
+
+    const CurrentStepComponent = STEP_COMPONENTS[safeStep];
 
     const validateCurrentStep = () => {
         try {
-            switch (currentStep) {
-                case 0: // Viajero
-                    quoteSchema.pick({ travelerName: true, email: true }).parse(activeQuote);
+            switch (safeStep) {
+                case 0: // Inicio (Viajero + Destino)
+                    quoteSchema.pick({ 
+                        travelerName: true, 
+                        email: true, 
+                        destination: true, 
+                        departureDate: true, 
+                        returnDate: true 
+                    }).parse(activeQuote);
                     break;
-                case 1: // Destino
-                    quoteSchema.pick({ destination: true, departureDate: true, returnDate: true }).parse(activeQuote);
-                    break;
-                case 2: // Transporte
-                    z.object({ flights: quoteSchema.shape.flights }).parse(activeQuote);
-                    break;
-                case 3: // Hospedaje
-                    z.object({ hotelOptions: quoteSchema.shape.hotelOptions }).parse(activeQuote);
-                    break;
-                case 4: // Itinerario
+                case 1: // El Viaje (Itinerario)
                     z.object({ itinerary: quoteSchema.shape.itinerary }).parse(activeQuote);
                     break;
-                case 5: // Diseño
-                    // No hay campos estrictamente requeridos para avanzar
+                case 2: // Hospedaje
+                    z.object({ hotelOptions: quoteSchema.shape.hotelOptions }).parse(activeQuote);
                     break;
-                case 6: // Finanzas
-                    z.object({ netCostCOP: quoteSchema.shape.netCostCOP, netCostUSD: quoteSchema.shape.netCostUSD }).parse(activeQuote);
+                case 3: // Transporte (Vuelos)
+                    z.object({ flights: quoteSchema.shape.flights }).parse(activeQuote);
+                    break;
+                case 4: // Condiciones
+                    // (Validación de plantilla)
+                    break;
+                case 5: // Inversión (Finanzas + Diseño)
+                    z.object({ pvpCOP: quoteSchema.shape.pvpCOP, pvpUSD: quoteSchema.shape.pvpUSD }).parse(activeQuote);
                     break;
             }
             return true;
@@ -93,10 +100,17 @@ export default function QuotePage() {
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (validateCurrentStep()) {
             setHasAttemptedNext(false);
-            setCurrentStep(prev => Math.min(steps.length - 1, prev + 1));
+            const nextStep = Math.min(steps.length - 1, safeStep + 1);
+            setCurrentStep(nextStep);
+            
+            // ☁️ Auto-sync to cloud on step progression
+            if (activeQuote.travelerName) {
+                saveQuote();
+                syncToSupabase(); 
+            }
         } else {
             setHasAttemptedNext(true);
         }
@@ -104,7 +118,14 @@ export default function QuotePage() {
 
     const handleBack = () => {
         setHasAttemptedNext(false);
-        setCurrentStep(prev => Math.max(0, prev - 1));
+        const prevStep = Math.max(0, safeStep - 1);
+        setCurrentStep(prevStep);
+        
+        // ☁️ Auto-sync on back too
+        if (activeQuote.travelerName) {
+            saveQuote();
+            syncToSupabase();
+        }
     };
 
     const handleReset = () => {
@@ -123,15 +144,12 @@ export default function QuotePage() {
             return;
         }
 
-        setIsSaving(true);
         try {
             saveQuote();
             await syncToSupabase();
             toast.success("Borrador guardado en la nube ☁️");
         } catch (error) {
             toast.error("Error al guardar", { description: error instanceof Error ? error.message : "Error desconocido" });
-        } finally {
-            setIsSaving(false);
         }
     };
 
@@ -147,7 +165,6 @@ export default function QuotePage() {
             return;
         }
 
-        setIsSaving(true);
         try {
             useQuoteStore.getState().setQuoteField("status", "enviada");
             saveQuote();
@@ -157,13 +174,14 @@ export default function QuotePage() {
                 description: `Cotización para ${activeQuote.travelerName} enviada.`,
             });
 
+            // Reset step and possibly store on success redirect
+            setCurrentStep(0);
+
             setTimeout(() => {
                 router.push("/dashboard");
             }, 1000);
         } catch (error) {
             toast.error("Error al finalizar", { description: error instanceof Error ? error.message : "Error desconocido" });
-        } finally {
-            setIsSaving(false);
         }
     };
 
@@ -192,23 +210,23 @@ export default function QuotePage() {
                             <div key={idx} className="flex items-center">
                                 <div className={cn(
                                     "h-10 w-10 rounded-xl flex items-center justify-center text-sm font-extrabold transition-all duration-500",
-                                    idx === currentStep ? "bg-brand-primary text-primary-foreground shadow-xl shadow-brand-primary/20 scale-110" :
-                                        idx < currentStep ? "bg-brand-secondary text-primary-foreground" :
+                                    idx === safeStep ? "bg-brand-primary text-primary-foreground shadow-xl shadow-brand-primary/20 scale-110" :
+                                        idx < safeStep ? "bg-brand-secondary text-primary-foreground" :
                                             "bg-background text-muted-foreground border border-border/60"
                                 )}>
-                                    {idx < currentStep ? <Check className="h-5 w-5 stroke-[3px]" /> : idx + 1}
+                                    {idx < safeStep ? <Check className="h-5 w-5 stroke-[3px]" /> : idx + 1}
                                 </div>
                                 {idx < steps.length - 1 && (
                                     <div className={cn(
                                         "h-[2px] w-10 mx-1 transition-colors duration-500 rounded-full",
-                                        idx < currentStep ? "bg-brand-secondary" : "bg-border/60"
+                                        idx < safeStep ? "bg-brand-secondary" : "bg-border/60"
                                     )} />
                                 )}
                             </div>
                         ))}
                     </div>
                     <div className="text-[11px] font-bold text-brand-primary uppercase tracking-widest">
-                        {steps[currentStep]}
+                        {steps[safeStep]}
                     </div>
                 </div>
             </div>
@@ -220,10 +238,10 @@ export default function QuotePage() {
                         <CardHeader className="border-b border-glass-border bg-muted/20 px-10 py-10 flex flex-row items-center justify-between">
                             <div className="space-y-1.5">
                                 <CardTitle className="text-4xl font-black tracking-tighter text-foreground uppercase italic-pro-max">
-                                    {steps[currentStep]}
+                                    {steps[safeStep]}
                                 </CardTitle>
                                 <CardDescription className="text-sm font-bold text-muted-foreground/60 tracking-wide uppercase">
-                                    Fase {currentStep + 1} de {steps.length} — Configuración Estratégica
+                                    Fase {safeStep + 1} de {steps.length} — Configuración Estratégica
                                 </CardDescription>
                             </div>
                             <div className="hidden sm:block h-16 w-16 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary animate-pulse-subtle">
@@ -239,7 +257,7 @@ export default function QuotePage() {
                                     data-testid="quote-wizard-back"
                                     variant="outline"
                                     onClick={handleBack}
-                                    disabled={currentStep === 0 || isSaving}
+                                    disabled={safeStep === 0 || isSaving}
                                     className="h-14 rounded-2xl gap-3 px-8 font-black uppercase tracking-widest text-[10px] border-glass-border transition-all hover:bg-background active:scale-[0.95] shadow-sm"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
@@ -270,7 +288,7 @@ export default function QuotePage() {
                                     Borrador
                                 </Button>
 
-                                {currentStep < steps.length - 1 ? (
+                                {safeStep < steps.length - 1 ? (
                                     <Button
                                         data-testid="quote-wizard-next"
                                         onClick={handleNext}
@@ -296,8 +314,8 @@ export default function QuotePage() {
                     </Card>
                 </div>
 
-                {/* Show Preview only on the final step (Finanzas - index 6) */}
-                {currentStep === 6 && (
+                {/* Show Preview only on the final step (Finanzas - index 5) */}
+                {safeStep === 5 && (
                     <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <QuotePreview />
                     </div>

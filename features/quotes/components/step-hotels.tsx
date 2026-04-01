@@ -69,11 +69,11 @@ export function StepHotels({ showErrors = false }: StepHotelsProps) {
                             )}
                         >
                             <div className={cn(
-                                "absolute -top-4 left-12 px-6 py-2 text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl flex items-center gap-3 z-10",
+                                "absolute -top-4 right-10 md:left-12 px-6 py-2 text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-2xl flex items-center gap-3 z-10",
                                 option.isRecommended ? "bg-[#E33A7A] text-white" : "bg-slate-900 text-white"
                             )}>
                                 {option.isRecommended ? <Sparkles className="h-3 w-3" /> : <TrendingUp className="h-3 w-3" />}
-                                {option.isRecommended ? "Recomendación Premium" : `Opción de Estancia #${index + 1}`}
+                                {option.isRecommended ? "Selección Premium" : `Opción #${index + 1}`}
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
@@ -108,18 +108,45 @@ export function StepHotels({ showErrors = false }: StepHotelsProps) {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <Label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 ml-2">
-                                            <Hotel className="h-3.5 w-3.5 text-[#E33A7A]" />
-                                            Nombre del Establecimiento
-                                        </Label>
-                                        <Input
-                                            data-testid={`quote-hotel-name-${index}`}
-                                            placeholder="Introduce el nombre del hotel..."
-                                            value={option.name || ""}
-                                            onChange={(e) => updateHotelOption(index, { ...option, name: e.target.value })}
-                                            className="h-14 rounded-2xl border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 font-black text-slate-900 text-lg placeholder:text-slate-200"
-                                        />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-3">
+                                            <Label className={cn(
+                                                "flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-2",
+                                                showErrors && !option.name ? "text-destructive" : "text-slate-400"
+                                            )}>
+                                                <Hotel className={cn("h-3.5 w-3.5", showErrors && !option.name ? "text-destructive" : "text-[#E33A7A]")} />
+                                                Nombre del Establecimiento
+                                            </Label>
+                                            <Input
+                                                data-testid={`quote-hotel-name-${index}`}
+                                                placeholder="Ej: Burj Al Arab..."
+                                                value={option.name || ""}
+                                                onChange={(e) => updateHotelOption(index, { ...option, name: e.target.value })}
+                                                className={cn(
+                                                    "h-14 rounded-2xl border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 font-black text-slate-900 text-lg placeholder:text-slate-200",
+                                                    showErrors && !option.name && "ring-2 ring-destructive/40 bg-destructive/5"
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Label className={cn(
+                                                "flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-2",
+                                                showErrors && !option.roomType ? "text-destructive" : "text-slate-400"
+                                            )}>
+                                                <Star className={cn("h-3.5 w-3.5", showErrors && !option.roomType ? "text-destructive" : "text-[#E33A7A]")} />
+                                                Experiencia de Alojamiento
+                                            </Label>
+                                            <Input
+                                                data-testid={`quote-hotel-roomType-${index}`}
+                                                placeholder="Ej: Suite Signature vista mar..."
+                                                value={option.roomType || ""}
+                                                onChange={(e) => updateHotelOption(index, { ...option, roomType: e.target.value })}
+                                                className={cn(
+                                                    "h-14 rounded-2xl border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 font-bold text-slate-700 placeholder:text-slate-300",
+                                                    showErrors && !option.roomType && "ring-2 ring-destructive/40 bg-destructive/5"
+                                                )}
+                                            />
+                                        </div>
                                     </div>
                                     
                                     <div className="space-y-3">
@@ -129,7 +156,7 @@ export function StepHotels({ showErrors = false }: StepHotelsProps) {
                                         </Label>
                                         <Textarea
                                             data-testid={`quote-hotel-notes-${index}`}
-                                            placeholder="Detalles sobre el régimen, amenidades o beneficios VIP..."
+                                            placeholder="Detalles sobre el régimen de alimentación (ej: Todo Incluido), amenidades o beneficios VIP..."
                                             value={option.notes || ""}
                                             onChange={(e) => updateHotelOption(index, { ...option, notes: e.target.value })}
                                             className="min-h-[120px] rounded-[2rem] border-none bg-slate-50 focus-visible:ring-2 focus-visible:ring-[#E33A7A]/20 transition-all p-6 text-sm font-medium text-slate-600 leading-relaxed resize-none placeholder:text-slate-300"

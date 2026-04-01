@@ -15,8 +15,8 @@ type ServerQuote = {
     destination: string;
     destinationType: "nacional" | "internacional";
     status: "borrador" | "enviada" | "aprobada" | "rechazada";
-    netCostUSD?: number;
-    netCostCOP?: number;
+    pvpUSD?: number;
+    pvpCOP?: number;
     feePercentage?: number;
     trmUsed?: number;
 };
@@ -69,13 +69,13 @@ export function DraftsList({ initialQuotes }: DraftsListProps) {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 sm:gap-4">
-                                {(q.netCostUSD || 0) > 0 && (
+                                {(q.pvpUSD || 0) > 0 && (
                                     <div className="text-right hidden md:block">
                                         <p className="text-sm font-bold tabular-nums">
-                                            {formatUSD((q.netCostUSD || 0) * (1 + (q.feePercentage || 15) / 100))}
+                                            {formatUSD(q.pvpUSD || 0)}
                                         </p>
                                         <p className="text-xs text-brand tabular-nums">
-                                            {formatCOP(Math.round((q.netCostUSD || 0) * (1 + (q.feePercentage || 15) / 100) * (q.trmUsed || 4200)))}
+                                            {formatCOP(Math.round((q.pvpUSD || 0) * (q.trmUsed || 4200)))}
                                         </p>
                                     </div>
                                 )}

@@ -17,7 +17,7 @@ describe("quoteSchema", () => {
         departureDate: new Date("2026-06-15"),
         returnDate: new Date("2026-06-22"),
         numberOfTravelers: 2,
-        netCostUSD: 1500,
+        pvpUSD: 1500,
         feePercentage: 15,
     };
 
@@ -52,7 +52,7 @@ describe("quoteSchema", () => {
     });
 
     it("should reject negative cost", () => {
-        const result = quoteSchema.safeParse({ ...validQuote, netCostUSD: -100 });
+        const result = quoteSchema.safeParse({ ...validQuote, pvpUSD: -100 });
         expect(result.success).toBe(false);
     });
 
@@ -65,7 +65,7 @@ describe("quoteSchema", () => {
         const nacionalQuote = {
             ...validQuote,
             destinationType: "nacional" as const,
-            netCostCOP: 3000000,
+            pvpCOP: 3000000,
         };
         const result = quoteSchema.safeParse(nacionalQuote);
         expect(result.success).toBe(true);

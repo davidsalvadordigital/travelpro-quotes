@@ -14,8 +14,12 @@ interface QuoteState {
     savedQuotes: SavedQuote[];
     isLoading: boolean;
     isSyncing: boolean;
+    currentStep: number;
+    userId: string | null;
 
     setQuoteField: <T extends keyof Quote>(field: T, value: Quote[T]) => void;
+    setUserId: (userId: string | null) => void;
+    setCurrentStep: (step: number) => void;
     setSectionOrder: (order: string[]) => void;
     /** Cambia el tipo de destino y limpia los campos financieros del tipo anterior */
     setDestinationType: (type: "nacional" | "internacional") => void;
@@ -53,9 +57,10 @@ const initialQuote: Partial<Quote> = {
     itinerary: [],
     inclusions: [],
     exclusions: [],
-    netCostUSD: 0,
-    netCostCOP: 0,
+    pvpUSD: 0,
+    pvpCOP: 0,
     feePercentage: 15,
+    extraMarginPercent: 0,
     status: 'borrador',
     sectionOrder: ['flights', 'hotelOptions', 'itinerary', 'pricing', 'terms'],
 };
@@ -68,12 +73,27 @@ export const useQuoteStore = create<QuoteState>()(
             savedQuotes: [],
             isLoading: false,
             isSyncing: false,
+            currentStep: 0,
+            userId: null,
 
             setQuoteField: (field, value) =>
                 set((state) => ({
                     activeQuote: { ...state.activeQuote, [field]: value },
                     isDirty: true,
                 })),
+
+            setUserId: (userId) => {
+                const currentUserId = get().userId;
+                // Si el usuario cambia, limpiamos el borrador local por seguridad
+                if (currentUserId && userId !== currentUserId) {
+                    set({ activeQuote: { ...initialQuote }, userId, isDirty: false, currentStep: 0 });
+                } else {
+                    set({ userId });
+                }
+            },
+
+            setCurrentStep: (step) =>
+                set({ currentStep: step }),
 
             setSectionOrder: (order) =>
                 set((state) => ({
@@ -87,8 +107,8 @@ export const useQuoteStore = create<QuoteState>()(
                         ...state.activeQuote,
                         destinationType: type,
                         ...(type === 'nacional'
-                            ? { netCostUSD: 0, trmUsed: undefined }
-                            : { netCostCOP: 0 }),
+                            ? { pvpUSD: 0, trmUsed: undefined }
+                            : { pvpCOP: 0 }),
                     },
                     isDirty: true,
                 })),
@@ -221,8 +241,11 @@ export const useQuoteStore = create<QuoteState>()(
 
             saveQuote: () =>
                 set((state) => {
-                    const existingId = (state.activeQuote as { id?: string }).id as string | undefined;
-                    const id = existingId || `quote-${Date.now()}`;
+                    let id = (state.activeQuote as { id?: string }).id as string | undefined;
+                    // Supabase requires UUIDs, not custom strings
+                    if (!id || !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id)) {
+                        id = crypto.randomUUID();
+                    }
                     const savedAt = new Date().toISOString();
                     const saved: SavedQuote = { ...state.activeQuote, id, savedAt };
 
@@ -255,7 +278,14 @@ export const useQuoteStore = create<QuoteState>()(
                 set({ isSyncing: true });
 
                 try {
-                    const result = await upsertQuote(state.activeQuote);
+                    // 🛡️ Pre-emptive UUID validation for legacy drafts stuck in LocalStorage
+                    const payload = { ...state.activeQuote };
+                    if (payload.id && !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(payload.id)) {
+                        console.warn(`Sanitizing legacy ID format (${payload.id}) to valid UUID...`);
+                        payload.id = crypto.randomUUID();
+                    }
+
+                    const result = await upsertQuote(payload);
 
                     // Update local state with the DB-generated ID
                     set((s) => {
@@ -367,6 +397,8 @@ export const useQuoteActions = () =>
     useQuoteStore(
         useShallow((s) => ({
             setQuoteField: s.setQuoteField,
+            setUserId: s.setUserId,
+            setCurrentStep: s.setCurrentStep,
             setSectionOrder: s.setSectionOrder,
             setDestinationType: s.setDestinationType,
             updateItineraryDay: s.updateItineraryDay,

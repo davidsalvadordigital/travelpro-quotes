@@ -7,10 +7,10 @@ import { calculateNacional, calculateInternacional } from '@/features/quotes/uti
 Font.register({
     family: 'Outfit',
     fonts: [
-        { src: 'https://fonts.gstatic.com/s/outfit/v11/QdbO4Fe9PyovL0GnyhEFcvEK.ttf', fontWeight: 300 },
-        { src: 'https://fonts.gstatic.com/s/outfit/v11/QdbO4Fe9PyovL0GnyhEFZPEK.ttf', fontWeight: 400 },
-        { src: 'https://fonts.gstatic.com/s/outfit/v11/QdbO4Fe9PyovL0GnyhEFcfEK.ttf', fontWeight: 600 },
-        { src: 'https://fonts.gstatic.com/s/outfit/v11/QdbO4Fe9PyovL0GnyhEFC_EK.ttf', fontWeight: 700 },
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Light.ttf', fontWeight: 300 },
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Regular.ttf', fontWeight: 400 },
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-SemiBold.ttf', fontWeight: 600 },
+        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Bold.ttf', fontWeight: 700 },
     ]
 });
 
@@ -488,8 +488,8 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
     const fee = quote.feePercentage ?? 15;
     const trm = quote.trmUsed || 4200;
 
-    const calcNac = isNacional ? calculateNacional(quote.netCostCOP || 0, fee) : null;
-    const calcInt = !isNacional ? calculateInternacional(quote.netCostUSD || 0, fee, trm) : null;
+    const calcNac = isNacional ? calculateNacional(quote.pvpCOP || 0, fee, quote.extraMarginPercent ?? 0) : null;
+    const calcInt = !isNacional ? calculateInternacional(quote.pvpUSD || 0, fee, trm, quote.extraMarginPercent ?? 0) : null;
 
     const formattedDate = new Date().toLocaleDateString('es-CO', {
         day: 'numeric',
@@ -516,13 +516,13 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                             {quote.flights.map((flight, idx) => (
                                 <View key={idx} style={[styles.tableRow, idx === (quote.flights?.length || 0) - 1 ? { borderBottomWidth: 0 } : {}]}>
                                     <View style={{ width: '25%', paddingHorizontal: 10 }}>
-                                        <Text style={{ fontSize: 9, fontWeight: 700, color: '#E33A7A' }}>{flight.airline}</Text>
-                                        <Text style={{ fontSize: 7, color: '#94A3B8' }}>{flight.flightNumber}</Text>
+                                        <Text style={{ fontSize: 9, fontWeight: 700, color: '#E33A7A' }}>{flight.airline || ''}</Text>
+                                        <Text style={{ fontSize: 7, color: '#94A3B8' }}>{flight.flightNumber || ''}</Text>
                                     </View>
-                                    <Text style={[styles.tableCell, { width: '30%' }]}>{flight.origin} → {flight.destination}</Text>
+                                    <Text style={[styles.tableCell, { width: '30%' }]}>{flight.origin || ''} → {flight.destination || ''}</Text>
                                     <Text style={[styles.tableCell, { width: '15%' }]}>{fDate(flight.date)}</Text>
-                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.departureTime}</Text>
-                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.arrivalTime}</Text>
+                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.departureTime || ''}</Text>
+                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.arrivalTime || ''}</Text>
                                 </View>
                             ))}
                         </View>
@@ -558,15 +558,15 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                                     {hotels.map((hotel, idx) => (
                                         <View key={idx} style={[styles.tableRow, idx === hotels.length - 1 ? { borderBottomWidth: 0 } : {}]}>
                                             <View style={{ width: '30%', paddingHorizontal: 10 }}>
-                                                <Text style={{ fontSize: 9, fontWeight: 700, color: '#0F172A' }}>{hotel.name}</Text>
+                                                <Text style={{ fontSize: 9, fontWeight: 700, color: '#0F172A' }}>{hotel.name || ''}</Text>
                                                 {hotel.isRecommended ? (
                                                     <Text style={{ fontSize: 6, color: '#E33A7A', fontWeight: 700, textTransform: 'uppercase' }}>Recomendado</Text>
                                                 ) : null}
                                             </View>
-                                            <Text style={[styles.tableCell, { width: '15%' }]}>{hotel.category}</Text>
+                                            <Text style={[styles.tableCell, { width: '15%' }]}>{hotel.category || ''}</Text>
                                             <View style={{ width: '40%', paddingHorizontal: 10 }}>
-                                                <Text style={{ fontSize: 8, color: '#475569', fontWeight: 700 }}>{hotel.roomType}</Text>
-                                                <Text style={{ fontSize: 7, color: '#64748B', lineHeight: 1.2 }}>{hotel.notes}</Text>
+                                                <Text style={{ fontSize: 8, color: '#475569', fontWeight: 700 }}>{hotel.roomType || ''}</Text>
+                                                <Text style={{ fontSize: 7, color: '#64748B', lineHeight: 1.2 }}>{hotel.notes || ''}</Text>
                                             </View>
                                             <Text style={[styles.tableCell, { width: '15%', fontWeight: 700, color: '#E33A7A' }]}>
                                                 {hotel.isCOP ? fCOP(hotel.price) : fUSD(hotel.price)}
@@ -589,7 +589,7 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                                 <Text style={styles.dayNumber}>{day.day}</Text>
                                 <View style={styles.dayContent}>
                                     <Text style={styles.dayTitle}>{day.title || `Experiencia Día ${day.day}`}</Text>
-                                    <Text style={styles.dayDesc}>{day.description}</Text>
+                                    <Text style={styles.dayDesc}>{day.description || ''}</Text>
                                 </View>
                             </View>
                         ))}
@@ -604,7 +604,7 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                             {isNacional && calcNac ? (
                                 <View>
                                     <Text style={styles.priceTitle}>Valor Total del Paquete (COP)</Text>
-                                    <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcNac.totalCOP)}</Text>
+                                    <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcNac.precioClienteCOP)}</Text>
                                     <Text style={styles.trmNote}>Tarifa neta garantizada por Trappvel · Sujeta a disponibilidad</Text>
                                 </View>
                             ) : calcInt ? (
@@ -612,11 +612,11 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                                     <View style={styles.priceRow}>
                                         <View style={styles.priceBox}>
                                             <Text style={styles.priceTitle}>Cotización en Dólares</Text>
-                                            <Text style={styles.priceBig}>{fUSD(calcInt.totalUSD)}</Text>
+                                            <Text style={styles.priceBig}>{fUSD(calcInt.precioClienteUSD)}</Text>
                                         </View>
                                         <View style={styles.priceBox}>
                                             <Text style={styles.priceTitle}>Conversión Estimada</Text>
-                                            <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcInt.totalCOP)}</Text>
+                                            <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcInt.precioClienteCOP)}</Text>
                                         </View>
                                     </View>
                                     <Text style={styles.trmNote}>
@@ -641,19 +641,25 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                             {quote.paymentTerms ? (
                                 <View>
                                     <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>POLÍTICAS DE PAGO</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.paymentTerms}</Text>
+                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.paymentTerms || ''}</Text>
                                 </View>
                             ) : null}
                             {quote.cancellationPolicy ? (
                                 <View>
                                     <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>POLÍTICAS DE CANCELACIÓN</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.cancellationPolicy}</Text>
+                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.cancellationPolicy || ''}</Text>
                                 </View>
                             ) : null}
                             {quote.requiredDocuments ? (
                                 <View>
                                     <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>DOCUMENTACIÓN REQUERIDA</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.requiredDocuments}</Text>
+                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.requiredDocuments || ''}</Text>
+                                </View>
+                            ) : null}
+                            {quote.legalConditions ? (
+                                <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                                    <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 5 }}>CONDICIONES LEGALES Y GENERALES</Text>
+                                    <Text style={{ fontSize: 8, color: '#64748B', lineHeight: 1.4, textAlign: 'justify' }}>{quote.legalConditions || ''}</Text>
                                 </View>
                             ) : null}
                             <View style={styles.incExcContainer} wrap={false}>
@@ -663,7 +669,7 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                                         {quote.inclusions.map((item, idx) => (
                                             <View key={idx} style={styles.listItem}>
                                                 <Text style={[styles.bullet, { color: '#10B981' }]}>•</Text>
-                                                <Text style={styles.listItemText}>{item}</Text>
+                                                <Text style={styles.listItemText}>{item || ''}</Text>
                                             </View>
                                         ))}
                                     </View>
@@ -674,7 +680,7 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                                         {quote.exclusions.map((item, idx) => (
                                             <View key={idx} style={styles.listItem}>
                                                 <Text style={[styles.bullet, { color: '#94A3B8' }]}>•</Text>
-                                                <Text style={[styles.listItemText, { color: '#94A3B8' }]}>{item}</Text>
+                                                <Text style={[styles.listItemText, { color: '#94A3B8' }]}>{item || ''}</Text>
                                             </View>
                                         ))}
                                     </View>
@@ -737,8 +743,8 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                         <Text style={[styles.brandText, { fontSize: 18 }]}>TRAPPVEL</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.dateText}>{quote.destination?.toUpperCase()}</Text>
-                        <Text style={{ fontSize: 7, color: '#94A3B8', marginTop: 2 }}>{quote.travelerName}</Text>
+                        <Text style={styles.dateText}>{quote.destination?.toUpperCase() || ''}</Text>
+                        <Text style={{ fontSize: 7, color: '#94A3B8', marginTop: 2 }}>{quote.travelerName || ''}</Text>
                     </View>
                 </View>
 
@@ -752,7 +758,7 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                         <View style={styles.infoBox}>
                             <Text style={styles.infoLabel}>FECHAS</Text>
                             <Text style={styles.infoValue}>
-                                {quote.departureDate ? new Date(quote.departureDate).toLocaleDateString('es-CO') : '—'} 
+                                {quote.departureDate ? new Date(quote.departureDate).toLocaleDateString('es-CO') : '—'}
                                 {" al "}
                                 {quote.returnDate ? new Date(quote.returnDate).toLocaleDateString('es-CO') : '—'}
                             </Text>
@@ -761,10 +767,10 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                 </View>
 
                 {/* Renderizado dinámico de secciones según el orden definido */}
-                {quote.sectionOrder.map(sectionId => renderSection(sectionId))}
+                {(quote.sectionOrder || []).map(sectionId => renderSection(sectionId))}
 
                 <Text style={styles.footer} fixed>
-                    Documento Oficial Trappvel · Elite Travel Agency · {new Date().getFullYear()}
+                    Documento Oficial Trappvel · Agencia de viajes · {new Date().getFullYear()}
                 </Text>
             </Page>
         </Document>

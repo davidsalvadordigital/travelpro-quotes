@@ -33,12 +33,12 @@ export function QuotePreview() {
     const fee = activeQuote.feePercentage ?? 15;
     const trm = activeQuote.trmUsed || 4200;
 
-    const calcNac = isNacional ? calculateNacional(activeQuote.netCostCOP || 0, fee) : null;
-    const calcInt = !isNacional ? calculateInternacional(activeQuote.netCostUSD || 0, fee, trm) : null;
+    const calcNac = isNacional ? calculateNacional(activeQuote.pvpCOP || 0, fee, activeQuote.extraMarginPercent ?? 0) : null;
+    const calcInt = !isNacional ? calculateInternacional(activeQuote.pvpUSD || 0, fee, trm, activeQuote.extraMarginPercent ?? 0) : null;
 
     const hasFinancials = isNacional
-        ? (activeQuote.netCostCOP || 0) > 0
-        : (activeQuote.netCostUSD || 0) > 0;
+        ? (activeQuote.pvpCOP || 0) > 0
+        : (activeQuote.pvpUSD || 0) > 0;
 
     const hasData = activeQuote.travelerName || activeQuote.destination;
 
@@ -144,7 +144,7 @@ export function QuotePreview() {
                                         </div>
                                     </div>
                                     <div className="text-4xl font-black text-[#E33A7A] tracking-tighter tabular-nums leading-none italic">
-                                        {formatCOP(calcNac.totalCOP)} <span className="text-sm font-bold opacity-20 not-italic">COP</span>
+                                        {formatCOP(calcNac.precioClienteCOP)} <span className="text-sm font-bold opacity-20 not-italic">COP</span>
                                     </div>
                                 </div>
                             ) : calcInt ? (
@@ -153,12 +153,12 @@ export function QuotePreview() {
                                         <div className="space-y-2">
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total USD</p>
                                             <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums leading-none italic">
-                                                {formatUSD(calcInt.totalUSD)}
+                                                {formatUSD(calcInt.precioClienteUSD)}
                                             </p>
                                         </div>
                                         <div className="text-right space-y-2">
                                             <p className="text-sm font-black text-[#E33A7A] tabular-nums leading-none">
-                                                {formatCOP(calcInt.totalCOP)}
+                                                {formatCOP(calcInt.precioClienteCOP)}
                                             </p>
                                             <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">TRM {formatTRM(trm)}</p>
                                         </div>

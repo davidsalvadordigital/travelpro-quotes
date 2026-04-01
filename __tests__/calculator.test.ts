@@ -1,8 +1,12 @@
 /**
- * Unit Tests — Quote Calculator
+ * Unit Tests — Quote Calculator (Modelo de Agencia — Comisión Cedida)
  *
- * Tests for calculateInternacional, calculateNacional, and calculateQuote.
- * Pure functions with zero side effects — ideal for unit testing.
+ * MODELO CANÓNICO:
+ *   comision      = pvp * (feePercent / 100)     ← cedida por el mayorista
+ *   costoNeto     = pvp - comision               ← lo que se le paga al proveedor
+ *   extraAmount   = pvp * (extraPercent / 100)   ← margen opcional de la agencia
+ *   precioCliente = pvp + extraAmount            ← lo que paga el viajero
+ *   utilidad      = comision + extraAmount       ← ganancia total de la agencia
  */
 import { describe, it, expect } from "vitest";
 import {
@@ -11,135 +15,181 @@ import {
     calculateQuote,
 } from "@/features/quotes/utils/calculator";
 
+// ─── calculateInternacional ───────────────────────────────────────────────────
+
 describe("calculateInternacional", () => {
-    it("should calculate fees and totals correctly", () => {
+    it("extrae la comisión del PVP y calcula el costo neto correctamente", () => {
+        // pvp=1000, fee=15% → comision=150, costoNeto=850
         const result = calculateInternacional(1000, 15, 4200);
 
         expect(result.type).toBe("internacional");
-        expect(result.netCostUSD).toBe(1000);
+        expect(result.pvpUSD).toBe(1000);
         expect(result.feePercent).toBe(15);
         expect(result.feeAmountUSD).toBe(150);
-        expect(result.totalUSD).toBe(1150);
-        expect(result.totalCOP).toBe(4830000); // 1150 * 4200
-        expect(result.profitCOP).toBe(630000); // 150 * 4200
+        expect(result.netCostUSD).toBe(850);        // costoNeto = pvp - comision
+        expect(result.extraPercent).toBe(0);
+        expect(result.extraAmountUSD).toBe(0);
+        expect(result.precioClienteUSD).toBe(1000); // sin extra → precio = pvp
+        expect(result.precioClienteCOP).toBe(4200000); // 1000 * 4200
+        expect(result.utilidadUSD).toBe(150);
+        expect(result.utilidadCOP).toBe(630000);    // 150 * 4200
         expect(result.trm).toBe(4200);
     });
 
-    it("should handle zero cost", () => {
+    it("aplica el margen extra correctamente encima del PVP", () => {
+        // pvp=1000, fee=15%, extra=3% → precioCliente=1030, utilidad=180
+        const result = calculateInternacional(1000, 15, 4200, 3);
+
+        expect(result.extraPercent).toBe(3);
+        expect(result.extraAmountUSD).toBe(30);
+        expect(result.precioClienteUSD).toBe(1030); // pvp + extra
+        expect(result.utilidadUSD).toBe(180);       // comision + extra
+        expect(result.precioClienteCOP).toBe(4326000); // 1030 * 4200
+    });
+
+    it("maneja costo cero", () => {
         const result = calculateInternacional(0, 15, 4200);
 
         expect(result.feeAmountUSD).toBe(0);
-        expect(result.totalUSD).toBe(0);
-        expect(result.totalCOP).toBe(0);
-        expect(result.profitCOP).toBe(0);
+        expect(result.netCostUSD).toBe(0);
+        expect(result.precioClienteUSD).toBe(0);
+        expect(result.precioClienteCOP).toBe(0);
+        expect(result.utilidadCOP).toBe(0);
     });
 
-    it("should handle zero fee", () => {
+    it("maneja fee cero (pass-through sin comisión)", () => {
         const result = calculateInternacional(1000, 0, 4200);
 
         expect(result.feeAmountUSD).toBe(0);
-        expect(result.totalUSD).toBe(1000);
-        expect(result.totalCOP).toBe(4200000);
-        expect(result.profitCOP).toBe(0);
+        expect(result.netCostUSD).toBe(1000);       // toda la plata va al proveedor
+        expect(result.precioClienteUSD).toBe(1000);
+        expect(result.utilidadUSD).toBe(0);
     });
 
-    it("should round COP values to integers", () => {
+    it("redondea valores COP a enteros", () => {
         const result = calculateInternacional(333, 7, 4150);
 
-        expect(Number.isInteger(result.totalCOP)).toBe(true);
-        expect(Number.isInteger(result.profitCOP)).toBe(true);
-    });
-
-    it("should handle high TRM values", () => {
-        const result = calculateInternacional(500, 10, 5000);
-
-        expect(result.feeAmountUSD).toBe(50);
-        expect(result.totalUSD).toBe(550);
-        expect(result.totalCOP).toBe(2750000);
-        expect(result.profitCOP).toBe(250000);
+        expect(Number.isInteger(result.precioClienteCOP)).toBe(true);
+        expect(Number.isInteger(result.utilidadCOP)).toBe(true);
     });
 });
 
+// ─── calculateNacional ────────────────────────────────────────────────────────
+
 describe("calculateNacional", () => {
-    it("should calculate fees and totals in COP", () => {
-        const result = calculateNacional(2000000, 15);
+    it("extrae comisión del PVP en COP", () => {
+        // pvp=2_000_000, fee=15% → comision=300_000, costoNeto=1_700_000
+        const result = calculateNacional(2_000_000, 15);
 
         expect(result.type).toBe("nacional");
-        expect(result.netCostCOP).toBe(2000000);
+        expect(result.pvpCOP).toBe(2_000_000);
         expect(result.feePercent).toBe(15);
-        expect(result.feeAmountCOP).toBe(300000);
-        expect(result.totalCOP).toBe(2300000);
-        expect(result.profitCOP).toBe(300000);
+        expect(result.feeAmountCOP).toBe(300_000);
+        expect(result.netCostCOP).toBe(1_700_000);  // costoNeto = pvp - comision
+        expect(result.extraPercent).toBe(0);
+        expect(result.extraAmountCOP).toBe(0);
+        expect(result.precioClienteCOP).toBe(2_000_000); // sin extra = pvp
+        expect(result.utilidadCOP).toBe(300_000);
     });
 
-    it("should handle zero cost", () => {
+    it("aplica margen extra nacional", () => {
+        // pvp=2_000_000, fee=15%, extra=3%
+        const result = calculateNacional(2_000_000, 15, 3);
+
+        expect(result.extraAmountCOP).toBe(60_000);
+        expect(result.precioClienteCOP).toBe(2_060_000);
+        expect(result.utilidadCOP).toBe(360_000);
+    });
+
+    it("maneja costo cero", () => {
         const result = calculateNacional(0, 15);
 
         expect(result.feeAmountCOP).toBe(0);
-        expect(result.totalCOP).toBe(0);
-        expect(result.profitCOP).toBe(0);
+        expect(result.precioClienteCOP).toBe(0);
+        expect(result.utilidadCOP).toBe(0);
     });
 
-    it("should handle zero fee", () => {
-        const result = calculateNacional(1500000, 0);
+    it("maneja fee cero", () => {
+        const result = calculateNacional(1_500_000, 0);
 
         expect(result.feeAmountCOP).toBe(0);
-        expect(result.totalCOP).toBe(1500000);
-        expect(result.profitCOP).toBe(0);
+        expect(result.netCostCOP).toBe(1_500_000);
+        expect(result.precioClienteCOP).toBe(1_500_000);
     });
 
-    it("should round fee to integer", () => {
-        const result = calculateNacional(1000001, 7);
+    it("redondea a enteros", () => {
+        const result = calculateNacional(1_000_001, 7);
 
         expect(Number.isInteger(result.feeAmountCOP)).toBe(true);
-        expect(Number.isInteger(result.totalCOP)).toBe(true);
+        expect(Number.isInteger(result.precioClienteCOP)).toBe(true);
     });
 });
 
-describe("calculateQuote (unified)", () => {
-    it("should delegate to calculateNacional for nacional type", () => {
+// ─── calculateQuote (unificada) ───────────────────────────────────────────────
+
+describe("calculateQuote (unificada)", () => {
+    it("delega a calculateNacional para destinos nacionales", () => {
         const result = calculateQuote("nacional", {
-            netCostCOP: 1000000,
+            pvpCOP: 1_000_000,
             feePercent: 10,
         });
 
         expect(result.type).toBe("nacional");
         if (result.type === "nacional") {
-            expect(result.totalCOP).toBe(1100000);
+            expect(result.precioClienteCOP).toBe(1_000_000); // sin extra = pvp
+            expect(result.netCostCOP).toBe(900_000);          // 1M - 10%
+            expect(result.utilidadCOP).toBe(100_000);
         }
     });
 
-    it("should delegate to calculateInternacional for internacional type", () => {
+    it("delega a calculateInternacional para destinos internacionales", () => {
         const result = calculateQuote("internacional", {
-            netCostUSD: 800,
-            feePercent: 12,
+            pvpUSD: 800,
+            feePercent: 15,
             trm: 4300,
         });
 
         expect(result.type).toBe("internacional");
         if (result.type === "internacional") {
-            expect(result.totalUSD).toBe(896);
-            expect(result.totalCOP).toBe(Math.round(896 * 4300));
+            expect(result.feeAmountUSD).toBe(120);            // 800 * 15%
+            expect(result.netCostUSD).toBe(680);              // 800 - 120
+            expect(result.precioClienteUSD).toBe(800);        // sin extra
+            expect(result.precioClienteCOP).toBe(3_440_000);  // 800 * 4300
         }
     });
 
-    it("should default to 0 for missing cost values", () => {
+    it("aplica extra margin en la función unificada", () => {
+        const result = calculateQuote("internacional", {
+            pvpUSD: 1000,
+            feePercent: 15,
+            extraPercent: 3,
+            trm: 4200,
+        });
+
+        if (result.type === "internacional") {
+            expect(result.precioClienteUSD).toBe(1030);
+            expect(result.utilidadUSD).toBe(180);
+        }
+    });
+
+    it("defaultea pvp a 0 si no se provee", () => {
         const result = calculateQuote("nacional", { feePercent: 15 });
         if (result.type === "nacional") {
-            expect(result.netCostCOP).toBe(0);
-            expect(result.totalCOP).toBe(0);
+            expect(result.pvpCOP).toBe(0);
+            expect(result.precioClienteCOP).toBe(0);
         }
     });
 
-    it("should default TRM to 4200 when not provided", () => {
+    it("defaultea TRM a 4200 cuando no se provee", () => {
         const result = calculateQuote("internacional", {
-            netCostUSD: 100,
+            pvpUSD: 100,
             feePercent: 10,
         });
 
         if (result.type === "internacional") {
             expect(result.trm).toBe(4200);
-            expect(result.totalCOP).toBe(Math.round(110 * 4200));
+            expect(result.precioClienteUSD).toBe(100);
+            expect(result.precioClienteCOP).toBe(420_000);
         }
     });
 });
