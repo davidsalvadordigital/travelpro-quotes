@@ -1,372 +1,39 @@
 import React from 'react';
-import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import { Quote } from '@/features/quotes/schemas/quote-schema';
 import { calculateNacional, calculateInternacional } from '@/features/quotes/utils/calculator';
 
-// Registrar fuentes premium (Outfit)
-Font.register({
-    family: 'Outfit',
-    fonts: [
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Light.ttf', fontWeight: 300 },
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Regular.ttf', fontWeight: 400 },
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-SemiBold.ttf', fontWeight: 600 },
-        { src: 'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/outfit/static/Outfit-Bold.ttf', fontWeight: 700 },
-    ]
-});
+/**
+ * PDF Document — Diamond Standard v3.0 (Authority Standard)
+ * Cleaned of marketing noise, integrated with corporate agency data.
+ */
 
-// Estilos del documento PDF - Diamond Standard Edition
+const AGENCY_INFO = {
+    name: "TRAPPVEL ENTERPRISE SAS",
+    nit: "900.945.317",
+    rnt: "116125 - 43733 - 43735",
+    phones: "+57 322 222 3329 · 313 221 1090",
+    email: "contacto@trappvel.com",
+    web: "www.trappvel.com",
+    address: "Calle 26 #102-20, Oficina 303, Bogotá, Colombia"
+};
+
 const styles = StyleSheet.create({
+    // Estilos Base
     page: {
         flexDirection: 'column',
         backgroundColor: '#FFFFFF',
         padding: 50,
-        fontFamily: 'Outfit'
+        fontFamily: 'Helvetica'
     },
-    // Estilos de la Portada (Cover Page)
+    // Portada Corporativa
     coverPage: {
         height: '100%',
-        backgroundColor: '#0F172A', // Dark Slate para elegancia extrema
+        backgroundColor: '#0F172A', // Slate-900
         padding: 0,
-        position: 'relative'
-    },
-    coverGradient: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: '100%',
-        height: '40%',
-        backgroundColor: '#E33A7A', // Acento de marca
-        opacity: 0.05
-    },
-    coverContent: {
-        padding: 60,
-        height: '100%',
-        justifyContent: 'space-between'
-    },
-    coverBrand: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 15
-    },
-    coverLogo: {
-        width: 50,
-        height: 50,
-        backgroundColor: '#E33A7A',
-        borderRadius: 12,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    coverBrandName: {
-        fontSize: 32,
-        fontWeight: 700,
-        color: '#FFFFFF',
-        letterSpacing: -1
-    },
-    coverTitleSection: {
-        marginTop: 40
-    },
-    coverSubtitle: {
-        fontSize: 12,
-        fontWeight: 600,
-        color: '#E33A7A',
-        letterSpacing: 4,
-        textTransform: 'uppercase',
-        marginBottom: 10
-    },
-    coverTitle: {
-        fontSize: 54,
-        fontWeight: 700,
-        color: '#FFFFFF',
-        letterSpacing: -2,
-        lineHeight: 1.1
-    },
-    coverDestination: {
-        fontSize: 38,
-        fontWeight: 700,
-        color: '#E33A7A',
-        marginTop: 10
-    },
-    coverBottom: {
-        borderTopWidth: 1,
-        borderTopColor: '#1E293B',
-        paddingTop: 30,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end'
-    },
-    coverPreparedFor: {
-        fontSize: 10,
-        color: '#64748B',
-        textTransform: 'uppercase',
-        letterSpacing: 2,
-        marginBottom: 5
-    },
-    coverTravelerName: {
-        fontSize: 18,
-        fontWeight: 600,
+        position: 'relative',
         color: '#FFFFFF'
     },
-    coverDate: {
-        fontSize: 10,
-        color: '#64748B',
-        textAlign: 'right'
-    },
-
-    // Cuerpo del documento
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: 30
-    },
-    brandContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12
-    },
-    brandLogo: {
-        width: 40,
-        height: 40,
-        backgroundColor: '#E33A7A',
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    brandText: {
-        fontSize: 24,
-        fontWeight: 700,
-        color: '#E33A7A',
-        letterSpacing: -1,
-        textTransform: 'uppercase'
-    },
-    brandSub: {
-        fontSize: 8,
-        color: '#94A3B8',
-        letterSpacing: 2,
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        marginTop: 2
-    },
-    headerRight: {
-        alignItems: 'flex-end'
-    },
-    docTitle: {
-        fontSize: 18,
-        fontWeight: 700,
-        color: '#0F172A',
-        textTransform: 'uppercase'
-    },
-    dateText: {
-        fontSize: 9,
-        color: '#64748B',
-        marginTop: 4,
-        textTransform: 'uppercase',
-        fontWeight: 700
-    },
-    badge: {
-        marginTop: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: 20,
-        fontSize: 8,
-        fontWeight: 700,
-        textTransform: 'uppercase',
-        borderWidth: 1
-    },
-    divider: {
-        height: 4,
-        backgroundColor: '#E33A7A',
-        marginBottom: 30,
-        borderRadius: 2,
-        width: '100%'
-    },
-    section: {
-        marginBottom: 25,
-    },
-    sectionLabel: {
-        fontSize: 9,
-        fontWeight: 700,
-        color: '#94A3B8',
-        textTransform: 'uppercase',
-        letterSpacing: 1.5,
-        marginBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F1F5F9',
-        paddingBottom: 4
-    },
-    infoGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 20
-    },
-    infoBox: {
-        flex: 1,
-        minWidth: '30%',
-        marginBottom: 10
-    },
-    infoLabel: {
-        fontSize: 8,
-        color: '#94A3B8',
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        marginBottom: 2
-    },
-    infoValue: {
-        fontSize: 10,
-        fontWeight: 700,
-        color: '#334155'
-    },
-    tripCard: {
-        backgroundColor: '#F8FAFC',
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 25,
-        borderWidth: 1,
-        borderColor: '#F1F5F9'
-    },
-    itineraryDay: {
-        flexDirection: 'row',
-        gap: 15,
-        marginBottom: 15,
-        paddingBottom: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F1F5F9'
-    },
-    dayNumber: {
-        width: 35,
-        height: 35,
-        borderRadius: 10,
-        backgroundColor: '#E33A7A',
-        color: '#FFFFFF',
-        fontSize: 12,
-        fontWeight: 700,
-        textAlign: 'center',
-        paddingTop: 10
-    },
-    dayContent: {
-        flex: 1
-    },
-    dayTitle: {
-        fontSize: 11,
-        fontWeight: 700,
-        color: '#0F172A',
-        marginBottom: 4,
-        textTransform: 'uppercase'
-    },
-    dayDesc: {
-        fontSize: 10,
-        color: '#64748B',
-        lineHeight: 1.5
-    },
-    incExcContainer: {
-        flexDirection: 'row',
-        gap: 30,
-        marginBottom: 30
-    },
-    incExcColumn: {
-        flex: 1
-    },
-    incTitle: {
-        fontSize: 9,
-        fontWeight: 700,
-        color: '#10B981',
-        textTransform: 'uppercase',
-        marginBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ECFDF5',
-        paddingBottom: 4
-    },
-    excTitle: {
-        fontSize: 9,
-        fontWeight: 700,
-        color: '#94A3B8',
-        textTransform: 'uppercase',
-        marginBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F8FAFC',
-        paddingBottom: 4
-    },
-    listItem: {
-        flexDirection: 'row',
-        marginBottom: 6,
-        alignItems: 'flex-start'
-    },
-    bullet: {
-        width: 12,
-        fontSize: 10,
-        fontWeight: 700
-    },
-    listItemText: {
-        flex: 1,
-        fontSize: 9,
-        color: '#475569',
-        fontWeight: 400
-    },
-    financialsCard: {
-        backgroundColor: '#0F172A',
-        borderRadius: 25,
-        padding: 30,
-        marginTop: 10,
-        position: 'relative',
-        overflow: 'hidden'
-    },
-    finLabel: {
-        fontSize: 8,
-        fontWeight: 700,
-        color: '#64748B',
-        textTransform: 'uppercase',
-        letterSpacing: 2,
-        marginBottom: 15
-    },
-    priceRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    },
-    priceBox: {
-        flex: 1
-    },
-    priceTitle: {
-        fontSize: 8,
-        color: '#64748B',
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        marginBottom: 5
-    },
-    priceBig: {
-        fontSize: 28,
-        fontWeight: 700,
-        color: '#FFFFFF',
-        letterSpacing: -1
-    },
-    priceAccent: {
-        color: '#E33A7A'
-    },
-    trmNote: {
-        fontSize: 8,
-        color: '#475569',
-        borderTopWidth: 1,
-        borderTopColor: '#1E293B',
-        paddingTop: 15,
-        marginTop: 15,
-        fontWeight: 700,
-        textTransform: 'uppercase'
-    },
-    footer: {
-        position: 'absolute',
-        bottom: 30,
-        left: 50,
-        right: 50,
-        fontSize: 7,
-        color: '#CBD5E1',
-        textAlign: 'center',
-        borderTopWidth: 1,
-        borderTopColor: '#F1F5F9',
-        paddingTop: 10,
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        letterSpacing: 1
-    },
-    // Nuevos estilos para imágenes y tablas
     coverImageContainer: {
         position: 'absolute',
         top: 0,
@@ -378,7 +45,8 @@ const styles = StyleSheet.create({
     coverImage: {
         width: '100%',
         height: '100%',
-        objectFit: 'cover'
+        objectFit: 'cover',
+        opacity: 0.35
     },
     coverOverlay: {
         position: 'absolute',
@@ -386,101 +54,398 @@ const styles = StyleSheet.create({
         left: 0,
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(15, 23, 42, 0.65)' // Overlay para legibilidad
+        backgroundColor: 'rgba(15, 23, 42, 0.7)'
     },
-    flightCard: {
-        backgroundColor: '#F8FAFC',
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 10,
-        borderWidth: 1,
-        borderColor: '#F1F5F9'
+    coverContent: {
+        height: '100%',
+        flexDirection: 'column',
+        padding: 40
     },
-    hotelCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 15,
-        borderWidth: 1,
-        borderColor: '#F1F5F9'
+    // Header Técnico
+    coverHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 60
     },
-    hotelTag: {
-        fontSize: 7,
+    coverHeaderLabel: {
+        fontSize: 9,
         fontWeight: 700,
+        color: '#FFFFFF',
         textTransform: 'uppercase',
-        color: '#E33A7A',
-        backgroundColor: '#FFF1F2',
-        paddingHorizontal: 6,
-        paddingVertical: 2,
-        borderRadius: 4,
-        alignSelf: 'flex-start',
-        marginBottom: 5
+        letterSpacing: 3
     },
-    // Estilos de tabla
-    table: {
-        width: '100%',
+    coverHeaderSec: {
+        fontSize: 7,
+        color: 'rgba(255, 255, 255, 0.3)',
+        marginTop: 4,
+        letterSpacing: 2
+    },
+    coverBadge: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderWidth: 1,
-        borderColor: '#F1F5F9',
-        borderRadius: 10,
-        overflow: 'hidden'
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        paddingVertical: 5,
+        paddingHorizontal: 12,
+        borderRadius: 20
     },
-    tableHeaderRow: {
-        flexDirection: 'row',
-        backgroundColor: '#F8FAFC',
-        borderBottomWidth: 1,
-        borderBottomColor: '#F1F5F9',
-        paddingVertical: 8,
+    coverBadgeText: {
+        fontSize: 8,
+        fontWeight: 700,
+        color: '#E33A7A',
+        textTransform: 'uppercase',
+        letterSpacing: 2
     },
-    tableRow: {
+
+    // Cuerpo Central
+    coverMain: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center'
+    },
+    coverTag: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#E33A7A',
+        letterSpacing: 6,
+        textTransform: 'uppercase',
+        marginBottom: 20,
+        fontStyle: 'italic'
+    },
+    coverTitle: {
+        fontSize: 68,
+        fontWeight: 800,
+        color: '#FFFFFF',
+        letterSpacing: -2,
+        textTransform: 'uppercase',
+        marginBottom: 30
+    },
+    coverRecipientLabel: {
+        fontSize: 8,
+        color: 'rgba(255, 255, 255, 0.4)',
+        textTransform: 'uppercase',
+        letterSpacing: 4,
+        marginBottom: 10
+    },
+    coverRecipientName: {
+        fontSize: 28,
+        fontWeight: 700,
+        color: '#FFFFFF',
+        textTransform: 'uppercase',
+        borderBottomWidth: 3,
+        borderBottomColor: 'rgba(227, 58, 122, 0.4)',
+        paddingBottom: 4
+    },
+
+    // Píldora Logística
+    coverStatsPill: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: '#F8FAFC',
-        paddingVertical: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderRadius: 40,
+        paddingVertical: 18,
+        paddingHorizontal: 35,
+        gap: 30,
+        marginTop: 50
+    },
+    coverStatBox: {
         alignItems: 'center'
     },
-    tableColHeader: {
+    coverStatLabel: {
+        fontSize: 7,
+        fontWeight: 700,
+        color: '#E33A7A',
+        textTransform: 'uppercase',
+        letterSpacing: 2,
+        marginBottom: 4
+    },
+    coverStatValue: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#FFFFFF'
+    },
+    coverStatDivider: {
+        width: 1,
+        height: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+    },
+
+    // Footer Portada
+    coverFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingTop: 40
+    },
+    coverAgencyName: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: '#FFFFFF',
+        textTransform: 'uppercase'
+    },
+    coverAgencyLine: {
+        fontSize: 8,
+        color: 'rgba(255, 255, 255, 0.4)',
+        marginTop: 4,
+        letterSpacing: 2
+    },
+    coverFooterBadge: {
+        backgroundColor: '#FFFFFF',
+        paddingVertical: 6,
+        paddingHorizontal: 15,
+        borderRadius: 8
+    },
+    coverFooterBadgeText: {
+        fontSize: 9,
+        fontWeight: 900,
+        color: '#0F172A',
+        textTransform: 'uppercase',
+        letterSpacing: 2
+    },
+
+    // Cuerpo del Documento
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 40,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F1F5F9',
+        paddingBottom: 20
+    },
+    headerBrand: {
+        flexDirection: 'column',
+        gap: 3
+    },
+    headerText: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#0F172A',
+        letterSpacing: -0.2
+    },
+    headerSubText: {
+        fontSize: 7,
+        color: '#94A3B8',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: 1.5
+    },
+    headerMeta: {
+        textAlign: 'right'
+    },
+    headerLabel: {
+        fontSize: 7,
+        fontWeight: 700,
+        color: '#94A3B8',
+        textTransform: 'uppercase',
+        letterSpacing: 2
+    },
+    headerValue: {
+        fontSize: 10,
+        fontWeight: 700,
+        color: '#E33A7A',
+        textTransform: 'uppercase',
+        marginTop: 2
+    },
+
+    // Secciones
+    section: {
+        marginBottom: 35
+    },
+    sectionTitle: {
+        fontSize: 11,
+        fontWeight: 700,
+        color: '#0F172A',
+        textTransform: 'uppercase',
+        letterSpacing: 2,
+        marginBottom: 15,
+        borderLeftWidth: 3,
+        borderLeftColor: '#E33A7A',
+        paddingLeft: 12
+    },
+    
+    // Grid de Datos Rápidos
+    statsGrid: {
+        flexDirection: 'row',
+        backgroundColor: '#F8FAFC',
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 35,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
+        gap: 30
+    },
+    statBox: {
+        flex: 1
+    },
+    statLabel: {
+        fontSize: 7,
+        fontWeight: 700,
+        color: '#94A3B8',
+        textTransform: 'uppercase',
+        letterSpacing: 1.5,
+        marginBottom: 4
+    },
+    statValue: {
+        fontSize: 12,
+        fontWeight: 700,
+        color: '#334155'
+    },
+
+    // Tablas
+    table: {
+        width: '100%',
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
+        overflow: 'hidden'
+    },
+    tableHeader: {
+        flexDirection: 'row',
+        backgroundColor: '#F8FAFC',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F1F5F9'
+    },
+    tableHeaderText: {
         fontSize: 8,
         fontWeight: 700,
         color: '#94A3B8',
         textTransform: 'uppercase',
-        paddingHorizontal: 10
+        letterSpacing: 1
     },
-    tableCell: {
-        fontSize: 9,
-        color: '#334155',
-        paddingHorizontal: 10
-    },
-    locationHeader: {
+    tableRow: {
         flexDirection: 'row',
-        alignItems: 'center',
-        paddingTop: 15,
-        paddingBottom: 8,
-        gap: 8,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F8FAFC',
+        alignItems: 'center'
     },
-    locationLine: {
-        width: 3,
-        height: 12,
-        backgroundColor: '#E33A7A',
-        borderRadius: 2
-    },
-    locationText: {
+    tableCellMain: {
         fontSize: 10,
         fontWeight: 700,
+        color: '#0F172A'
+    },
+    tableCellSub: {
+        fontSize: 7,
+        color: '#94A3B8',
+        marginTop: 2
+    },
+    
+    // Itinerario
+    itineraryContainer: {
+        paddingLeft: 20,
+        borderLeftWidth: 1,
+        borderLeftColor: '#F1F5F9'
+    },
+    itineraryDay: {
+        marginBottom: 20,
+        position: 'relative'
+    },
+    dayMarker: {
+        position: 'absolute',
+        left: -32,
+        top: 0,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#0F172A',
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: 700,
+        textAlign: 'center',
+        paddingTop: 7
+    },
+    dayTitle: {
+        fontSize: 11,
+        fontWeight: 700,
         color: '#0F172A',
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+        marginBottom: 6
+    },
+    dayDesc: {
+        fontSize: 9,
+        color: '#475569',
+        lineHeight: 1.5,
+        textAlign: 'justify'
+    },
+
+    // Card de Precios
+    priceCard: {
+        backgroundColor: '#0F172A',
+        borderRadius: 25,
+        padding: 30,
+        marginTop: 20,
+        position: 'relative',
+        overflow: 'hidden'
+    },
+    priceLabel: {
+        fontSize: 8,
+        fontWeight: 700,
+        color: 'rgba(255, 255, 255, 0.4)',
+        textTransform: 'uppercase',
+        letterSpacing: 3,
+        marginBottom: 15
+    },
+    priceRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end'
+    },
+    priceValue: {
+        fontSize: 32,
+        fontWeight: 700,
+        color: '#FFFFFF'
+    },
+    priceCurrency: {
+        fontSize: 12,
+        color: 'rgba(255, 255, 255, 0.2)',
+        marginLeft: 8,
+        fontWeight: 700
+    },
+    trmBadge: {
+        marginTop: 20,
+        paddingTop: 15,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.05)',
+        fontSize: 7,
+        color: 'rgba(255, 255, 255, 0.4)',
+        textTransform: 'uppercase',
+        letterSpacing: 1
+    },
+
+    // Footer General
+    footer: {
+        position: 'absolute',
+        bottom: 30,
+        left: 50,
+        right: 50,
+        textAlign: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#F1F5F9',
+        paddingTop: 12,
+        fontSize: 6,
+        fontWeight: 700,
+        color: '#CBD5E1',
+        textTransform: 'uppercase',
+        letterSpacing: 2
     }
 });
 
 interface QuoteDocumentProps {
-    quote: Quote;
+    quote: Quote & { id?: string };
 }
 
 const fCOP = (val: number) => `$ ${Math.round(val).toLocaleString('es-CO')}`;
 const fUSD = (val: number) => `US$ ${val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fDate = (date: string | Date | null | undefined) => {
-    if (!date) return "-";
+    if (!date) return "TBA";
     const d = new Date(date);
-    return d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' }).toUpperCase();
 };
 
 export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
@@ -491,91 +456,72 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
     const calcNac = isNacional ? calculateNacional(quote.pvpCOP || 0, fee, quote.extraMarginPercent ?? 0) : null;
     const calcInt = !isNacional ? calculateInternacional(quote.pvpUSD || 0, fee, trm, quote.extraMarginPercent ?? 0) : null;
 
-    const formattedDate = new Date().toLocaleDateString('es-CO', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
-
-    // Renderizado dinámico de secciones por orden
     const renderSection = (sectionId: string) => {
         switch (sectionId) {
             case 'flights':
                 if (!quote.flights || quote.flights.length === 0) return null;
                 return (
-                    <View style={styles.section} key="flights">
-                        <Text style={styles.sectionLabel}>Itinerario de Vuelos Previstos</Text>
+                    <View style={styles.section} key="flights" wrap={false}>
+                        <Text style={styles.sectionTitle}>Itinerario de Vuelos</Text>
                         <View style={styles.table}>
-                            <View style={styles.tableHeaderRow}>
-                                <Text style={[styles.tableColHeader, { width: '25%' }]}>Aerolínea</Text>
-                                <Text style={[styles.tableColHeader, { width: '30%' }]}>Ruta</Text>
-                                <Text style={[styles.tableColHeader, { width: '15%' }]}>Fecha</Text>
-                                <Text style={[styles.tableColHeader, { width: '15%' }]}>Salida</Text>
-                                <Text style={[styles.tableColHeader, { width: '15%' }]}>Llegada</Text>
+                            <View style={styles.tableHeader}>
+                                <Text style={[styles.tableHeaderText, { width: '30%' }]}>Aerolínea</Text>
+                                <Text style={[styles.tableHeaderText, { width: '40%' }]}>Ruta</Text>
+                                <Text style={[styles.tableHeaderText, { width: '30%', textAlign: 'right' }]}>Horarios</Text>
                             </View>
-                            {quote.flights.map((flight, idx) => (
-                                <View key={idx} style={[styles.tableRow, idx === (quote.flights?.length || 0) - 1 ? { borderBottomWidth: 0 } : {}]}>
-                                    <View style={{ width: '25%', paddingHorizontal: 10 }}>
-                                        <Text style={{ fontSize: 9, fontWeight: 700, color: '#E33A7A' }}>{flight.airline || ''}</Text>
-                                        <Text style={{ fontSize: 7, color: '#94A3B8' }}>{flight.flightNumber || ''}</Text>
+                            {quote.flights.map((f, i) => (
+                                <View key={i} style={styles.tableRow}>
+                                    <View style={{ width: '30%' }}>
+                                        <Text style={styles.tableCellMain}>{f.airline}</Text>
+                                        <Text style={styles.tableCellSub}>{f.flightNumber}</Text>
                                     </View>
-                                    <Text style={[styles.tableCell, { width: '30%' }]}>{flight.origin || ''} → {flight.destination || ''}</Text>
-                                    <Text style={[styles.tableCell, { width: '15%' }]}>{fDate(flight.date)}</Text>
-                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.departureTime || ''}</Text>
-                                    <Text style={[styles.tableCell, { width: '15%', fontWeight: 700 }]}>{flight.arrivalTime || ''}</Text>
+                                    <View style={{ width: '40%' }}>
+                                        <Text style={[styles.tableCellMain, { fontSize: 9 }]}>
+                                          {f.origin} → {f.destination}
+                                        </Text>
+                                        <Text style={styles.tableCellSub}>{fDate(f.date)}</Text>
+                                    </View>
+                                    <View style={{ width: '30%', textAlign: 'right' }}>
+                                        <Text style={styles.tableCellMain}>{f.departureTime}</Text>
+                                        <Text style={styles.tableCellSub}>Salida Local</Text>
+                                    </View>
                                 </View>
                             ))}
                         </View>
                     </View>
                 );
 
+            case 'hotelOptions':
             case 'hotels':
                 if (!quote.hotelOptions || quote.hotelOptions.length === 0) return null;
-
-                const groupedHotels = quote.hotelOptions.reduce((acc, hotel) => {
-                    const loc = hotel.location || "Destino General";
-                    if (!acc[loc]) acc[loc] = [];
-                    acc[loc].push(hotel);
-                    return acc;
-                }, {} as Record<string, typeof quote.hotelOptions>);
-
                 return (
                     <View style={styles.section} key="hotels">
-                        <Text style={styles.sectionLabel}>Tabla de Hoteles Previstos</Text>
-                        {Object.entries(groupedHotels).map(([location, hotels], gIdx) => (
-                            <View key={gIdx} wrap={false} style={{ marginBottom: 15 }}>
-                                <View style={styles.locationHeader}>
-                                    <View style={styles.locationLine} />
-                                    <Text style={styles.locationText}>Destino: {location}</Text>
-                                </View>
-                                <View style={styles.table}>
-                                    <View style={styles.tableHeaderRow}>
-                                        <Text style={[styles.tableColHeader, { width: '30%' }]}>Hotel</Text>
-                                        <Text style={[styles.tableColHeader, { width: '15%' }]}>Categoría</Text>
-                                        <Text style={[styles.tableColHeader, { width: '40%' }]}>Descripción / Concepto</Text>
-                                        <Text style={[styles.tableColHeader, { width: '15%' }]}>Precio p/p</Text>
-                                    </View>
-                                    {hotels.map((hotel, idx) => (
-                                        <View key={idx} style={[styles.tableRow, idx === hotels.length - 1 ? { borderBottomWidth: 0 } : {}]}>
-                                            <View style={{ width: '30%', paddingHorizontal: 10 }}>
-                                                <Text style={{ fontSize: 9, fontWeight: 700, color: '#0F172A' }}>{hotel.name || ''}</Text>
-                                                {hotel.isRecommended ? (
-                                                    <Text style={{ fontSize: 6, color: '#E33A7A', fontWeight: 700, textTransform: 'uppercase' }}>Recomendado</Text>
-                                                ) : null}
-                                            </View>
-                                            <Text style={[styles.tableCell, { width: '15%' }]}>{hotel.category || ''}</Text>
-                                            <View style={{ width: '40%', paddingHorizontal: 10 }}>
-                                                <Text style={{ fontSize: 8, color: '#475569', fontWeight: 700 }}>{hotel.roomType || ''}</Text>
-                                                <Text style={{ fontSize: 7, color: '#64748B', lineHeight: 1.2 }}>{hotel.notes || ''}</Text>
-                                            </View>
-                                            <Text style={[styles.tableCell, { width: '15%', fontWeight: 700, color: '#E33A7A' }]}>
-                                                {hotel.isCOP ? fCOP(hotel.price) : fUSD(hotel.price)}
+                        <Text style={styles.sectionTitle}>Detalles de Alojamiento</Text>
+                        <View style={{ gap: 15 }}>
+                            {quote.hotelOptions.map((h, i) => (
+                                <View key={i} style={styles.table} wrap={false}>
+                                    <View style={[styles.tableRow, { backgroundColor: h.isRecommended ? '#FFF1F2' : 'transparent' }]}>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.tableCellMain}>{h.name.toUpperCase()}</Text>
+                                            <Text style={[styles.tableCellSub, { color: '#E33A7A', fontWeight: 'bold' }]}>
+                                              {h.location.toUpperCase()} · {'★'.repeat(Number(h.category) || 5)}
                                             </Text>
                                         </View>
-                                    ))}
+                                        <View style={{ textAlign: 'right' }}>
+                                            <Text style={styles.tableCellMain}>{h.roomType || 'ESTÁNDAR'}</Text>
+                                            <Text style={styles.tableCellSub}>CATEGORÍA</Text>
+                                        </View>
+                                    </View>
+                                    {h.notes && (
+                                        <View style={{ padding: 12, backgroundColor: '#FAFAFA' }}>
+                                            <Text style={{ fontSize: 8, color: '#64748B', lineHeight: 1.4, fontStyle: 'italic' }}>
+                                              {h.notes}
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
-                            </View>
-                        ))}
+                            ))}
+                        </View>
                     </View>
                 );
 
@@ -583,110 +529,76 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
                 if (!quote.itinerary || quote.itinerary.length === 0) return null;
                 return (
                     <View style={styles.section} key="itinerary">
-                        <Text style={styles.sectionLabel}>Itinerario Curado</Text>
-                        {quote.itinerary.map((day, idx) => (
-                            <View key={idx} style={styles.itineraryDay} wrap={false}>
-                                <Text style={styles.dayNumber}>{day.day}</Text>
-                                <View style={styles.dayContent}>
-                                    <Text style={styles.dayTitle}>{day.title || `Experiencia Día ${day.day}`}</Text>
-                                    <Text style={styles.dayDesc}>{day.description || ''}</Text>
+                        <Text style={styles.sectionTitle}>Jornadas de Viaje</Text>
+                        <View style={styles.itineraryContainer}>
+                            {quote.itinerary.map((day, i) => (
+                                <View key={i} style={styles.itineraryDay} wrap={false}>
+                                    <Text style={styles.dayMarker}>{day.day}</Text>
+                                    <Text style={[styles.dayTitle, { color: '#0F172A' }]}>{day.title || `Día ${day.day}`}</Text>
+                                    <Text style={styles.dayDesc}>{day.description}</Text>
                                 </View>
-                            </View>
-                        ))}
+                            ))}
+                        </View>
                     </View>
                 );
 
             case 'pricing':
                 return (
-                    <View style={styles.section} key="pricing">
-                        <View style={styles.financialsCard} wrap={false}>
-                            <Text style={styles.finLabel}>Resumen de Inversión Elite</Text>
-                            {isNacional && calcNac ? (
+                    <View style={styles.section} key="pricing" wrap={false}>
+                        <View style={styles.priceCard}>
+                            <Text style={styles.priceLabel}>Presupuesto Final</Text>
+                            <View style={styles.priceRow}>
                                 <View>
-                                    <Text style={styles.priceTitle}>Valor Total del Paquete (COP)</Text>
-                                    <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcNac.precioClienteCOP)}</Text>
-                                    <Text style={styles.trmNote}>Tarifa neta garantizada por Trappvel · Sujeta a disponibilidad</Text>
-                                </View>
-                            ) : calcInt ? (
-                                <View>
-                                    <View style={styles.priceRow}>
-                                        <View style={styles.priceBox}>
-                                            <Text style={styles.priceTitle}>Cotización en Dólares</Text>
-                                            <Text style={styles.priceBig}>{fUSD(calcInt.precioClienteUSD)}</Text>
-                                        </View>
-                                        <View style={styles.priceBox}>
-                                            <Text style={styles.priceTitle}>Conversión Estimada</Text>
-                                            <Text style={[styles.priceBig, styles.priceAccent]}>{fCOP(calcInt.precioClienteCOP)}</Text>
-                                        </View>
-                                    </View>
-                                    <Text style={styles.trmNote}>
-                                        Tasa Referencial: {trm} COP/USD · Liquidación final según TRM de pago bancario
+                                    <Text style={styles.priceValue}>
+                                      {isNacional ? fCOP(calcNac?.precioClienteCOP || 0) : fUSD(calcInt?.precioClienteUSD || 0)}
+                                    </Text>
+                                    <Text style={[styles.priceCurrency, { marginLeft: 0, marginTop: 4 }]}>
+                                      TARIFA POR PERSONA
                                     </Text>
                                 </View>
-                            ) : null}
-                            {quote.validUntil ? (
-                                <Text style={{ fontSize: 8, color: '#64748B', marginTop: 15, textAlign: 'right', fontWeight: 700 }}>
-                                    PROPUESTA VÁLIDA HASTA: {new Date(quote.validUntil).toLocaleDateString('es-CO')}
+                                {!isNacional && (
+                                    <View style={{ textAlign: 'right' }}>
+                                        <Text style={[styles.priceValue, { fontSize: 20, opacity: 0.8 }]}>
+                                          ≈ {fCOP(calcInt?.precioClienteCOP || 0)}
+                                        </Text>
+                                        <Text style={[styles.priceCurrency, { marginLeft: 0, marginTop: 4 }]}>PESOS COLOMBIANOS</Text>
+                                    </View>
+                                )}
+                            </View>
+                            {!isNacional && (
+                                <Text style={styles.trmBadge}>
+                                    TRM DE REFERENCIA: {trm} COP/USD · LIQUIDACIÓN FINAL SEGÚN TRM DEL DÍA DE PAGO
                                 </Text>
-                            ) : null}
+                            )}
                         </View>
                     </View>
                 );
 
             case 'terms':
                 return (
-                    <View style={styles.section} key="terms">
-                        <Text style={styles.sectionLabel}>Condiciones y Políticas</Text>
-                        <View style={{ gap: 15 }}>
-                            {quote.paymentTerms ? (
-                                <View>
-                                    <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>POLÍTICAS DE PAGO</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.paymentTerms || ''}</Text>
-                                </View>
-                            ) : null}
-                            {quote.cancellationPolicy ? (
-                                <View>
-                                    <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>POLÍTICAS DE CANCELACIÓN</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.cancellationPolicy || ''}</Text>
-                                </View>
-                            ) : null}
-                            {quote.requiredDocuments ? (
-                                <View>
-                                    <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 3 }}>DOCUMENTACIÓN REQUERIDA</Text>
-                                    <Text style={{ fontSize: 9, color: '#64748B', lineHeight: 1.4 }}>{quote.requiredDocuments || ''}</Text>
-                                </View>
-                            ) : null}
-                            {quote.legalConditions ? (
-                                <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
-                                    <Text style={{ fontSize: 9, fontWeight: 700, color: '#334155', marginBottom: 5 }}>CONDICIONES LEGALES Y GENERALES</Text>
-                                    <Text style={{ fontSize: 8, color: '#64748B', lineHeight: 1.4, textAlign: 'justify' }}>{quote.legalConditions || ''}</Text>
-                                </View>
-                            ) : null}
-                            <View style={styles.incExcContainer} wrap={false}>
-                                {quote.inclusions && quote.inclusions.length > 0 ? (
-                                    <View style={styles.incExcColumn}>
-                                        <Text style={styles.incTitle}>✓ Beneficios Incluidos</Text>
-                                        {quote.inclusions.map((item, idx) => (
-                                            <View key={idx} style={styles.listItem}>
-                                                <Text style={[styles.bullet, { color: '#10B981' }]}>•</Text>
-                                                <Text style={styles.listItemText}>{item || ''}</Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ) : null}
-                                {quote.exclusions && quote.exclusions.length > 0 ? (
-                                    <View style={styles.incExcColumn}>
-                                        <Text style={styles.excTitle}>✗ Consideraciones Adicionales</Text>
-                                        {quote.exclusions.map((item, idx) => (
-                                            <View key={idx} style={styles.listItem}>
-                                                <Text style={[styles.bullet, { color: '#94A3B8' }]}>•</Text>
-                                                <Text style={[styles.listItemText, { color: '#94A3B8' }]}>{item || ''}</Text>
-                                            </View>
-                                        ))}
-                                    </View>
-                                ) : null}
+                    <View style={styles.section} key="terms" wrap={false}>
+                        <Text style={styles.sectionTitle}>Términos y Condiciones</Text>
+                        <View style={{ flexDirection: 'row', gap: 20 }}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[styles.statLabel, { color: '#10B981', marginBottom: 10 }]}>✓ Incluye</Text>
+                                {quote.inclusions?.map((item, i) => (
+                                    <Text key={i} style={{ fontSize: 8, color: '#475569', marginBottom: 4 }}>• {item}</Text>
+                                ))}
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[styles.statLabel, { color: '#94A3B8', marginBottom: 10 }]}>× No Incluido</Text>
+                                {quote.exclusions?.map((item, i) => (
+                                    <Text key={i} style={{ fontSize: 8, color: '#94A3B8', marginBottom: 4 }}>• {item}</Text>
+                                ))}
                             </View>
                         </View>
+                        {quote.legalConditions && (
+                           <View style={{ marginTop: 25, paddingTop: 15, borderTopWidth: 1, borderTopColor: '#F1F5F9' }}>
+                               <Text style={{ fontSize: 7, color: '#94A3B8', textAlign: 'justify', lineHeight: 1.4 }}>
+                                 {quote.legalConditions}
+                               </Text>
+                           </View>
+                        )}
                     </View>
                 );
 
@@ -697,82 +609,108 @@ export const QuoteDocument = ({ quote }: QuoteDocumentProps) => {
 
     return (
         <Document title={`Propuesta Trappvel - ${quote.travelerName}`}>
-
-            {/* PORTADA (Cover Page) */}
-            <Page size="LETTER" style={styles.coverPage}>
-                {quote.destinationImage ? (
-                    <View style={styles.coverImageContainer}>
-                        <Image src={quote.destinationImage} style={styles.coverImage} />
-                        <View style={styles.coverOverlay} />
-                    </View>
-                ) : null}
-                <View style={styles.coverGradient} />
+            {/* PORTADA CORPORATIVA */}
+            <Page size="A4" style={styles.coverPage}>
+                <View style={styles.coverImageContainer}>
+                    {quote.destinationImage && <Image src={quote.destinationImage} style={styles.coverImage} />}
+                    <View style={styles.coverOverlay} />
+                </View>
+                
                 <View style={styles.coverContent}>
-                    <View style={styles.coverBrand}>
-                        <View style={styles.coverLogo}>
-                            <Text style={{ color: 'white', fontSize: 24 }}>✈</Text>
-                        </View>
-                        <Text style={styles.coverBrandName}>TRAPPVEL</Text>
-                    </View>
-
-                    <View style={styles.coverTitleSection}>
-                        <Text style={styles.coverSubtitle}>Propuesta Exclusiva</Text>
-                        <Text style={styles.coverTitle}>TU PRÓXIMA</Text>
-                        <Text style={styles.coverTitle}>EXPERIENCIA EN</Text>
-                        <Text style={styles.coverDestination}>{quote.destination?.toUpperCase() || 'EL DESTINO SOÑADO'}</Text>
-                    </View>
-
-                    <View style={styles.coverBottom}>
+                    {/* Header Technical */}
+                    <View style={styles.coverHeader}>
                         <View>
-                            <Text style={styles.coverPreparedFor}>Diseñado para</Text>
-                            <Text style={styles.coverTravelerName}>{quote.travelerName || 'Viajero Distinguido'}</Text>
+                            <Text style={styles.coverHeaderLabel}>Verified Technical Document</Text>
+                            <Text style={styles.coverHeaderSec}>Security ID: TR-{(quote.id || 'EV').substring(0,8).toUpperCase()}</Text>
                         </View>
-                        <Text style={styles.coverDate}>{formattedDate}</Text>
+                        <View style={styles.coverBadge}>
+                            <Text style={styles.coverBadgeText}>Edición 2026</Text>
+                        </View>
+                    </View>
+
+                    {/* Main Content */}
+                    <View style={styles.coverMain}>
+                        <Text style={styles.coverTag}>Propuesta Técnica</Text>
+                        <Text style={styles.coverTitle}>{quote.destination?.toUpperCase() || 'Global'}</Text>
+                        
+                        <View style={{ marginTop: 40, alignItems: 'center' }}>
+                            <Text style={styles.coverRecipientLabel}>Diseñado Exclusivamente Para</Text>
+                            <Text style={styles.coverRecipientName}>{quote.travelerName || 'Pasajero de Honor'}</Text>
+                        </View>
+
+                        {/* Logistics Pill */}
+                        <View style={styles.coverStatsPill}>
+                            <View style={styles.coverStatBox}>
+                                <Text style={styles.coverStatLabel}>Salida</Text>
+                                <Text style={styles.coverStatValue}>{fDate(quote.departureDate)}</Text>
+                            </View>
+                            <View style={styles.coverStatDivider} />
+                            <View style={styles.coverStatBox}>
+                                <Text style={styles.coverStatLabel}>Duración</Text>
+                                <Text style={styles.coverStatValue}>{quote.itinerary?.length || 0} DÍAS</Text>
+                            </View>
+                            <View style={styles.coverStatDivider} />
+                            <View style={styles.coverStatBox}>
+                                <Text style={styles.coverStatLabel}>Viajeros</Text>
+                                <Text style={styles.coverStatValue}>{quote.numberOfTravelers || 1} PAX</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Footer Authority */}
+                    <View style={styles.coverFooter}>
+                        <View>
+                            <Text style={styles.coverAgencyName}>{AGENCY_INFO.name}</Text>
+                            <Text style={styles.coverAgencyLine}>NIT. {AGENCY_INFO.nit} · RNT {AGENCY_INFO.rnt}</Text>
+                        </View>
+                        <View style={styles.coverFooterBadge}>
+                            <Text style={styles.coverFooterBadgeText}>Documento Oficial</Text>
+                        </View>
                     </View>
                 </View>
             </Page>
 
             {/* CUERPO DEL DOCUMENTO */}
-            <Page size="LETTER" style={styles.page}>
-                {/* Header en cada página subsiguiente */}
-                <View style={[styles.header, { marginBottom: 20 }]}>
-                    <View style={styles.brandContainer}>
-                        <View style={styles.brandLogo}>
-                            <Text style={{ color: 'white', fontSize: 18 }}>✈</Text>
-                        </View>
-                        <Text style={[styles.brandText, { fontSize: 18 }]}>TRAPPVEL</Text>
+            <Page size="A4" style={styles.page}>
+                <View style={styles.header}>
+                    <View style={styles.headerBrand}>
+                        <Text style={styles.headerText}>{AGENCY_INFO.name}</Text>
+                        <Text style={styles.headerSubText}>NIT. {AGENCY_INFO.nit} · RNT {AGENCY_INFO.rnt}</Text>
                     </View>
-                    <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={styles.dateText}>{quote.destination?.toUpperCase() || ''}</Text>
-                        <Text style={{ fontSize: 7, color: '#94A3B8', marginTop: 2 }}>{quote.travelerName || ''}</Text>
+                    <View style={styles.headerMeta}>
+                        <Text style={styles.headerLabel}>Propuesta Técnica</Text>
+                        <Text style={styles.headerValue}>{quote.travelerName}</Text>
                     </View>
                 </View>
 
-                {/* Info Básica del Viaje */}
-                <View style={[styles.tripCard, { padding: 15, marginBottom: 20 }]}>
-                    <View style={styles.infoGrid}>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoLabel}>VIAJEROS</Text>
-                            <Text style={styles.infoValue}>{quote.numberOfTravelers || 1} ADULTOS</Text>
-                        </View>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoLabel}>FECHAS</Text>
-                            <Text style={styles.infoValue}>
-                                {quote.departureDate ? new Date(quote.departureDate).toLocaleDateString('es-CO') : '—'}
-                                {" al "}
-                                {quote.returnDate ? new Date(quote.returnDate).toLocaleDateString('es-CO') : '—'}
-                            </Text>
-                        </View>
+                <View style={styles.statsGrid}>
+                    <View style={styles.statBox}>
+                        <Text style={styles.statLabel}>Salida</Text>
+                        <Text style={styles.statValue}>{fDate(quote.departureDate)}</Text>
+                    </View>
+                    <View style={styles.statBox}>
+                        <Text style={styles.statLabel}>Duración</Text>
+                        <Text style={styles.statValue}>{quote.itinerary?.length || 0} DÍAS</Text>
+                    </View>
+                    <View style={styles.statBox}>
+                        <Text style={styles.statLabel}>Pasajeros</Text>
+                        <Text style={styles.statValue}>{quote.numberOfTravelers || 1} ADT</Text>
                     </View>
                 </View>
 
-                {/* Renderizado dinámico de secciones según el orden definido */}
-                {(quote.sectionOrder || []).map(sectionId => renderSection(sectionId))}
+                {/* Render dinámico de secciones */}
+                {(quote.sectionOrder || ['flights', 'hotelOptions', 'itinerary', 'pricing', 'terms'])
+                    .map(sid => renderSection(sid))}
 
-                <Text style={styles.footer} fixed>
-                    Documento Oficial Trappvel · Agencia de viajes · {new Date().getFullYear()}
-                </Text>
+                <Text 
+                    style={styles.footer} 
+                    fixed 
+                    render={({ pageNumber, totalPages }) => (
+                        `${AGENCY_INFO.name} · NIT ${AGENCY_INFO.nit} · ${AGENCY_INFO.web} · Pág. ${pageNumber} de ${totalPages}`
+                    )} 
+                />
             </Page>
         </Document>
     );
 };
+

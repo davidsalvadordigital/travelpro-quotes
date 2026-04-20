@@ -78,7 +78,7 @@ export function StepFinances() {
                             onChange={(e) => setQuoteField("pvpCOP", parseFloat(e.target.value) || 0)}
                             data-testid="quote-finances-pvp-cop"
                             className={cn(
-                                "h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-lg font-black tabular-nums transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-primary/5 focus-visible:border-brand-primary/40",
+                                "h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40",
                                 activeQuote.pvpCOP === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                             )}
                             placeholder="0"
@@ -105,7 +105,7 @@ export function StepFinances() {
                             onChange={(e) => setQuoteField("pvpUSD", parseFloat(e.target.value) || 0)}
                             data-testid="quote-finances-pvp-usd"
                             className={cn(
-                                "h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-lg font-black tabular-nums transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-primary/5 focus-visible:border-brand-primary/40",
+                                "h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40",
                                 activeQuote.pvpUSD === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                             )}
                             placeholder="0.00"
@@ -127,7 +127,7 @@ export function StepFinances() {
                         value={fee}
                         onChange={(e) => setQuoteField("feePercentage", parseFloat(e.target.value) || 0)}
                         data-testid="quote-finances-fee"
-                        className="h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-lg font-black tabular-nums transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-primary/5 focus-visible:border-brand-primary/40 italic"
+                        className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40"
                     />
                 </div>
 
@@ -146,7 +146,7 @@ export function StepFinances() {
                         value={extra}
                         onChange={(e) => setQuoteField("extraMarginPercent", parseFloat(e.target.value) || 0)}
                         data-testid="quote-finances-extra-margin"
-                        className="h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-lg font-black tabular-nums transition-all duration-300 focus-visible:ring-8 focus-visible:ring-emerald-500/10 focus-visible:border-emerald-500/40"
+                        className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-500/40"
                     />
                 </div>
 
@@ -176,7 +176,7 @@ export function StepFinances() {
                             value={trm}
                             onChange={(e) => setQuoteField("trmUsed", parseFloat(e.target.value) || 0)}
                             data-testid="quote-finances-trm"
-                            className="h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-lg font-black tabular-nums transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-secondary/5 focus-visible:border-brand-secondary/40"
+                            className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-secondary/20 focus-visible:border-brand-secondary/40"
                         />
                         {trmSource && (
                             <p className="text-[10px] text-muted-foreground/50 ml-1">Fuente: {trmSource}</p>
@@ -186,90 +186,100 @@ export function StepFinances() {
             </div>
 
             {/* ── Cards de resultado ────────────────────────────────────────── */}
-            <div className="relative">
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-brand-primary text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl shadow-brand-primary/20 z-10">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    Resumen Financiero Estratégico
+            <div className="pt-6 border-t border-border/40">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-brand-primary" />
+                        <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground">Desglose de Tarifas</span>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-full text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        Cálculo para {activeQuote.numberOfTravelers || 1} { (activeQuote.numberOfTravelers || 1) === 1 ? "Pasajero" : "Pasajeros" }
+                    </div>
                 </div>
 
                 {isNacional && calcNac ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Precio cliente */}
-                        <div className="p-10 rounded-[2.5rem] bg-brand-primary/5 border-2 border-brand-primary/20 backdrop-blur-3xl text-center shadow-2xl shadow-brand-primary/5 group transition-all duration-500 hover:border-brand-primary/40 animate-scale-in">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-brand-primary/60 mb-3">Precio al Viajero</p>
-                            <p className="text-5xl font-black text-brand-primary tabular-nums tracking-tighter italic-pro-max">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {/* PRECIO PAX DESTACADO */}
+                        <div className="md:col-span-2 p-6 rounded-2xl bg-brand-primary text-white shadow-xl shadow-brand-primary/20 flex flex-col justify-center relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                <Coins className="h-24 w-24 rotate-12" />
+                            </div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio por Pasajero (PAX)</p>
+                            <p className="text-4xl font-black tabular-nums tracking-tighter">
+                                {formatCOP(calcNac.precioClienteCOP / (activeQuote.numberOfTravelers || 1))}
+                            </p>
+                            <p className="text-[10px] font-medium opacity-60 mt-2 uppercase tracking-widest">Incluye impuestos y gastos de gestión</p>
+                        </div>
+
+                        {/* TOTAL GRUPAL */}
+                        <div className="p-6 rounded-2xl bg-card border border-border/60 flex flex-col justify-center">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Total Cotización</p>
+                            <p className="text-xl font-bold text-foreground tabular-nums">
                                 {formatCOP(calcNac.precioClienteCOP)}
                             </p>
                         </div>
-                        {/* Costo neto */}
-                        <div className="p-10 rounded-[2.5rem] bg-muted/30 border-2 border-glass-border backdrop-blur-3xl text-center shadow-2xl shadow-muted/5 group transition-all duration-500 hover:border-muted-foreground/20 animate-scale-in [animation-delay:100ms]">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 mb-3">Pago al Proveedor</p>
-                            <p className="text-5xl font-black text-muted-foreground tabular-nums tracking-tighter italic-pro-max">
-                                {formatCOP(calcNac.netCostCOP)}
-                            </p>
-                        </div>
-                        {/* Utilidad */}
-                        <div className="p-10 rounded-[2.5rem] bg-emerald-500/5 border-2 border-emerald-500/20 backdrop-blur-3xl text-center shadow-2xl shadow-emerald-500/5 group transition-all duration-500 hover:border-emerald-500/40 animate-scale-in [animation-delay:200ms]">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600/60 mb-3">Utilidad Agencia</p>
-                            <p className="text-5xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tighter italic-pro-max">
+
+                        {/* UTILIDAD (Solo visible para la asesora/agencia) */}
+                        <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col justify-center">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/60 mb-1">Rentabilidad Estimada</p>
+                            <p className="text-xl font-bold text-emerald-600 tabular-nums">
                                 {formatCOP(calcNac.utilidadCOP)}
                             </p>
-                            {extra > 0 && (
-                                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full text-[10px] font-bold text-emerald-600/80">
-                                    incl. {extra}% extra
-                                </div>
-                            )}
+                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Comisión + Margen</p>
                         </div>
                     </div>
                 ) : calcInt ? (
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                        {/* Precio USD */}
-                        <div className="p-10 rounded-[2.5rem] bg-brand-primary/5 border-2 border-brand-primary/20 backdrop-blur-3xl text-center shadow-2xl shadow-brand-primary/5 group transition-all duration-500 hover:border-brand-primary/40 animate-scale-in">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-brand-primary/60 mb-3">Precio Viajero (USD)</p>
-                            <p className="text-4xl font-black text-brand-primary tabular-nums tracking-tighter italic-pro-max">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {/* PRECIO PAX DESTACADO (USD) */}
+                        <div className="md:col-span-2 p-6 rounded-2xl bg-brand-primary text-white shadow-xl shadow-brand-primary/20 flex flex-col justify-center relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                <DollarSign className="h-24 w-24 rotate-12" />
+                            </div>
+                            <div className="flex items-center justify-between items-start">
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio por Pasajero (PAX)</p>
+                                    <p className="text-4xl font-black tabular-nums tracking-tighter">
+                                        {formatUSD(calcInt.precioClienteUSD / (activeQuote.numberOfTravelers || 1))}
+                                    </p>
+                                </div>
+                                <div className="text-right border-l border-white/20 pl-4">
+                                    <p className="text-[9px] font-bold uppercase tracking-widest opacity-60 mb-1 leading-none">Equivalente</p>
+                                    <p className="text-sm font-bold opacity-90 tabular-nums">
+                                        {formatCOP(calcInt.precioClienteCOP / (activeQuote.numberOfTravelers || 1))}
+                                    </p>
+                                </div>
+                            </div>
+                            <p className="text-[10px] font-medium opacity-60 mt-2 uppercase tracking-widest">Calculado a TRM {formatTRM(trm)}</p>
+                        </div>
+
+                        {/* TOTAL GRUPAL */}
+                        <div className="p-6 rounded-2xl bg-card border border-border/60 flex flex-col justify-center">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Total Cotización</p>
+                            <p className="text-xl font-bold text-foreground tabular-nums">
                                 {formatUSD(calcInt.precioClienteUSD)}
                             </p>
-                        </div>
-                        {/* Precio COP */}
-                        <div className="p-10 rounded-[2.5rem] bg-brand-secondary/5 border-2 border-brand-secondary/20 backdrop-blur-3xl text-center shadow-2xl shadow-brand-secondary/5 group transition-all duration-500 hover:border-brand-secondary/40 animate-scale-in [animation-delay:100ms]">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-brand-secondary/60 mb-3">Precio Viajero (COP)</p>
-                            <p className="text-4xl font-black text-brand-secondary tabular-nums tracking-tighter italic-pro-max">
-                                {formatCOP(calcInt.precioClienteCOP)}
-                            </p>
-                            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-brand-secondary/10 rounded-full text-[10px] font-bold text-brand-secondary/80">
-                                TRM: {formatTRM(trm)}
-                            </div>
-                        </div>
-                        {/* Pago proveedor */}
-                        <div className="p-10 rounded-[2.5rem] bg-muted/30 border-2 border-glass-border backdrop-blur-3xl text-center shadow-2xl shadow-muted/5 group transition-all duration-500 hover:border-muted-foreground/20 animate-scale-in [animation-delay:200ms]">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 mb-3">Pago al Proveedor</p>
-                            <p className="text-4xl font-black text-muted-foreground tabular-nums tracking-tighter italic-pro-max">
-                                {formatUSD(calcInt.netCostUSD)}
+                            <p className="text-[10px] font-medium text-muted-foreground/40 mt-1 uppercase tracking-tighter">
+                                {formatCOP(calcInt.precioClienteCOP)} Total
                             </p>
                         </div>
-                        {/* Utilidad */}
-                        <div className="p-10 rounded-[2.5rem] bg-emerald-500/5 border-2 border-emerald-500/20 backdrop-blur-3xl text-center shadow-2xl shadow-emerald-500/5 group transition-all duration-500 hover:border-emerald-500/40 animate-scale-in [animation-delay:300ms]">
-                            <p className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600/60 mb-3">Utilidad Agencia</p>
-                            <p className="text-4xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums tracking-tighter italic-pro-max">
+
+                        {/* UTILIDAD */}
+                        <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col justify-center">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/60 mb-1">Utilidad Agencia</p>
+                            <p className="text-xl font-bold text-emerald-600 tabular-nums">
                                 {formatUSD(calcInt.utilidadUSD)}
                             </p>
-                            {extra > 0 && (
-                                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full text-[10px] font-bold text-emerald-600/80">
-                                    incl. {extra}% extra
-                                </div>
-                            )}
+                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Margen total acumulado</p>
                         </div>
                     </div>
                 ) : null}
             </div>
 
             {/* ── Configuración Final de PDF ────────────────────────────────── */}
-            <div className="pt-8 mt-4 border-t border-glass-border">
-                <div className="flex items-center gap-2 mb-8">
-                    <div className="h-8 w-8 rounded-full bg-slate-900 flex items-center justify-center text-white">
-                        <Settings2 className="h-4 w-4" />
-                    </div>
-                    <h4 className="text-xl font-black uppercase tracking-tight text-foreground">Distribución de PDF</h4>
+            <div className="pt-6 mt-2 border-t border-border/40">
+                <div className="flex items-center gap-2 mb-5">
+                    <Settings2 className="h-3.5 w-3.5 text-muted-foreground/50" />
+                    <h4 className="text-sm font-bold text-muted-foreground/70 uppercase tracking-widest">Configuración del documento</h4>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -288,7 +298,7 @@ export function StepFinances() {
                             value={activeQuote.validUntil ? new Date(activeQuote.validUntil).toISOString().split('T')[0] : ""}
                             onChange={(e) => setQuoteField("validUntil", new Date(e.target.value))}
                             data-testid="quote-design-validity"
-                            className="h-14 rounded-2xl border-2 border-glass-border bg-background/50 text-base font-medium transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-primary/5 focus-visible:border-brand-primary/40"
+                            className="h-10 rounded-xl border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40"
                         />
                         <p className="text-[10px] text-muted-foreground/40 uppercase tracking-widest font-black ml-1">
                             El enlace marcará la cotización como vencida tras esta fecha.
@@ -300,7 +310,7 @@ export function StepFinances() {
                         <Label className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
                             Orden de Lectura del Cliente
                         </Label>
-                        <div className="p-1 rounded-3xl border border-glass-border bg-background/30 shadow-inner">
+                        <div className="p-1 rounded-xl border border-border/50 bg-background/30">
                             <SortableSectionList />
                         </div>
                     </div>

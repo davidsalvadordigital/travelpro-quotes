@@ -55,7 +55,7 @@ export default function QuotePage() {
         hasInitialized.current = true;
     }, []);
 
-    const steps = ["Inicio", "El Viaje", "Hospedaje", "Transporte", "Condiciones", "Inversión"];
+    const steps = ["Datos del viajero", "Itinerario", "Hospedaje", "Transporte", "Condiciones", "Tarifas"];
     const safeStep = typeof currentStep === 'number' && currentStep >= 0 && currentStep < steps.length ? currentStep : 0;
     const progress = ((safeStep + 1) / steps.length) * 100;
 
@@ -186,82 +186,73 @@ export default function QuotePage() {
     };
 
     return (
-        <div className="mx-auto max-w-7xl flex-1 space-y-10 p-8 pb-24 pt-10 animate-fade-in">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-border/40 pb-10">
-                <div className="space-y-3">
-                    <div className="inline-flex items-center rounded-full bg-brand-secondary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-brand-secondary border border-brand-secondary/20">
-                        Configuración de Propuesta
-                    </div>
-                    <h2 className="text-5xl font-extrabold tracking-tight text-foreground">
-                        Crear Cotización
+        <div className="mx-auto max-w-6xl flex-1 space-y-8 p-6 pb-24 pt-8 animate-fade-in">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border/40 pb-8">
+                <div className="space-y-1">
+                    <h2 className="text-2xl font-black tracking-tighter text-foreground">
+                        Nueva Cotización
                     </h2>
-                    <p className="text-lg font-medium text-muted-foreground max-w-2xl leading-relaxed">
-                        Transforma los datos de tu cliente en una propuesta de viaje de alto impacto en minutos.
+                    <p className="text-sm font-medium text-muted-foreground">
+                        Paso {safeStep + 1} de {steps.length} — {steps[safeStep]}
                     </p>
                 </div>
 
-                {/* Refined Stepper */}
-                <div className="flex flex-col items-end gap-4 bg-muted/20 p-5 rounded-2xl border border-border/40">
-                    <div className="text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.25em]">
-                        Estado del Progreso
-                    </div>
-                    <div className="flex items-center gap-3">
-                        {steps.map((step, idx) => (
-                            <div key={idx} className="flex items-center">
-                                <div className={cn(
-                                    "h-10 w-10 rounded-xl flex items-center justify-center text-sm font-extrabold transition-all duration-500",
-                                    idx === safeStep ? "bg-brand-primary text-primary-foreground shadow-xl shadow-brand-primary/20 scale-110" :
-                                        idx < safeStep ? "bg-brand-secondary text-primary-foreground" :
-                                            "bg-background text-muted-foreground border border-border/60"
-                                )}>
-                                    {idx < safeStep ? <Check className="h-5 w-5 stroke-[3px]" /> : idx + 1}
-                                </div>
-                                {idx < steps.length - 1 && (
-                                    <div className={cn(
-                                        "h-[2px] w-10 mx-1 transition-colors duration-500 rounded-full",
-                                        idx < safeStep ? "bg-brand-secondary" : "bg-border/60"
-                                    )} />
-                                )}
+                {/* Stepper limpio — sin labels, solo números y conectores */}
+                <div className="flex items-center gap-2">
+                    {steps.map((step, idx) => (
+                        <div key={idx} className="flex items-center">
+                            <div className={cn(
+                                "h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all duration-300",
+                                idx === safeStep ? "bg-brand-primary text-white shadow-md shadow-brand-primary/25 scale-110" :
+                                    idx < safeStep ? "bg-brand-secondary/20 text-brand-secondary border border-brand-secondary/30" :
+                                        "bg-muted/50 text-muted-foreground border border-border/50"
+                            )}>
+                                {idx < safeStep ? <Check className="h-3.5 w-3.5 stroke-[3px]" /> : idx + 1}
                             </div>
-                        ))}
-                    </div>
-                    <div className="text-[11px] font-bold text-brand-primary uppercase tracking-widest">
-                        {steps[safeStep]}
-                    </div>
+                            {idx < steps.length - 1 && (
+                                <div className={cn(
+                                    "h-[1.5px] w-6 mx-1 transition-colors duration-500 rounded-full",
+                                    idx < safeStep ? "bg-brand-secondary/40" : "bg-border/50"
+                                )} />
+                            )}
+                        </div>
+                    ))}
                 </div>
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-6">
                 {/* Main Form Area */}
                 <div className="w-full">
-                    <Card className="overflow-hidden rounded-[3rem] border border-glass-border bg-glass backdrop-blur-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] transition-all duration-700">
-                        <CardHeader className="border-b border-glass-border bg-muted/20 px-10 py-10 flex flex-row items-center justify-between">
-                            <div className="space-y-1.5">
-                                <CardTitle className="text-4xl font-black tracking-tighter text-foreground uppercase italic-pro-max">
+                    <Card className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-500">
+                        <CardHeader className="border-b border-border/40 bg-muted/20 px-8 py-6 flex flex-row items-center justify-between">
+                            <div className="space-y-0.5">
+                                <CardTitle className="text-lg font-bold tracking-tight text-foreground">
                                     {steps[safeStep]}
                                 </CardTitle>
-                                <CardDescription className="text-sm font-bold text-muted-foreground/60 tracking-wide uppercase">
-                                    Fase {safeStep + 1} de {steps.length} — Configuración Estratégica
+                                <CardDescription className="text-xs font-medium text-muted-foreground/70">
+                                    Paso {safeStep + 1} de {steps.length}
                                 </CardDescription>
                             </div>
-                            <div className="hidden sm:block h-16 w-16 rounded-2xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary animate-pulse-subtle">
-                                <Check className="h-8 w-8 stroke-[3.5px]" />
+                            {/* Progress bar visual */}
+                            <div className="hidden sm:flex items-center gap-3">
+                                <Progress value={progress} className="w-32 h-1.5 bg-border/40" />
+                                <span className="text-xs text-muted-foreground/60 tabular-nums">{Math.round(progress)}%</span>
                             </div>
                         </CardHeader>
-                        <CardContent className="p-8 sm:p-12">
+                        <CardContent className="p-6 sm:p-8">
                             <CurrentStepComponent showErrors={hasAttemptedNext} />
                         </CardContent>
-                        <div className="flex flex-col-reverse justify-between gap-6 border-t border-glass-border bg-muted/30 px-10 py-10 sm:flex-row sm:items-center">
-                            <div className="flex gap-5">
+                        <div className="flex flex-col-reverse justify-between gap-4 border-t border-border/40 bg-muted/20 px-8 py-5 sm:flex-row sm:items-center">
+                            <div className="flex gap-3">
                                 <Button
                                     data-testid="quote-wizard-back"
                                     variant="outline"
                                     onClick={handleBack}
                                     disabled={safeStep === 0 || isSaving}
-                                    className="h-14 rounded-2xl gap-3 px-8 font-black uppercase tracking-widest text-[10px] border-glass-border transition-all hover:bg-background active:scale-[0.95] shadow-sm"
+                                    className="h-10 rounded-xl gap-2 px-5 font-medium text-sm border-border/60 transition-all hover:bg-background active:scale-[0.97]"
                                 >
-                                    <ArrowLeft className="h-4 w-4" />
-                                    Regresar
+                                    <ArrowLeft className="h-3.5 w-3.5" />
+                                    Atrás
                                 </Button>
 
                                 <Button
@@ -269,23 +260,23 @@ export default function QuotePage() {
                                     variant="ghost"
                                     onClick={handleReset}
                                     disabled={isSaving}
-                                    className="h-14 rounded-2xl gap-3 px-8 font-black uppercase tracking-widest text-[10px] text-muted-foreground/40 transition-all hover:bg-destructive/10 hover:text-destructive active:scale-[0.95]"
+                                    className="h-10 rounded-xl gap-2 px-4 font-medium text-sm text-muted-foreground/50 transition-all hover:bg-destructive/10 hover:text-destructive active:scale-[0.97]"
                                 >
-                                    <Trash2 className="h-4 w-4" />
-                                    Reset
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    Limpiar
                                 </Button>
                             </div>
 
-                            <div className="flex gap-5">
+                            <div className="flex gap-3">
                                 <Button
                                     data-testid="quote-wizard-draft"
                                     variant="outline"
-                                    className="h-14 rounded-2xl gap-3 border-brand-secondary/30 bg-background/50 px-8 font-black uppercase tracking-widest text-[10px] transition-all hover:border-brand-secondary/60 hover:text-brand-secondary active:scale-[0.95] text-brand-secondary"
+                                    className="h-10 rounded-xl gap-2 border-brand-secondary/30 bg-background/50 px-5 font-medium text-sm transition-all hover:border-brand-secondary/50 hover:text-brand-secondary active:scale-[0.97] text-brand-secondary"
                                     onClick={handleSaveDraft}
                                     disabled={isSaving}
                                 >
-                                    {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                                    Borrador
+                                    {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                                    Guardar borrador
                                 </Button>
 
                                 {safeStep < steps.length - 1 ? (
@@ -293,20 +284,20 @@ export default function QuotePage() {
                                         data-testid="quote-wizard-next"
                                         onClick={handleNext}
                                         disabled={isSaving}
-                                        className="h-14 rounded-2xl gap-4 px-12 font-black uppercase tracking-widest text-[10px] bg-brand-primary text-white shadow-2xl shadow-brand-primary/30 transition-all hover:shadow-brand-primary/50 active:scale-[0.95] border-t border-white/20"
+                                        className="h-10 rounded-xl gap-2 px-6 font-semibold text-sm bg-brand-primary text-white shadow-md shadow-brand-primary/20 transition-all hover:shadow-brand-primary/30 hover:bg-brand-primary/90 active:scale-[0.97]"
                                     >
                                         Continuar
-                                        <ArrowRight className="h-4 w-4" />
+                                        <ArrowRight className="h-3.5 w-3.5" />
                                     </Button>
                                 ) : (
                                     <Button
                                         data-testid="quote-wizard-submit"
-                                        className="h-14 rounded-2xl gap-4 bg-brand-primary px-14 font-black uppercase tracking-widest text-[10px] text-white shadow-2xl shadow-brand-primary/40 transition-all hover:shadow-brand-primary/60 active:scale-[0.95] border-t border-white/20 animate-pulse-subtle"
+                                        className="h-10 rounded-xl gap-2 bg-brand-primary px-6 font-semibold text-sm text-white shadow-md shadow-brand-primary/25 transition-all hover:shadow-brand-primary/40 hover:bg-brand-primary/90 active:scale-[0.97]"
                                         onClick={handleFinalize}
                                         disabled={isSaving}
                                     >
-                                        {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                                        Emitir Propuesta
+                                        {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                                        Finalizar cotización
                                     </Button>
                                 )}
                             </div>
@@ -314,9 +305,9 @@ export default function QuotePage() {
                     </Card>
                 </div>
 
-                {/* Show Preview only on the final step (Finanzas - index 5) */}
+                {/* Preview disponible en el paso final (Tarifas - index 5) */}
                 {safeStep === 5 && (
-                    <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <QuotePreview />
                     </div>
                 )}

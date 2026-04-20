@@ -51,7 +51,7 @@ function LeadsSkeleton() {
 function ActivitySkeleton() {
     return (
         <div className="col-span-1 lg:col-span-3">
-            <Card className="border-none shadow-sm ring-1 ring-border/50 bg-card rounded-[2.5rem] h-full">
+            <Card className="border-none shadow-sm ring-1 ring-border/50 bg-card rounded-2xl h-full">
                 <CardHeader className="border-b border-border/50 bg-muted/20 pb-5 pt-8 px-8">
                     <Skeleton className="h-6 w-48" />
                 </CardHeader>
@@ -73,7 +73,7 @@ function ActivitySkeleton() {
 
 function DraftsSkeleton() {
     return (
-        <Card className="border-none shadow-sm ring-1 ring-border/50 bg-card rounded-[2rem]">
+        <Card className="border-none shadow-sm ring-1 ring-border/50 bg-card rounded-2xl">
             <CardHeader className="pb-5 pt-8 px-8">
                 <Skeleton className="h-8 w-48" />
                 <Skeleton className="h-4 w-32 mt-2" />
@@ -117,16 +117,13 @@ export default async function DashboardPage() {
         <div className="flex-1 space-y-10 p-8 pt-10 pb-24">
             {/* Page header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-border/40 pb-10">
-                <div className="space-y-3">
-                    <div className="inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.25em] text-brand-primary border border-brand-primary/20">
-                        Operational Dashboard
-                    </div>
-                    <h2 className="text-5xl font-black tracking-tighter text-foreground">Panel de Control</h2>
-                    <p className="text-lg font-bold text-muted-foreground/70 max-w-2xl">Gestión estratégica de prospectos y motor de cotización activa.</p>
+                <div className="space-y-1">
+                    <h2 className="text-xl font-semibold tracking-tight text-foreground">Panel de Control</h2>
+                    <p className="text-sm font-medium text-muted-foreground/70">Cotizaciones activas, seguimiento y estado del equipo.</p>
                 </div>
-                <Button asChild className="h-13 rounded-2xl bg-brand-action text-white px-8 shadow-2xl shadow-brand-action/30 transition-all duration-500 hover:bg-brand-action/90 hover:shadow-brand-action/40 hover:-translate-y-1 active:scale-[0.97] border-t border-white/20 w-full lg:w-auto">
-                    <Link href="/dashboard/cotizar" className="flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[11px]">
-                        <Plus className="h-5 w-5 stroke-[3px]" />
+                <Button asChild className="h-11 rounded-xl bg-brand-primary text-white px-7 shadow-lg shadow-brand-primary/20 transition-all duration-300 hover:bg-brand-primary/90 hover:-translate-y-0.5 active:scale-[0.97] w-full lg:w-auto">
+                    <Link href="/dashboard/cotizar" className="flex items-center justify-center gap-2 font-semibold text-sm">
+                        <Plus className="h-4 w-4 stroke-[2.5px]" />
                         <span>Nueva Cotización</span>
                     </Link>
                 </Button>

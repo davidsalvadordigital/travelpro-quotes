@@ -29,10 +29,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { label: "Mis Leads", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Cotizar", href: "/dashboard/cotizar", icon: FileText },
-    { label: "Mi Perfil", href: "/dashboard/profile", icon: Settings },
-    { label: "Admin", href: "/admin", icon: BarChart3, adminOnly: true },
+    { label: "Panel", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Nueva Cotización", href: "/dashboard/cotizar", icon: FileText },
+    { label: "Configuración", href: "/dashboard/profile", icon: Settings },
+    { label: "Analíticas", href: "/admin", icon: BarChart3, adminOnly: true },
 ];
 
 interface SidebarProps {

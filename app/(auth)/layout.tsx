@@ -36,48 +36,29 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     </span>
                 </div>
 
-                {/* Main Hero Section */}
-                <div className="relative z-10 max-w-lg">
-                    <div className="space-y-8">
-                        <div className="space-y-3">
-                            <span className="inline-flex items-center rounded-full bg-white/15 px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-white border border-white/20 backdrop-blur-sm">
-                                Travel Intelligence
-                            </span>
-                            <h2 className="text-6xl font-black leading-[1] tracking-tighter text-white">
-                                Cotiza el <br />
-                                <span className="text-white/90">
-                                    mundo.
-                                </span>
-                            </h2>
-                        </div>
-                        <p className="text-xl leading-relaxed text-white/80 font-bold tracking-tight">
-                            El motor que impulsa a las agencias que no conocen fronteras. 
-                            Rápido, vivo y diseñado para el éxito.
+                {/* Main center content — clean abstract branding */}
+                <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 text-center">
+                    <div className="space-y-3">
+                        <h2 className="text-5xl font-black leading-[1] tracking-tighter text-white">
+                            Plataforma de<br />
+                            <span className="text-white/70 font-light">Cotizaciones</span>
+                        </h2>
+                        <p className="text-base font-medium text-white/60 tracking-tight">
+                            Herramienta interna Trappvel · Uso exclusivo del equipo
                         </p>
-                        
-                        {/* Executive KPIs */}
-                        <div className="grid grid-cols-3 gap-10 pt-10 border-t border-white/10">
-                            <div className="space-y-1">
-                                <div className="text-4xl font-black text-white tracking-tighter tabular-nums">+500</div>
-                                <div className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em]">Cotizaciones</div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="text-4xl font-black text-white tracking-tighter tabular-nums">98%</div>
-                                <div className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em]">Precisión IA</div>
-                            </div>
-                            <div className="space-y-1">
-                                <div className="text-4xl font-black text-white tracking-tighter tabular-nums">2min</div>
-                                <div className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em]">Entrega</div>
-                            </div>
-                        </div>
+                    </div>
+                    <div className="pt-6 border-t border-white/10">
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest text-center">
+                            Motor de cotización · v2.0
+                        </p>
                     </div>
                 </div>
 
                 {/* Layout Footer */}
-                <div className="relative z-10 flex items-center justify-between text-[11px] font-black text-white/60 uppercase tracking-[0.25em]">
-                    <span>© 2026 Trappvel Quotes</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/30" />
-                    <span>Adventure Engine v4</span>
+                <div className="relative z-10 flex items-center justify-between text-[11px] font-medium text-white/40 uppercase tracking-[0.2em]">
+                    <span>© 2026 Trappvel</span>
+                    <span className="h-1 w-1 rounded-full bg-white/30" />
+                    <span>Uso Interno</span>
                 </div>
             </div>
 

@@ -93,13 +93,13 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
     return (
         <div className="space-y-10 animate-fade-in">
             {/* Avatar Section — Glassmorphism Pro */}
-            <Card className="p-8 border border-glass-border bg-glass backdrop-blur-xl rounded-[2.5rem] shadow-xl shadow-black/5 overflow-hidden relative group">
+            <Card className="p-6 border border-border/60 bg-card rounded-2xl shadow-sm overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent pointer-events-none" />
                 <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8">
                     <div className="relative group/avatar">
-                        <Avatar className="h-32 w-32 ring-4 ring-brand-primary/20 shadow-2xl transition-all duration-500 group-hover/avatar:ring-brand-primary/40">
+                        <Avatar className="h-20 w-20 ring-2 ring-brand-primary/20 shadow-md transition-all duration-300 group-hover/avatar:ring-brand-primary/40">
                             <AvatarImage src={avatarUrl || ""} alt={fullName} className="object-cover" />
-                            <AvatarFallback className="bg-brand-primary text-white text-4xl font-black italic">
+                            <AvatarFallback className="bg-brand-primary/10 text-brand-primary text-xl font-bold">
                                 {initials}
                             </AvatarFallback>
                         </Avatar>
@@ -125,7 +125,7 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
                     </div>
                     <div className="text-center sm:text-left space-y-2">
                         <div className="space-y-1">
-                            <h2 className="text-3xl font-black tracking-tighter text-foreground">{fullName || "Agente Trappvel"}</h2>
+                            <h2 className="text-lg font-semibold tracking-tight text-foreground">{fullName || "Agente Trappvel"}</h2>
                             <p className="text-sm font-bold text-muted-foreground/80 tracking-tight">{profile.email}</p>
                         </div>
                         <span className="inline-flex items-center rounded-full bg-brand-primary/10 px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/20">
@@ -136,12 +136,12 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
             </Card>
 
             {/* Info Form — Clean UI */}
-            <Card className="p-10 border border-glass-border bg-glass backdrop-blur-xl rounded-[2.5rem] shadow-xl shadow-black/5">
+            <Card className="p-8 border border-border/60 bg-card rounded-2xl shadow-sm">
                 <form onSubmit={handleSave} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-3">
-                            <label htmlFor="fullName" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                                Nombre Estratégico
+                            <label htmlFor="fullName" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70 ml-1">
+                                Nombre Completo
                             </label>
                             <div className="relative group">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-muted-foreground/40 group-focus-within:text-brand-primary transition-colors" />
@@ -157,8 +157,8 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
                         </div>
 
                         <div className="space-y-3">
-                            <label htmlFor="phone" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                                Línea Directa (WhatsApp)
+                            <label htmlFor="phone" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70 ml-1">
+                                Teléfono (WhatsApp)
                             </label>
                             <Input
                                 id="phone"
@@ -172,8 +172,8 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
                     </div>
 
                     <div className="space-y-3">
-                        <label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
-                            Identidad Digital (Inalterable)
+                        <label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/70 ml-1">
+                            Correo Electrónico (Solo lectura)
                         </label>
                         <Input
                             id="email"

@@ -3,29 +3,30 @@
 import { useState, useEffect } from "react";
 import { useActiveQuote } from "@/features/quotes/store/quote-store";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+    Sheet,
+    SheetContent,
+    SheetTitle,
+} from "@/components/ui/sheet";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { QuoteTemplate } from "@/features/quotes/components/quote-template";
 import type { Quote } from "@/features/quotes/schemas/quote-schema";
 import {
-    User, MapPin, Eye, Printer, Download, Loader2, ArrowRight, X, Sparkles, ShieldCheck
+    User, MapPin, Eye, Printer, Download, Loader2, X, FileText, Info
 } from "lucide-react";
 import { formatCOP, formatUSD, formatTRM } from "@/lib/utils";
 import { calculateNacional, calculateInternacional } from "@/features/quotes/utils/calculator";
 import { cn } from "@/lib/utils";
 
 /**
- * QuotePreview — Diamond Standard Edition (2026)
- * Previsualización lateral con estilo Glassmorphism Premium.
- * Modal de visualización "Modo Magazine" a pantalla completa.
+ * QuotePreview — Panel lateral de previsualización de cotización en curso.
+ * Muestra datos clave y abre el modal de vista completa A4.
  */
 export function QuotePreview() {
     const activeQuote = useActiveQuote();
     const [open, setOpen] = useState(false);
 
-    // Estados para PDF dinámico
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -49,7 +50,6 @@ export function QuotePreview() {
                 try {
                     const { pdf } = await import("@react-pdf/renderer");
                     const { QuoteDocument } = await import("@/features/quotes/components/pdf-document");
-
                     const blob = await pdf(<QuoteDocument quote={activeQuote as unknown as Quote} />).toBlob();
                     setPdfUrl(URL.createObjectURL(blob));
                 } catch (error) {
@@ -64,21 +64,26 @@ export function QuotePreview() {
 
         return () => {
             if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-        }
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeQuote, open]);
 
     const handlePrint = () => { window.print(); };
 
+    // ── Estado vacío ──────────────────────────────────────────────────────────
     if (!hasData) {
         return (
-            <Card className="border-2 border-dashed border-slate-200 bg-slate-50/50 rounded-[2.5rem] shadow-none">
-                <CardContent className="py-20 text-center space-y-4">
-                    <div className="h-16 w-16 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-sm border border-slate-100">
-                        <Sparkles className="h-8 w-8 text-slate-300" />
+            <Card className="border border-dashed border-border/60 bg-muted/20 rounded-2xl shadow-none">
+                <CardContent className="py-16 text-center space-y-3">
+                    <div className="h-12 w-12 bg-muted rounded-xl flex items-center justify-center mx-auto">
+                        <FileText className="h-6 w-6 text-muted-foreground/30" />
                     </div>
-                    <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Tu obra maestra se está creando...</p>
-                    <p className="text-[10px] font-bold text-slate-300 max-w-[200px] mx-auto uppercase tracking-widest leading-relaxed">Completa los detalles para ver la magia.</p>
+                    <div className="space-y-1">
+                        <p className="text-sm font-semibold text-muted-foreground/60">Sin datos para previsualizar</p>
+                        <p className="text-xs text-muted-foreground/40 max-w-[180px] mx-auto leading-relaxed">
+                            Completá los datos del viajero para ver la previsualización.
+                        </p>
+                    </div>
                 </CardContent>
             </Card>
         );
@@ -86,173 +91,207 @@ export function QuotePreview() {
 
     return (
         <>
-            {/* Glassmorphism Preview Card */}
-            <Card className="border-none ring-1 ring-white/20 bg-white/60 dark:bg-slate-900/40 backdrop-blur-3xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] rounded-[3rem] overflow-hidden transition-all duration-700 hover:shadow-[0_60px_100px_-20px_rgba(227,58,122,0.15)] group relative">
-                {/* Accent glow */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#E33A7A]/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:bg-[#E33A7A]/20 transition-all duration-700" />
-                
-                <CardContent className="p-10 space-y-8 relative z-10">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Live Proposal Editor</h3>
-                        </div>
-                        <Badge variant="outline" className="rounded-full bg-slate-900 text-white border-none text-[8px] font-black tracking-widest px-4 py-1.5 uppercase italic">
-                            Diamond v2.8
-                        </Badge>
+            {/* ── Panel lateral de resumen ─────────────────────────────────── */}
+            <Card className="border border-border/60 bg-card rounded-2xl shadow-sm overflow-hidden transition-all duration-300 hover:border-border">
+                <CardContent className="p-6 space-y-6">
+
+                    {/* Header del panel */}
+                    <div className="flex items-center gap-2 border-b border-border/40 pb-4">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                            Vista previa
+                        </h3>
                     </div>
 
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-6">
-                            <div className="h-20 w-20 rounded-[2rem] bg-slate-900 flex items-center justify-center text-[#E33A7A] shadow-2xl transition-transform group-hover:rotate-6 duration-500">
-                                <User className="h-10 w-10" />
-                            </div>
-                            <div className="space-y-1">
-                                <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none truncate max-w-[150px]">
-                                    {activeQuote.travelerName || "Elite Guest"}
-                                </p>
-                                <div className="flex items-center gap-2 text-[10px] font-black text-[#E33A7A] uppercase tracking-widest">
-                                    <MapPin className="h-3 w-3" /> {activeQuote.destination || "Pendiente"}
-                                </div>
-                            </div>
+                    {/* Datos del viajero */}
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground/40 shrink-0">
+                            <User className="h-6 w-6" />
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-slate-50/80 p-5 rounded-[2rem] border border-slate-100/50 backdrop-blur-sm">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-2">Pasajeros</p>
-                                <div className="text-xl font-black text-slate-800 tabular-nums italic">
-                                    {activeQuote.numberOfTravelers || 1} <span className="text-[10px] font-bold opacity-30 not-italic">PAX</span>
-                                </div>
-                            </div>
-                            <div className="bg-slate-50/80 p-5 rounded-[2rem] border border-slate-100/50 backdrop-blur-sm">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-2">Expedición</p>
-                                <div className="text-xl font-black text-slate-800 tabular-nums italic">
-                                    {activeQuote.itinerary?.length || 0} <span className="text-[10px] font-bold opacity-30 not-italic">DÍAS</span>
-                                </div>
+                        <div className="min-w-0">
+                            <p className="text-base font-bold text-foreground tracking-tight truncate">
+                                {activeQuote.travelerName || "—"}
+                            </p>
+                            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground/70 mt-0.5">
+                                <MapPin className="h-3 w-3 shrink-0" />
+                                <span className="truncate">{activeQuote.destination || "Sin destino"}</span>
                             </div>
                         </div>
                     </div>
 
+                    {/* Métricas */}
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-muted/40 p-4 rounded-xl border border-border/50">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Pasajeros</p>
+                            <div className="text-lg font-black text-foreground tabular-nums">
+                                {activeQuote.numberOfTravelers || 1}
+                                <span className="text-[10px] font-medium text-muted-foreground/40 ml-1">PAX</span>
+                            </div>
+                        </div>
+                        <div className="bg-muted/40 p-4 rounded-xl border border-border/50">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Días</p>
+                            <div className="text-lg font-black text-foreground tabular-nums">
+                                {activeQuote.itinerary?.length || 0}
+                                <span className="text-[10px] font-medium text-muted-foreground/40 ml-1">noches</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Financiero (si aplica) */}
                     {hasFinancials && (
-                        <div className="pt-8 border-t border-slate-100/50 flex flex-col gap-6">
+                        <div className="pt-4 border-t border-border/40 space-y-3">
                             {isNacional && calcNac ? (
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                        <span>Total Inversión</span>
-                                        <div className="flex items-center gap-1.5 text-emerald-500">
-                                            <ShieldCheck className="h-3 w-3" /> Seguro
-                                        </div>
-                                    </div>
-                                    <div className="text-4xl font-black text-[#E33A7A] tracking-tighter tabular-nums leading-none italic">
-                                        {formatCOP(calcNac.precioClienteCOP)} <span className="text-sm font-bold opacity-20 not-italic">COP</span>
-                                    </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Precio total</p>
+                                    <p className="text-2xl font-black text-brand-primary tabular-nums tracking-tight">
+                                        {formatCOP(calcNac.precioClienteCOP)}
+                                        <span className="text-xs font-medium text-muted-foreground/40 ml-1.5">COP</span>
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground/50">
+                                        Utilidad: {formatCOP(calcNac.utilidadCOP)}
+                                    </p>
                                 </div>
                             ) : calcInt ? (
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total USD</p>
-                                            <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter tabular-nums leading-none italic">
-                                                {formatUSD(calcInt.precioClienteUSD)}
-                                            </p>
-                                        </div>
-                                        <div className="text-right space-y-2">
-                                            <p className="text-sm font-black text-[#E33A7A] tabular-nums leading-none">
-                                                {formatCOP(calcInt.precioClienteCOP)}
-                                            </p>
-                                            <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest">TRM {formatTRM(trm)}</p>
-                                        </div>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Precio total</p>
+                                        <p className="text-xl font-black text-foreground tabular-nums tracking-tight">
+                                            {formatUSD(calcInt.precioClienteUSD)}
+                                        </p>
+                                    </div>
+                                    <div className="text-right space-y-1">
+                                        <p className="text-sm font-bold text-brand-primary tabular-nums">
+                                            {formatCOP(calcInt.precioClienteCOP)}
+                                        </p>
+                                        <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                            TRM {formatTRM(trm)}
+                                        </p>
                                     </div>
                                 </div>
                             ) : null}
                         </div>
                     )}
 
-                    <Button 
+                    {/* CTA Principal */}
+                    <Button
                         data-testid="quote-preview-visualize"
                         onClick={() => setOpen(true)}
-                        className="w-full h-16 rounded-[2rem] bg-[#E33A7A] hover:bg-[#E33A7A]/90 text-white font-black uppercase tracking-[0.3em] text-[11px] shadow-2xl shadow-[#E33A7A]/20 active:scale-95 transition-all relative overflow-hidden group/btn border-none"
+                        className="w-full h-10 rounded-xl bg-brand-primary text-white font-semibold text-sm gap-2 shadow-md shadow-brand-primary/20 hover:bg-brand-primary/90 active:scale-[0.97] transition-all"
                     >
-                        <span className="relative z-10 flex items-center gap-3">
-                             Visualizar Experiencia <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-2 transition-transform duration-500" />
-                        </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+                        <Eye className="h-4 w-4" />
+                        Ver propuesta
                     </Button>
                 </CardContent>
             </Card>
 
-            {/* Full Quote Dialog — Magazine View Mode */}
-            <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="max-w-[100vw] w-screen h-screen m-0 p-0 border-none shadow-none bg-[#F8FAFC] rounded-none flex flex-col items-center overflow-hidden custom-scrollbar">
-                    {/* Título oculto para accesibilidad (screen readers) — requerido por Radix */}
-                    <VisuallyHidden.Root asChild>
-                        <DialogTitle>Propuesta de Viaje Premium — {activeQuote.travelerName || "Cliente Elite"}</DialogTitle>
+            {/* ── Slide-over Document ──────────────────────────────────────── */}
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetContent side="right" className="!w-screen !max-w-none p-0 gap-0 overflow-hidden flex flex-col bg-slate-900 border-none shadow-2xl">
+                    <VisuallyHidden.Root>
+                        <SheetTitle>Previsualización — {activeQuote.travelerName || "Cotización"}</SheetTitle>
                     </VisuallyHidden.Root>
 
-                    {/* Floating Premium Navigation */}
-                    <header className="fixed top-0 left-0 right-0 h-24 bg-[#0F172A]/95 backdrop-blur-2xl border-b border-white/5 px-12 flex items-center justify-between z-[100] transition-colors duration-500 hover:bg-[#0F172A]">
-                        <div className="flex items-center gap-10">
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                onClick={() => setOpen(false)}
-                                className="h-12 w-12 text-white/40 hover:text-[#E33A7A] hover:bg-[#E33A7A]/10 rounded-2xl transition-all duration-300"
-                            >
-                                <X className="h-6 w-6" />
-                            </Button>
-                            <div className="h-10 w-px bg-white/10 hidden md:block" />
-                            <div className="space-y-1 hidden sm:block">
-                                <h2 className="text-2xl font-black tracking-tighter uppercase italic text-white flex items-center gap-4">
-                                    <span className="text-[#E33A7A]">Trappvel</span> <span className="opacity-40">/</span> Luxury Proposal
-                                </h2>
-                                <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/20">Edición Diamante 2026 · Certificado de Exclusividad</p>
-                            </div>
-                        </div>
-
+                    <div className="flex items-center justify-between px-6 py-3 border-b border-white/5 bg-slate-900/95 backdrop-blur-xl sticky top-0 z-50 shadow-2xl">
                         <div className="flex items-center gap-6">
-                            <div className="hidden lg:flex flex-col text-right mr-6 border-r border-white/10 pr-10 space-y-1">
-                                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">Preparado para</p>
-                                <p className="text-base font-black text-white italic tracking-tight">{activeQuote.travelerName || "Cliente Elite"}</p>
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">
+                                    Propuesta de viajes
+                                </span>
+                                <h2 className="text-sm font-bold text-white uppercase tracking-tight">
+                                    {activeQuote.destination || "Sin Destino"}
+                                </h2>
                             </div>
-
-                            <div className="flex items-center gap-3">
-                                <Button
-                                    data-testid="quote-preview-print"
-                                    variant="outline"
-                                    className="h-12 gap-3 rounded-2xl px-6 font-black uppercase tracking-widest text-[10px] bg-white/5 border-white/10 hover:bg-white/10 text-white transition-all active:scale-95 group/print"
-                                    onClick={handlePrint}
-                                >
-                                    <Printer className="h-4 w-4 text-[#E33A7A] group-hover/print:scale-110 transition-transform" /> <span className="hidden sm:inline">Imprimir Propuesta</span>
-                                </Button>
-
-                                <Button
-                                    asChild
-                                    data-testid="quote-preview-download-master"
-                                    className="h-12 gap-3 rounded-2xl px-10 font-black uppercase tracking-widest text-[10px] bg-[#E33A7A] hover:bg-[#E33A7A]/90 text-white shadow-[0_20px_40px_-10px_rgba(227,58,122,0.4)] transition-all active:scale-95 border-none group/dl"
-                                >
-                                    <a data-testid="quote-preview-download-link" href={pdfUrl || "#"} download={`Propuesta-Elite-${activeQuote.travelerName || 'Trappvel'}.pdf`}>
-                                        {isGeneratingPdf ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <>Descargar Master <Download className="h-4 w-4 group-hover/dl:translate-y-0.5 transition-transform" /></>
-                                        )}
-                                    </a>
-                                </Button>
+                            
+                            <div className="h-8 w-px bg-white/10 hidden md:block" />
+                            
+                            <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-white/5 rounded-full border border-white/10">
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em]">
+                                    Previsualización de documento PDF
+                                </span>
                             </div>
                         </div>
-                    </header>
 
-                    {/* Magazine Layout Canvas */}
-                    <div className="flex-1 w-full pt-24 overflow-y-auto bg-slate-100/30 flex justify-center p-6 md:p-12 lg:p-24 custom-scrollbar">
-                        <div className="w-full max-w-[1000px] shadow-[0_80px_150px_-30px_rgba(0,0,0,0.1)] transition-transform duration-1000">
-                             {/* Frame for the magazine page */}
-                            <div className="bg-white rounded-sm overflow-hidden min-h-[1414px] ring-1 ring-slate-200">
-                                <QuoteTemplate />
+                        <div className="flex items-center gap-3">
+                            <div className="hidden sm:flex items-center gap-2 mr-4 px-3 py-1 bg-white/5 rounded-lg border border-white/10">
+                                <div className={cn("h-1.5 w-1.5 rounded-full", activeQuote.id ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-amber-500 animate-pulse")} />
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                                    {activeQuote.id ? "Sincronizado con Servidor" : "Sesión Local / Borrador"}
+                                </span>
                             </div>
+
+                            <Button
+                                asChild
+                                variant="secondary"
+                                size="sm"
+                                className="h-9 px-5 rounded-xl bg-white text-slate-900 font-bold text-[11px] uppercase tracking-wider hover:bg-slate-100 shadow-xl"
+                            >
+                                <a
+                                    href={pdfUrl || "#"}
+                                    download={`Propuesta-${activeQuote.travelerName || "Trappvel"}.pdf`}
+                                >
+                                    {isGeneratingPdf ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
+                                    ) : (
+                                        <Download className="h-3.5 w-3.5 mr-2" />
+                                    )}
+                                    Exportar PDF
+                                </a>
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setOpen(false)}
+                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+                            >
+                                <X className="h-5 w-5" />
+                            </Button>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
+
+                    <div className="flex-1 overflow-y-auto bg-[#0a0f1a] p-4 md:p-12 scrollbar-premium flex flex-col items-center">
+                        
+                        {/* Status bar sutil sobre el documento */}
+                        <div className="w-[210mm] flex items-center justify-between px-1 mb-2">
+                             <div className="flex items-center gap-2">
+                                <FileText className="h-3 w-3 text-slate-500" />
+                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    A4 Vertical · {isNacional ? 'Nacional' : 'Internacional'}
+                                </span>
+                             </div>
+                             <span className="text-[8px] font-black text-slate-600 uppercase tracking-[0.2em]">
+                                v3.0 · {new Date().toLocaleDateString()}
+                             </span>
+                        </div>
+
+                        {/* Multi-Page Document Canvas (A4 Pages) */}
+                        <div className="flex flex-col items-center gap-0 pb-20 w-full">
+                            {/* Seamless integration of the Quote Template which contains multiple A4 pages */}
+                            <QuoteTemplate />
+                            
+                            {/* Signatures Page attached to the end */}
+                            <div className="relative w-[210mm] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 mx-auto overflow-hidden min-h-[150mm] flex flex-col print:shadow-none print:ring-0 print:break-after-page">
+                                <div className="px-10 pb-20 pt-10 bg-white flex-1 flex flex-col justify-end">
+                                    <div className="mt-auto pt-16 flex justify-between gap-16 border-t border-slate-100">
+                                        <div className="flex-1">
+                                            <div className="h-px bg-slate-300 w-full mb-3" />
+                                            <p className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">Asesor Encargado</p>
+                                            <p className="text-[8px] text-slate-400 mt-1 italic">Trappvel Travel Systems</p>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="h-px bg-slate-300 w-full mb-3" />
+                                            <p className="text-[9px] font-bold text-slate-900 uppercase tracking-wider text-right">Aceptación Cliente</p>
+                                            <p className="text-[8px] text-slate-400 mt-1 italic text-right">Firma Digital / Escrita</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </SheetContent>
+            </Sheet>
         </>
     );
 }

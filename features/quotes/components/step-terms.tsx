@@ -75,13 +75,10 @@ El pago se liquida a la TRM oficial del día del abono.`
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-border/40 pb-8">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                        <ShieldCheck className="h-6 w-6 text-brand-secondary" />
-                        <h3 className="text-3xl font-black uppercase tracking-tight">Cierre y Políticas</h3>
-                    </div>
-                    <p className="text-sm font-medium text-muted-foreground max-w-xl leading-relaxed">
-                        Ahorra tiempo utilizando las plantillas de automatización para términos, documentos y forma de pago.
+                <div className="space-y-1">
+                    <h3 className="text-base font-bold tracking-tight text-foreground">Cláusulas y Condiciones</h3>
+                    <p className="text-xs text-muted-foreground/70">
+                        Define inclusiones, exclusiones y políticas legales de la propuesta.
                     </p>
                 </div>
 
@@ -115,7 +112,7 @@ El pago se liquida a la TRM oficial del día del abono.`
                         <div className="flex items-center justify-between">
                             <Label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
                                 <CheckCircle2 className="h-4 w-4 text-emerald-500" strokeWidth={3} />
-                                ¿Qué Otorga Nuestra Propuesta?
+                                Inclusiones
                             </Label>
                             <Button
                                 type="button"
@@ -161,7 +158,7 @@ El pago se liquida a la TRM oficial del día del abono.`
                         <div className="flex items-center justify-between">
                             <Label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-red-600/80">
                                 <AlertCircle className="h-4 w-4 text-red-500" strokeWidth={3} />
-                                Restricciones Comerciales
+                                Exclusiones
                             </Label>
                             <Button
                                 type="button"
@@ -238,16 +235,16 @@ El pago se liquida a la TRM oficial del día del abono.`
 
                     {/* Respaldo Legal */}
                     <div className="space-y-3">
-                        <Label htmlFor="legalConditions" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground">
+                        <Label htmlFor="legalConditions" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ml-0.5 text-muted-foreground/60">
                             <FileText className="h-3.5 w-3.5" />
-                            Políticas Gubernamentales y Generales
+                            Cláusulas Legales y Generales
                         </Label>
                         <Textarea
                             id="legalConditions"
-                            placeholder="Letra pequeña y términos estándar de la agencia..."
+                            placeholder="Términos estándar, políticas de cancelación y letra pequeña..."
                             value={activeQuote.legalConditions || ""}
                             onChange={(e) => setQuoteField("legalConditions", e.target.value)}
-                            className="min-h-[130px] resize-none rounded-[2rem] border border-glass-border bg-muted/20 text-xs font-semibold leading-relaxed p-5 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 hover:bg-muted/40"
+                            className="min-h-[130px] resize-none rounded-xl border border-border/60 bg-muted/20 text-xs font-medium leading-relaxed p-4 transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 hover:bg-muted/40"
                         />
                     </div>
                 </div>

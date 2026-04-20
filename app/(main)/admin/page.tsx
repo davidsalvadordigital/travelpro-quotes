@@ -64,7 +64,7 @@ async function AdminKpiSection({ userId }: { userId: string }) {
                 const isNegative = kpi.trend === "down";
 
                 return (
-                    <Card key={kpi.label} variant="glass" className="overflow-hidden border border-glass-border/30 hover:border-brand-primary/40 shadow-xl shadow-black/5 hover:shadow-premium hover:-translate-y-1.5 transition-all duration-500 group animate-scale-in">
+                    <Card key={kpi.label} variant="glass" className="overflow-hidden border border-glass-border/30 hover:border-brand-primary/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group animate-scale-in">
                         <CardContent className="p-7">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary transition-all duration-500 group-hover:bg-brand-primary group-hover:text-white shadow-lg shadow-brand-primary/10 group-hover:shadow-brand-primary/30">
@@ -82,7 +82,7 @@ async function AdminKpiSection({ userId }: { userId: string }) {
                             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 mb-2">
                                 {kpi.label}
                             </p>
-                            <h3 className="text-4xl font-black text-foreground tabular-nums tracking-tighter italic-pro-max">
+                            <h3 className="text-3xl font-black text-foreground tabular-nums tracking-tighter">
                                 {kpi.value}
                             </h3>
                             <div className="mt-5 flex items-center gap-2.5 border-t border-glass-border/40 pt-5">
@@ -105,7 +105,7 @@ async function AdvisorPerformanceSection({ userId }: { userId: string }) {
         <Card variant="glass" className="lg:col-span-4 h-full border-glass-border/30">
             <CardHeader className="flex flex-row items-center justify-between pt-8 pb-5 px-8 border-b border-glass-border/30 bg-muted/10">
                 <div className="space-y-1">
-                    <CardTitle className="text-2xl font-black tracking-tight text-foreground">Advisor Breakdown</CardTitle>
+                    <CardTitle className="text-base font-bold tracking-tight text-foreground">Rendimiento por Asesora</CardTitle>
                     <p className="text-[13px] font-bold text-muted-foreground/70">Seguimiento de conversiones por agente.</p>
                 </div>
             </CardHeader>
@@ -158,20 +158,13 @@ export default async function AdminPage() {
     return (
         <div className="flex-1 space-y-10 p-8 pt-10 pb-24">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-border/40 pb-10">
-                <div className="space-y-3">
-                    <div className="inline-flex items-center rounded-full bg-brand-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.25em] text-brand-primary border border-brand-primary/20">
-                        Executive Control Center
-                    </div>
-                    <h2 className="text-5xl font-black tracking-tighter text-foreground">
-                        Admin Dashboard
+                <div className="space-y-2">
+                    <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                        Rendimiento del Equipo
                     </h2>
-                    <p className="text-lg font-bold text-muted-foreground/70 max-w-2xl">
-                        Métricas de rendimiento, conversión y productividad del equipo en tiempo real.
+                    <p className="text-sm font-medium text-muted-foreground/70">
+                        Métricas de conversión y productividad del equipo en tiempo real.
                     </p>
-                </div>
-                <div className="flex items-center gap-3 bg-muted/20 p-2 rounded-2xl border border-border/40">
-                    <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mr-2">Sistema Operativo</span>
                 </div>
             </div>
 

@@ -80,27 +80,27 @@ export async function getDashboardKpis(userId: string): Promise<DashboardKpi[]> 
 
     return [
         {
-            label: "Active Leads",
+            label: "Leads Activos",
             value: String(activeLeads),
-            description: "Pending prospects",
+            description: "Prospectos activos",
             trend: activeLeads > 0 ? "up" : "neutral",
         },
         {
-            label: "Quotes",
+            label: "Cotizaciones",
             value: String(totalQuotes),
-            description: "Total generated",
+            description: "Total generadas",
             trend: totalQuotes > 0 ? "up" : "neutral",
         },
         {
-            label: "Conversion Rate",
+            label: "Tasa de Conversión",
             value: `${conversionRate}%`,
-            description: "Won leads / total",
+            description: "Leads ganados / total",
             trend: conversionRate >= 25 ? "up" : "neutral",
         },
         {
-            label: "Total Revenue",
+            label: "Ventas Totales",
             value: "$0",
-            description: "Total won quotes",
+            description: "Cotizaciones ganadas",
             trend: "neutral",
         },
     ];
@@ -146,34 +146,34 @@ export async function getAdminKpis(userId: string): Promise<AdminKpi[]> {
 
     return [
         {
-            label: "Total Quotes",
+            label: "Cotizaciones Totales",
             value: String(total),
-            sub: "All advisors",
+            sub: "Todos los asesores",
             trend: total > 0 ? "up" : "neutral",
             delta: total > 0 ? `${total}` : "—",
         },
         {
-            label: "Conversion Rate",
+            label: "Tasa de Conversión",
             value: `${conversionRate}%`,
-            sub: "Team average",
+            sub: "Promedio del equipo",
             trend: conversionRate >= 25 ? "up" : "neutral",
             delta: conversionRate > 0 ? `${conversionRate}%` : "—",
         },
         {
-            label: "Average Ticket",
+            label: "Ticket Promedio",
             value: avgTicketUSD > 0 ? `$${avgTicketUSD.toLocaleString("en-US")} USD` : "—",
-            sub: "Per intl. quote",
+            sub: "Por cotización intl.",
             trend: "neutral",
             delta: "≈",
         },
         {
-            label: "Volume COP",
+            label: "Volumen COP",
             value: totalRevenueCOP > 1_000_000
                 ? `$${(totalRevenueCOP / 1_000_000).toFixed(1)}M`
                 : totalRevenueCOP > 0
                     ? `$${totalRevenueCOP.toLocaleString("es-CO")}`
                     : "—",
-            sub: "Total quoted value",
+            sub: "Valor total cotizado",
             trend: totalRevenueCOP > 0 ? "up" : "neutral",
             delta: totalRevenueCOP > 0 ? "+" : "—",
         },
@@ -281,7 +281,7 @@ export async function getWeeklyTrend(userId: string, isAdmin = true) {
         .sort(([a], [b]) => a.localeCompare(b))
         .slice(-8)
         .map(([, values], idx) => ({
-            semana: `Week ${idx + 1}`,
+            semana: `Semana ${idx + 1}`,
             ...values,
         }));
 }
@@ -325,21 +325,21 @@ export async function getRecentActivity(userId: string, isAdmin = false): Promis
     const [quotesRes, leadsRes] = await Promise.all([quotesQuery, leadsQuery]);
 
     const STATUS_LABELS: Record<string, string> = {
-        borrador: "Draft saved",
-        enviada: "Quote sent",
-        aprobada: "Quote approved",
-        rechazada: "Quote rejected",
-        nuevo: "New lead",
-        cotizado: "Lead quoted",
-        ganado: "Lead won",
-        perdido: "Lead lost",
+        borrador: "Borrador guardado",
+        enviada: "Cotización enviada",
+        aprobada: "Cotización aprobada",
+        rechazada: "Cotización rechazada",
+        nuevo: "Nuevo prospecto",
+        cotizado: "Prospecto cotizado",
+        ganado: "Prospecto ganado",
+        perdido: "Prospecto perdido",
     };
 
     const items: ActivityItem[] = [];
 
     (quotesRes.data ?? []).forEach((q: { status: string; destination?: string; updated_at: string; traveler_name: string }) => {
         items.push({
-            text: `${STATUS_LABELS[q.status] ?? q.status}: ${q.destination ?? "No destination"}`,
+            text: `${STATUS_LABELS[q.status] ?? q.status}: ${q.destination ?? "Sin destino"}`,
             time: formatRelativeTime(q.updated_at) + ` • ${q.traveler_name}`,
         });
     });
@@ -362,9 +362,9 @@ function formatRelativeTime(dateStr: string): string {
     const diffHrs = Math.floor(diffMs / 3_600_000);
     const diffDays = Math.floor(diffMs / 86_400_000);
 
-    if (diffMin < 1) return "Just now";
-    if (diffMin < 60) return `${diffMin} min ago`;
-    if (diffHrs < 24) return `${diffHrs} hour${diffHrs > 1 ? "s" : ""} ago`;
-    if (diffDays === 1) return "Yesterday";
-    return `${diffDays} days ago`;
+    if (diffMin < 1) return "Ahora mismo";
+    if (diffMin < 60) return `Hace ${diffMin} min`;
+    if (diffHrs < 24) return `Hace ${diffHrs} h`;
+    if (diffDays === 1) return "Ayer";
+    return `Hace ${diffDays} días`;
 }

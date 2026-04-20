@@ -94,19 +94,18 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         <div className="h-6 w-6 rounded-lg bg-brand-primary/10 flex items-center justify-center">
                             <User className="h-3.5 w-3.5 text-brand-primary" strokeWidth={3} />
                         </div>
-                        <h4 className="text-sm font-black uppercase tracking-widest text-foreground">El Cliente</h4>
+                        <h4 className="text-sm font-black uppercase tracking-widest text-foreground">Perfil del Cliente</h4>
                     </div>
 
                     <div className="space-y-4 animate-slide-up" ref={dropdownRef}>
                         <Label
                             htmlFor="travelerName"
                             className={cn(
-                                "flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1",
+                                "flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ml-0.5",
                                 nameError ? "text-destructive" : "text-muted-foreground/60"
                             )}
                         >
-                            <User className={cn("h-4 w-4", nameError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} />
-                            Nombre Completo del Cliente
+                            Nombre Completo
                         </Label>
                         <div className="relative group">
                             <Input
@@ -121,7 +120,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 }}
                                 onFocus={() => setShowDropdown(true)}
                                 className={cn(
-                                    "h-14 pl-12 rounded-2xl border-2 border-glass-border bg-background/50 text-base font-medium transition-all duration-300 focus-visible:ring-8 focus-visible:ring-brand-primary/5 focus-visible:border-brand-primary/40 focus-visible:bg-background",
+                                    "h-10 pl-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40 focus-visible:bg-background",
                                     nameError && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                                 )}
                             />
@@ -129,7 +128,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
 
                             {/* Floating Search Results */}
                             {showDropdown && (isSearching || (hasSearched && searchQuery.length >= 3)) && (
-                                <div className="absolute z-50 w-full mt-3 bg-glass backdrop-blur-2xl border border-glass-border shadow-[0_20px_50px_rgba(0,0,0,0.2)] rounded-[1.5rem] overflow-hidden animate-scale-in">
+                                <div className="absolute z-50 w-full mt-2 bg-card backdrop-blur-sm border border-border/60 shadow-lg rounded-xl overflow-hidden animate-scale-in">
                                     {isSearching ? (
                                         <div className="p-8 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex flex-col items-center gap-3">
                                             <Loader2 className="h-5 w-5 animate-spin text-brand-secondary" />
@@ -177,7 +176,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         {/* Correo */}
                         <div className="space-y-4">
                             <Label htmlFor="email" className={cn("flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1", emailError ? "text-destructive" : "text-muted-foreground/60")}>
-                                <Mail className={cn("h-4 w-4", emailError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Canal
+                                <Mail className={cn("h-4 w-4", emailError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Correo
                             </Label>
                             <Input
                                 data-testid="quote-traveler-email"
@@ -186,13 +185,13 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 placeholder="viajero@empresa.com"
                                 value={activeQuote.email || ""}
                                 onChange={(e) => setQuoteField("email", e.target.value)}
-                                className={cn("h-14 rounded-2xl border-2 border-glass-border bg-background/50", emailError && "border-destructive/40 bg-destructive/5")}
+                                className={cn("h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20", emailError && "border-destructive/40 bg-destructive/5")}
                             />
                         </div>
                         {/* Teléfono */}
                         <div className="space-y-4">
                             <Label htmlFor="phone" className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                                <Phone className="h-4 w-4 text-brand-primary" strokeWidth={3} /> Móvil / WhatsApp
+                                <Phone className="h-4 w-4 text-brand-primary" strokeWidth={3} /> Teléfono
                             </Label>
                             <Input
                                 data-testid="quote-traveler-phone"
@@ -201,25 +200,22 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 placeholder="+57 310 234 5678"
                                 value={activeQuote.phone || ""}
                                 onChange={(e) => setQuoteField("phone", e.target.value)}
-                                className="h-14 rounded-2xl border-2 border-glass-border bg-background/50"
+                                className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20"
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* 2. SECCIÓN VIAJE ESTRATÉGICO (DESTINO Y FECHAS) */}
-                <div className="space-y-8 animate-slide-up [animation-delay:150ms]">
+                {/* 2. SECCIÓN DEFINICIÓN DEL VIAJE */}
+                <div className="space-y-8 animate-slide-up">
                     <div className="flex items-center gap-3 border-b border-border/40 pb-4">
-                        <div className="h-6 w-6 rounded-lg bg-brand-secondary/10 flex items-center justify-center">
-                            <Globe className="h-3.5 w-3.5 text-brand-secondary" strokeWidth={3} />
-                        </div>
-                        <h4 className="text-sm font-black uppercase tracking-widest text-foreground">El Sueño (Destino)</h4>
+                        <h4 className="text-sm font-bold tracking-tight text-foreground">Definición del Viaje</h4>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         {/* Estrategia: Nacional / Internacional */}
                         <div className="space-y-4 md:col-span-2">
-                            <Label className="text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">Tipo de Expedición</Label>
+                            <Label className="text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">Cobertura</Label>
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     type="button"
@@ -262,7 +258,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 placeholder={isNacional ? "Ej: San Andrés..." : "Ej: Capadocia..."}
                                 value={activeQuote.destination || ""}
                                 onChange={(e) => setQuoteField("destination", e.target.value)}
-                                className={cn("h-14 rounded-2xl border-2 border-glass-border bg-background/50", destinationError && "border-destructive/40 bg-destructive/5")}
+                                className={cn("h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20", destinationError && "border-destructive/40 bg-destructive/5")}
                             />
                         </div>
 
@@ -276,7 +272,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 type="date"
                                 value={activeQuote.departureDate ? new Date(activeQuote.departureDate).toISOString().split("T")[0] : ""}
                                 onChange={(e) => setQuoteField("departureDate", new Date(e.target.value))}
-                                className={cn("h-14 rounded-2xl border-2 border-glass-border bg-background/50", departureError && "border-destructive/40 bg-destructive/5")}
+                                className={cn("h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20", departureError && "border-destructive/40 bg-destructive/5")}
                             />
                         </div>
 
@@ -290,14 +286,12 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 type="date"
                                 value={activeQuote.returnDate ? new Date(activeQuote.returnDate).toISOString().split("T")[0] : ""}
                                 onChange={(e) => setQuoteField("returnDate", new Date(e.target.value))}
-                                className={cn("h-14 rounded-2xl border-2 border-glass-border bg-background/50", returnError && "border-destructive/40 bg-destructive/5")}
+                                className={cn("h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20", returnError && "border-destructive/40 bg-destructive/5")}
                             />
                         </div>
 
                         <div className="space-y-4 md:col-span-2">
-                            <Label className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                                Volumen
-                            </Label>
+                            <Label className="text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">Pasajeros</Label>
                             <div className="flex gap-4 items-center">
                                 <Input
                                     data-testid="quote-traveler-count"
@@ -306,7 +300,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                     min={1}
                                     value={activeQuote.numberOfTravelers || 1}
                                     onChange={(e) => setQuoteField("numberOfTravelers", parseInt(e.target.value) || 1)}
-                                    className="h-14 w-24 rounded-2xl border-2 border-glass-border bg-background/50 text-base font-black italic text-center"
+                                    className="h-10 w-20 rounded-xl border border-border/60 bg-background/50 text-sm font-black text-center"
                                 />
                                 <span className="text-sm font-semibold text-muted-foreground/70">Pasajeros viajando juntos</span>
                             </div>
@@ -318,14 +312,14 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         <ImageUploader
                             value={activeQuote.destinationImage}
                             onChange={(base64) => setQuoteField("destinationImage", base64)}
-                            label="Portada Impactante para la Cotización (PDF)"
+                            label="Imagen de Portada (Opcional)"
                         />
                     </div>
                 </div>
             </div>
 
             {/* Contenedor Derecho: AI Extractor / SmartFill */}
-            <div className="lg:col-span-5 xl:col-span-4 flex flex-col pt-8 lg:pt-0 animate-slide-up [animation-delay:300ms]">
+            <div className="lg:col-span-5 xl:col-span-4 flex flex-col pt-8 lg:pt-0 animate-slide-up">
                 <div className="sticky top-6">
                     <AIExtractor />
                 </div>

@@ -18,7 +18,7 @@ export function KpiGrid({ initialStats }: { initialStats: DashboardKpi[] }) {
                 const isNegative = stat.trend === "down";
 
                 return (
-                    <Card key={stat.label} variant="glass" className="overflow-hidden border border-glass-border/30 hover:border-brand-primary/40 shadow-xl shadow-black/5 hover:shadow-premium hover:-translate-y-1.5 transition-all duration-500 group animate-scale-in">
+                    <Card key={stat.label} variant="glass" className="overflow-hidden border border-border/60 hover:border-brand-primary/40 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group animate-scale-in">
                         <CardContent className="p-7">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary transition-all duration-500 group-hover:bg-brand-primary group-hover:text-white shadow-lg shadow-brand-primary/10 group-hover:shadow-brand-primary/30">
@@ -30,11 +30,11 @@ export function KpiGrid({ initialStats }: { initialStats: DashboardKpi[] }) {
                                         isNegative ? "text-rose-600 bg-rose-500/10 dark:text-rose-400" : "text-muted-foreground bg-muted/40"
                                 )}>
                                     <TrendIcon className="h-4 w-4" strokeWidth={3} />
-                                    {isPositive ? "+12%" : isNegative ? "-5%" : "0%"} 
+                                    {isPositive ? "↑" : isNegative ? "↓" : "—"} 
                                 </div>
                             </div>
                             <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.25em] mb-2">{stat.label}</p>
-                            <h3 className="text-4xl font-black text-foreground tabular-nums tracking-tighter italic-pro-max">
+                            <h3 className="text-3xl font-black text-foreground tabular-nums tracking-tighter">
                                 {stat.value}
                             </h3>
                             <div className="mt-5 flex items-center gap-2.5 border-t border-glass-border/40 pt-5">

@@ -72,10 +72,10 @@ export default function LoginPage() {
             {/* Header */}
             <div className="space-y-2">
                 <h1 className="text-3xl font-black tracking-tighter text-foreground">
-                    Acceso Agentes
+                    Iniciar sesión
                 </h1>
-                <p className="text-sm text-muted-foreground font-bold">
-                    Ingresa al centro de mando de Trappvel.
+                <p className="text-sm text-muted-foreground font-medium">
+                    Acceso a la plataforma Trappvel.
                 </p>
             </div>
 
@@ -144,13 +144,13 @@ export default function LoginPage() {
                     <div className="space-y-2.5">
                         <div className="flex items-center justify-between ml-1">
                             <label htmlFor="password" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80">
-                                Clave Maestra
+                                Contraseña
                             </label>
                             <button
                                 type="button"
-                                className="text-[10px] font-black uppercase tracking-widest text-brand-primary hover:text-brand-primary/80 transition-colors"
+                                className="text-[10px] font-bold text-brand-primary hover:text-brand-primary/80 transition-colors"
                             >
-                                ¿La olvidaste?
+                                ¿Olvidaste tu contraseña?
                             </button>
                         </div>
                         <div className="relative group">
@@ -177,11 +177,11 @@ export default function LoginPage() {
 
                     <Button
                         type="submit"
-                        className="w-full h-12 bg-brand-primary text-white hover:bg-brand-primary/90 transition-all active:scale-[0.97] font-black uppercase tracking-widest text-[11px] shadow-xl shadow-brand-primary/20 border-t border-white/20"
+                        className="w-full h-12 bg-brand-primary text-white hover:bg-brand-primary/90 transition-all active:scale-[0.97] font-semibold text-sm shadow-lg shadow-brand-primary/20 border-t border-white/20"
                         disabled={loading}
                     >
                         {loading && <Loader2 className="h-4 w-4 animate-spin mr-3" />}
-                        {loading ? "Autenticando..." : "Entrar ahora"}
+                        {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                     </Button>
                 </form>
             </div>

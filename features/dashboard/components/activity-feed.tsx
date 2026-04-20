@@ -5,12 +5,12 @@ import { type ActivityItem } from "@/lib/dal/stats";
 
 export function ActivityFeed({ initialActivity }: { initialActivity: ActivityItem[] }) {
     return (
-        <Card className="lg:col-span-3 border border-glass-border bg-glass backdrop-blur-xl rounded-[2.5rem] shadow-xl shadow-black/5 relative overflow-hidden transition-all duration-500">
+        <Card className="lg:col-span-3 border border-border/60 bg-card rounded-2xl shadow-sm relative overflow-hidden transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/5 to-transparent pointer-events-none" />
             <CardHeader className="pt-8 pb-5 px-8 border-b border-glass-border bg-muted/10">
-                <CardTitle className="text-xl font-black tracking-tight text-foreground flex items-center gap-3">
+                <CardTitle className="text-base font-bold tracking-tight text-foreground flex items-center gap-2.5">
                     <Clock className="h-5 w-5 text-brand-primary" strokeWidth={2.5} />
-                    Bitácora de Operaciones
+                    Actividad reciente
                 </CardTitle>
             </CardHeader>
             <CardContent className="pt-7 px-8 pb-10">
@@ -34,13 +34,13 @@ export function ActivityFeed({ initialActivity }: { initialActivity: ActivityIte
                             <Inbox className="h-8 w-8 text-muted-foreground/40" />
                         </div>
                         <div className="space-y-1">
-                            <p className="text-sm font-bold text-foreground">Canal Silencioso</p>
-                            <p className="text-xs font-medium text-muted-foreground/60">No hay operaciones registradas en el radar.</p>
+                            <p className="text-sm font-bold text-foreground">Sin actividad reciente</p>
+                            <p className="text-xs font-medium text-muted-foreground/60">No hay operaciones registradas todavía.</p>
                         </div>
                     </div>
                 )}
-                <Button variant="outline" className="w-full mt-8 h-11 border-dashed border-brand-primary/30 rounded-2xl hover:border-brand-primary hover:text-brand-primary hover:bg-brand-primary/5 transition-all text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
-                    Ver Historial Estratégico
+                <Button variant="outline" className="w-full mt-8 h-10 border-dashed border-border/50 rounded-xl hover:border-brand-primary hover:text-brand-primary hover:bg-brand-primary/5 transition-all text-[10px] font-bold uppercase tracking-widest">
+                    Ver historial
                 </Button>
             </CardContent>
         </Card>

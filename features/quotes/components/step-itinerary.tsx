@@ -18,98 +18,99 @@ export function StepItinerary({ showErrors = false }: StepItineraryProps) {
     const { updateItineraryDay, addItineraryDay, removeItineraryDay } = useQuoteActions();
 
     return (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-            {/* Itinerary Days */}
-            <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-glass-border pb-4">
-                    <div className="space-y-1">
-                        <Label className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Experiencia Paso a Paso</Label>
-                        <h3 className="text-xl font-black text-foreground flex items-center gap-2">
-                            <Map className="h-5 w-5 text-brand-primary" />
-                            Ruta del Viaje
-                        </h3>
-                    </div>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={addItineraryDay}
-                        data-testid="quote-itinerary-add-day"
-                        className="rounded-2xl gap-2 px-5 h-11 font-black uppercase tracking-widest text-[10px] border-brand-primary/30 text-brand-primary hover:bg-brand-primary/5 active:scale-95 transition-all"
-                    >
-                        <Plus className="h-4 w-4" /> Agregar Día
-                    </Button>
+            <div className="flex items-center justify-between border-b border-border/40 pb-6">
+                <div className="space-y-0.5">
+                    <h3 className="text-base font-bold tracking-tight text-foreground">
+                        Cronograma de Actividades
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                        Detalla el itinerario día por día para el viajero.
+                    </p>
                 </div>
-
-                {(activeQuote.itinerary || []).length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-glass-border rounded-[2rem] bg-muted/5 animate-pulse-subtle">
-                        <Sparkles className="h-10 w-10 text-muted-foreground/20 mb-4" />
-                        <p className="text-sm font-black text-slate-400 uppercase tracking-[0.2em]">Sin itinerario detectado</p>
-                        <p className="text-[10px] text-slate-300 uppercase tracking-widest font-bold mt-2">Puedes agregarlos manualmente o usar la IA en el primer paso</p>
-                    </div>
-                )}
-
-                <div className="grid grid-cols-1 gap-8">
-                    {(activeQuote.itinerary || []).map((day, idx) => (
-                        <div key={idx} className="relative p-10 border border-glass-border/40 rounded-[2.5rem] bg-background/60 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.03)] backdrop-blur-2xl space-y-8 group hover:border-brand-primary/50 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all duration-700 animate-in zoom-in-95">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-2xl bg-brand-primary text-white flex items-center justify-center font-black text-lg shadow-[0_10px_20px_-5px_rgba(227,58,122,0.4)] group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                                        {day.day}
-                                    </div>
-                                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-brand-primary drop-shadow-sm">Día de Operación</span>
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-10 w-10 text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10 rounded-2xl transition-all active:scale-90"
-                                    onClick={() => removeItineraryDay(idx)}
-                                    data-testid={`quote-itinerary-remove-${idx}`}
-                                >
-                                    <Trash2 className="h-5 w-5" strokeWidth={2.5} />
-                                </Button>
-                            </div>
-                            <div className="space-y-6">
-                                <div>
-                                    <Label className={cn(
-                                        "text-[9px] font-black uppercase tracking-[0.2em] ml-1 mb-2 block",
-                                        showErrors && !day.title ? "text-destructive" : "text-muted-foreground/50"
-                                    )}>Identificador de la Experiencia</Label>
-                                    <Input
-                                        placeholder="Ej: Amanecer en el Desierto"
-                                        value={day.title}
-                                        onChange={(e) => updateItineraryDay(idx, { ...day, title: e.target.value })}
-                                        data-testid={`quote-itinerary-title-${idx}`}
-                                        className={cn(
-                                            "h-14 border-2 border-transparent bg-muted/30 focus-visible:border-brand-primary/40 focus-visible:bg-transparent focus-visible:ring-8 focus-visible:ring-brand-primary/5 rounded-[1.5rem] text-xl font-black tracking-tight px-6 transition-all placeholder:text-muted-foreground/30 shadow-inner",
-                                            showErrors && !day.title && "border-destructive/40 bg-destructive/5"
-                                        )}
-                                    />
-                                </div>
-                                <div>
-                                    <Label className={cn(
-                                        "text-[9px] font-black uppercase tracking-[0.2em] ml-1 mb-2 block",
-                                        showErrors && !day.description ? "text-destructive" : "text-muted-foreground/50"
-                                    )}>Narrativa del Servicio</Label>
-                                    <Textarea
-                                        placeholder="Describe los detalles estratégicos, horarios y sensaciones de este día..."
-                                        value={day.description}
-                                        onChange={(e) => updateItineraryDay(idx, { ...day, description: e.target.value })}
-                                        data-testid={`quote-itinerary-desc-${idx}`}
-                                        className={cn(
-                                            "min-h-[140px] resize-none border-2 border-transparent focus-visible:border-brand-primary/40 focus-visible:bg-transparent focus-visible:ring-8 focus-visible:ring-brand-primary/5 bg-muted/30 rounded-[1.5rem] p-6 font-medium leading-loose shadow-inner transition-all placeholder:text-muted-foreground/30",
-                                            showErrors && !day.description && "border-destructive/40 bg-destructive/5"
-                                        )}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                <Button
+                    type="button"
+                    onClick={addItineraryDay}
+                    data-testid="quote-itinerary-add-day"
+                    className="h-10 rounded-xl gap-2 px-5 font-semibold text-sm bg-brand-primary text-white shadow-md shadow-brand-primary/20 hover:bg-brand-primary/90 active:scale-[0.97] transition-all"
+                >
+                    <Plus className="h-3.5 w-3.5" /> Agregar Día
+                </Button>
             </div>
 
+            <div className="space-y-6">
+                {(activeQuote.itinerary || []).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-border/50 rounded-2xl bg-muted/20 text-center space-y-3">
+                        <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground/40">
+                            <Map className="h-6 w-6" />
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-sm font-medium text-muted-foreground">Sin itinerario</p>
+                            <p className="text-xs text-muted-foreground/60">Usa extracción IA en el paso anterior o agrega días manualmente.</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-6">
+                        {(activeQuote.itinerary || []).map((day, idx) => (
+                            <div key={idx} className="group relative p-6 border border-border/60 rounded-2xl bg-card transition-all duration-300 hover:border-brand-primary/30 shadow-sm">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-brand-primary text-white flex items-center justify-center font-bold text-sm shadow-md shadow-brand-primary/20">
+                                            {day.day}
+                                        </div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary">Día {day.day}</span>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                        onClick={() => removeItineraryDay(idx)}
+                                        data-testid={`quote-itinerary-remove-${idx}`}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div className="space-y-1.5">
+                                        <Label className={cn(
+                                            "text-[10px] font-bold uppercase tracking-widest block pl-0.5",
+                                            showErrors && !day.title ? "text-destructive" : "text-muted-foreground/60"
+                                        )}>Título del Día</Label>
+                                        <Input
+                                            placeholder="Ej: Llegada y City Tour"
+                                            value={day.title}
+                                            onChange={(e) => updateItineraryDay(idx, { ...day, title: e.target.value })}
+                                            data-testid={`quote-itinerary-title-${idx}`}
+                                            className={cn(
+                                                "h-10 border-border/60 bg-background/50 focus-visible:ring-brand-primary/20 rounded-xl font-bold text-sm",
+                                                showErrors && !day.title && "border-destructive/40 bg-destructive/5"
+                                            )}
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className={cn(
+                                            "text-[10px] font-bold uppercase tracking-widest block pl-0.5",
+                                            showErrors && !day.description ? "text-destructive" : "text-muted-foreground/60"
+                                        )}>Descripción de Actividades</Label>
+                                        <Textarea
+                                            placeholder="Detalle los servicios, traslados y actividades incluidas..."
+                                            value={day.description}
+                                            onChange={(e) => updateItineraryDay(idx, { ...day, description: e.target.value })}
+                                            data-testid={`quote-itinerary-desc-${idx}`}
+                                            className={cn(
+                                                "min-h-[100px] resize-none border-border/60 focus-visible:ring-brand-primary/20 bg-background/50 rounded-xl p-3 text-sm font-medium leading-relaxed leading-relaxed",
+                                                showErrors && !day.description && "border-destructive/40 bg-destructive/5"
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
