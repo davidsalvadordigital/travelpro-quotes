@@ -38,10 +38,12 @@ export interface QuoteRow {
     exclusions: string[] | null;
     net_cost_usd: number | null;
     net_cost_cop: number | null;
-    fee_percentage: number | null;
+    provider_commission_percent: number | null;
+    agency_fee_percent: number | null;
     trm_used: number | null;
     status: "borrador" | "enviada" | "aprobada" | "rechazada";
     legal_conditions: string | null;
+    locator_code: string | null;
     agency_id: string | null;
     transaction_id: string | null;
     created_at: string;
@@ -76,17 +78,15 @@ function toDbRow(
                 ? quote.returnDate.toISOString().split("T")[0]
                 : String(quote.returnDate)
             : null,
-        hotel_info: quote.hotelInfo ?? null,
-        airline_info: quote.airlineInfo ?? null,
         itinerary: quote.itinerary ?? [],
         inclusions: quote.inclusions ?? [],
         exclusions: quote.exclusions ?? [],
-        net_cost_usd: quote.pvpUSD ?? 0,          // DB col kept as-is; frontend renamed to pvpUSD
-        net_cost_cop: quote.pvpCOP ?? 0,           // DB col kept as-is; frontend renamed to pvpCOP
-        fee_percentage: quote.feePercentage ?? 15,
-        trm_used: quote.trmUsed ?? null,
+        net_cost_usd: quote.destinationType === "internacional" ? (quote.netCostUSD ?? 0) : 0,
+        net_cost_cop: quote.destinationType === "nacional" ? (quote.netCostCOP ?? 0) : 0,
+        provider_commission_percent: quote.providerCommissionPercent ?? 10,
+        agency_fee_percent: quote.agencyFeePercent ?? 5,
+        trm_used: quote.destinationType === "internacional" ? (quote.trmUsed ?? 4200) : null,
         status: quote.status ?? "borrador",
-        legal_conditions: quote.legalConditions ?? null,
     };
 }
 
@@ -107,20 +107,19 @@ function fromDbRow(
         destinationType: row.destination_type,
         departureDate: row.departure_date ? new Date(row.departure_date) : undefined,
         returnDate: row.return_date ? new Date(row.return_date) : undefined,
-        hotelInfo: row.hotel_info ?? undefined,
-        airlineInfo: row.airline_info ?? undefined,
-        itinerary: (row.itinerary as { day: number; title: string; description: string; activities: string[]; image?: string }[]) ?? [],
+        itinerary: (row.itinerary as any[]) ?? [],
         inclusions: row.inclusions ?? [],
         exclusions: row.exclusions ?? [],
-        pvpUSD: Number(row.net_cost_usd) || 0,    // DB col net_cost_usd → frontend pvpUSD
-        pvpCOP: Number(row.net_cost_cop) || 0,     // DB col net_cost_cop → frontend pvpCOP
-        extraMarginPercent: 0,                      // Not yet in DB; defaults to 0 on load
-        feePercentage: Number(row.fee_percentage) || 15,
-        trmUsed: row.trm_used ? Number(row.trm_used) : undefined,
+        netCostUSD: row.destination_type === "internacional" ? Number(row.net_cost_usd) : undefined,
+        netCostCOP: row.destination_type === "nacional" ? Number(row.net_cost_cop) : undefined,
+        providerCommissionPercent: Number(row.provider_commission_percent) || 10,
+        agencyFeePercent: Number(row.agency_fee_percent) || 5,
+        trmUsed: row.destination_type === "internacional" ? Number(row.trm_used) : undefined,
         status: row.status,
-        legalConditions: row.legal_conditions ?? undefined,
-    };
+        locatorCode: row.locator_code ?? undefined,
+    } as any;
 }
+
 
 // ── Queries ─────────────────────────────────────────────────────────────
 
@@ -139,7 +138,7 @@ export async function getQuotes(limit = 100, userId: string, isAdmin = false) {
     const query = withTenantIsolation(
         supabase
             .from("quotes")
-            .select("id, traveler_name, destination, destination_type, status, created_at, updated_at")
+            .select("id, traveler_name, destination, destination_type, status, locator_code, created_at, updated_at")
             .order("updated_at", { ascending: false })
             .limit(limit),
         userId,
@@ -157,6 +156,7 @@ export async function getQuotes(limit = 100, userId: string, isAdmin = false) {
         destination: row.destination ?? "",
         destinationType: row.destination_type!,
         status: row.status!,
+        locatorCode: row.locator_code ?? undefined,
     }));
 }
 
@@ -176,7 +176,7 @@ export async function getQuoteById(id: string, userId: string, isAdmin = false) 
     const query = withTenantIsolation(
         supabase
             .from("quotes")
-            .select("id, lead_id, created_by, traveler_name, email, phone, number_of_travelers, destination, destination_type, departure_date, return_date, hotel_info, airline_info, itinerary, inclusions, exclusions, net_cost_usd, net_cost_cop, fee_percentage, trm_used, status, legal_conditions, agency_id, created_at, updated_at")
+            .select("id, lead_id, created_by, traveler_name, email, phone, number_of_travelers, destination, destination_type, departure_date, return_date, hotel_info, airline_info, itinerary, inclusions, exclusions, net_cost_usd, net_cost_cop, provider_commission_percent, agency_fee_percent, trm_used, status, legal_conditions, agency_id, created_at, updated_at")
             .eq("id", id),
         userId,
         isAdmin

@@ -161,14 +161,28 @@ export function StepHotels({ showErrors = false }: StepHotelsProps) {
                                     />
                                 </div>
 
-                                <div className="space-y-1.5 md:col-span-2 lg:col-span-3">
+                                <div className="space-y-1.5 lg:col-span-1">
+                                    <Label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                                        <CheckCircle2 className="h-3 w-3 text-brand-primary/60" />
+                                        Disponibilidad
+                                    </Label>
+                                    <Input
+                                        data-testid={`quote-hotel-status-${index}`}
+                                        placeholder="Ej: Disponible, Sujeto..."
+                                        value={option.status || ""}
+                                        onChange={(e) => updateHotelOption(index, { ...option, status: e.target.value })}
+                                        className="h-10 rounded-xl border-border/60 bg-background/50 text-sm focus-visible:ring-brand-primary/20"
+                                    />
+                                </div>
+
+                                <div className="space-y-1.5 md:col-span-2 lg:col-span-2">
                                     <Label className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
                                         <Info className="h-3 w-3 text-brand-primary/60" />
-                                        Especificaciones de la estadía
+                                        Especificaciones
                                     </Label>
                                     <Input
                                         data-testid={`quote-hotel-notes-${index}`}
-                                        placeholder="Régimen (Desayuno, Todo Incluido), amenidades, fechas de Check-in/out..."
+                                        placeholder="Régimen, amenidades, fechas..."
                                         value={option.notes || ""}
                                         onChange={(e) => updateHotelOption(index, { ...option, notes: e.target.value })}
                                         className="h-10 rounded-xl border-border/60 bg-background/50 text-sm focus-visible:ring-brand-primary/20"

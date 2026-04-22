@@ -37,13 +37,13 @@ const A4PageWrapper = ({
 }) => (
     <div
         className={cn(
-            // Base A4 — fuente fija Inter para máxima legibilidad en documentos
+            // Base A4 — fuente corporativa Outfit
             "relative w-[210mm] min-h-[297mm] bg-white mx-auto overflow-hidden flex flex-col shrink-0 mb-12",
             "shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5",
             "print:shadow-none print:ring-0 print:m-0 print:w-full print:min-h-screen print:break-after-page",
             className
         )}
-        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+        style={{ fontFamily: "'Outfit', system-ui, sans-serif" }}
     >
         {children}
 
@@ -80,7 +80,7 @@ function DocumentFonts() {
         link.id = id;
         link.rel = "stylesheet";
         link.href =
-            "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap";
+            "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap";
         document.head.appendChild(link);
     }, []);
     return null;
@@ -101,7 +101,7 @@ const SectionHeader = ({
             <h2 className="text-[12px] font-black uppercase tracking-[0.25em] text-slate-800">
                 {title}
             </h2>
-            {Icon && <Icon className="h-3 w-3 text-slate-300" />}
+            {Icon && <Icon className="h-4 w-4 text-[#E33A7A]" strokeWidth={2.5} />}
         </div>
         {subtitle && (
             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
@@ -183,32 +183,31 @@ function HotelsSection({ hotelOptions }: { hotelOptions: NonNullable<ReturnType<
                             </div>
                         )}
                         <div className="flex gap-8">
-                            <div className="h-20 w-20 bg-white rounded-3xl flex items-center justify-center shrink-0 border border-slate-100 shadow-sm">
-                                <Hotel className="h-8 w-8 text-slate-300" strokeWidth={1} />
+                            <div className="h-20 w-20 bg-[#E33A7A]/5 rounded-3xl flex items-center justify-center shrink-0 border border-[#E33A7A]/10 shadow-sm">
+                                <Hotel className="h-8 w-8 text-[#E33A7A]" strokeWidth={1.5} />
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start mb-3">
-                                    <div className="space-y-1">
-                                        <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-tight">
+                                    <div className="space-y-2">
+                                        <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-tight font-playfair italic">
                                             {hotel.name}
                                         </h3>
-                                        <div className="flex items-center gap-2 text-[9px] font-black text-[#E33A7A] uppercase tracking-widest">
-                                            <MapPin className="h-2.5 w-2.5" /> {hotel.location}
+                                        <div className="flex gap-1">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star
+                                                    key={i}
+                                                    className={cn(
+                                                        "h-3.5 w-3.5",
+                                                        i < (parseInt(hotel.category) || 5)
+                                                            ? "fill-amber-400 text-amber-400 drop-shadow-sm"
+                                                            : "fill-slate-100 text-slate-100"
+                                                    )}
+                                                />
+                                            ))}
                                         </div>
-                                    </div>
-                                    {/* Contenedor de estrellas con margen para no chocar con el badge "Sugerido" */}
-                                    <div className="flex gap-1 pr-14">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                className={cn(
-                                                    "h-3.5 w-3.5",
-                                                    i < (parseInt(hotel.category) || 5)
-                                                        ? "fill-amber-400 text-amber-400 drop-shadow-sm"
-                                                        : "fill-slate-100 text-slate-100"
-                                                )}
-                                            />
-                                        ))}
+                                        <div className="flex items-center gap-2 text-[10px] font-black text-[#E33A7A] uppercase tracking-widest">
+                                            <MapPin className="h-3 w-3" /> {hotel.location}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-8 mt-6">
@@ -276,14 +275,16 @@ function PricingSection({
     isNacional,
     calcNac,
     calcInt,
-    fee,
+    commPercent,
+    agencyFeePercent,
     trm,
     validUntil,
 }: {
     isNacional: boolean;
     calcNac: ReturnType<typeof calculateNacional> | null;
     calcInt: ReturnType<typeof calculateInternacional> | null;
-    fee: number;
+    commPercent: number;
+    agencyFeePercent: number;
     trm: number;
     validUntil?: Date;
 }) {
@@ -364,9 +365,9 @@ function PricingSection({
                             <div className="grid grid-cols-2 gap-8">
                                 <div>
                                     <span className="text-[8px] font-black text-white/20 uppercase block tracking-[0.4em] mb-1.5">
-                                        Fee Agencia
+                                        Fee Gestión
                                     </span>
-                                    <span className="text-[12px] font-black text-[#E33A7A]">{fee}%</span>
+                                    <span className="text-[12px] font-black text-[#E33A7A]">{(commPercent + agencyFeePercent).toFixed(1)}%</span>
                                 </div>
                                 {!isNacional && (
                                     <div className="text-right">
@@ -407,14 +408,14 @@ function TermsSection({
                 <div className="grid grid-cols-2 gap-12">
                     <div className="space-y-5">
                         <div className="flex items-center gap-3">
-                            <div className="p-1 bg-cyan-500 rounded-md">
-                                <CheckCircle2 className="h-3.5 w-3.5 text-white fill-white" />
+                            <div className="p-1.5 bg-[#E33A7A]/5 rounded-lg border border-[#E33A7A]/10">
+                                <CheckCircle2 className="h-4 w-4 text-[#E33A7A]" />
                             </div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-700">Lo que Incluye</h4>
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">Lo que Incluye</h4>
                         </div>
                         <ul className="space-y-3">
                             {inclusions?.map((item, i) => (
-                                <li key={i} className="text-[9.5px] font-bold text-slate-700 leading-tight border-l-2 border-cyan-100 pl-4 py-0.5">
+                                <li key={i} className="text-[9.5px] font-bold text-slate-700 leading-tight border-l-2 border-[#E33A7A]/20 pl-4 py-0.5">
                                     {item}
                                 </li>
                             ))}
@@ -422,14 +423,14 @@ function TermsSection({
                     </div>
                     <div className="space-y-5">
                         <div className="flex items-center gap-3">
-                            <div className="p-1 bg-[#E33A7A] rounded-md">
-                                <XCircle className="h-3.5 w-3.5 text-white fill-white" />
+                            <div className="p-1.5 bg-[#E33A7A]/5 rounded-lg border border-[#E33A7A]/10">
+                                <XCircle className="h-4 w-4 text-[#E33A7A]" />
                             </div>
                             <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">No Incluye</h4>
                         </div>
                         <ul className="space-y-3">
                             {exclusions?.map((item, i) => (
-                                <li key={i} className="text-[9.5px] font-bold text-slate-600 leading-tight border-l-2 border-magenta-50 pl-4 py-0.5">
+                                <li key={i} className="text-[9.5px] font-bold text-slate-600 leading-tight border-l-2 border-[#E33A7A]/20 pl-4 py-0.5">
                                     {item}
                                 </li>
                             ))}
@@ -472,14 +473,15 @@ export function QuoteTemplate() {
     const activeQuote = useActiveQuote();
 
     const isNacional = activeQuote.destinationType === "nacional";
-    const fee = activeQuote.feePercentage ?? 15;
+    const commPercent = activeQuote.providerCommissionPercent ?? 10;
+    const agencyFeePercent = activeQuote.agencyFeePercent ?? 5;
     const trm = activeQuote.trmUsed || 4200;
 
     const calcNac = isNacional
-        ? calculateNacional(activeQuote.pvpCOP || 0, fee, activeQuote.extraMarginPercent ?? 0)
+        ? calculateNacional(activeQuote.netCostCOP || 0, commPercent, agencyFeePercent)
         : null;
     const calcInt = !isNacional
-        ? calculateInternacional(activeQuote.pvpUSD || 0, fee, trm, activeQuote.extraMarginPercent ?? 0)
+        ? calculateInternacional(activeQuote.netCostUSD || 0, commPercent, agencyFeePercent, trm)
         : null;
 
     // Consume el orden definido por el asesor en el wizard
@@ -510,7 +512,8 @@ export function QuoteTemplate() {
                         isNacional={isNacional}
                         calcNac={calcNac}
                         calcInt={calcInt}
-                        fee={fee}
+                        commPercent={commPercent}
+                        agencyFeePercent={agencyFeePercent}
                         trm={trm}
                         validUntil={activeQuote.validUntil}
                     />
@@ -580,7 +583,7 @@ export function QuoteTemplate() {
                             {/* Inter — label de clasificación */}
                             <span
                                 className="text-[11px] font-semibold text-[#E33A7A] uppercase tracking-[0.5em]"
-                                style={{ fontFamily: "'Inter', sans-serif" }}
+                                style={{ fontFamily: "'Outfit', sans-serif" }}
                             >
                                 Propuesta de viajes
                             </span>
@@ -596,7 +599,7 @@ export function QuoteTemplate() {
                         <div className="space-y-4 py-8">
                             <span
                                 className="text-[8px] font-semibold text-white/40 uppercase tracking-[0.5em] block"
-                                style={{ fontFamily: "'Inter', sans-serif" }}
+                                style={{ fontFamily: "'Outfit', sans-serif" }}
                             >
                                 Diseñado Exclusivamente Para
                             </span>
@@ -672,17 +675,33 @@ export function QuoteTemplate() {
                 </div>
             </A4PageWrapper>
 
-            {/* ── HOJA 2+: CONTENIDO DINÁMICO (orden del wizard) ─────── */}
+            {/* ── HOJA 2: CONTENIDO DINÁMICO ─────────────────────────── */}
             <A4PageWrapper className="px-16 py-12" pageNumber={2}>
-                {sectionOrder.map((sectionId) => renderSection(sectionId))}
+                {sectionOrder
+                    .filter(id => id !== "terms")
+                    .map((sectionId) => renderSection(sectionId))}
 
-                {/* Legal Footer */}
+                {/* Info de continuación */}
                 <div className="mt-auto pt-6 border-t border-slate-100">
-                    <div className="flex flex-col items-center gap-4 text-[7px] text-slate-400 leading-relaxed uppercase font-black text-center tracking-[0.4em]">
-                        <p className="text-[9px] text-slate-900 border-b border-slate-200 pb-2">
+                    <p className="text-[10px] text-slate-400 font-black uppercase text-center tracking-[0.3em] italic">
+                        Esta propuesta continúa en la siguiente página con términos y condiciones.
+                    </p>
+                </div>
+            </A4PageWrapper>
+
+            {/* ── HOJA 3: TÉRMINOS Y CONDICIONES ──────────────────── */}
+            <A4PageWrapper className="px-16 py-12" pageNumber={3}>
+                <div className="flex-1">
+                    {renderSection("terms")}
+                </div>
+
+                {/* Legal Footer Final */}
+                <div className="mt-auto pt-10 border-t border-slate-100">
+                    <div className="flex flex-col items-center gap-6 text-[10px] text-slate-500 leading-relaxed uppercase font-black text-center tracking-[0.4em]">
+                        <p className="text-[11px] text-slate-900 border-b border-slate-300 pb-3 max-w-2xl px-4">
                             Esta propuesta es un documento informativo y está sujeta a disponibilidad y cambios de tarifa sin previo aviso hasta que se realice el pago total.
                         </p>
-                        <p className="pt-2 w-full text-slate-500">
+                        <p className="pt-2 w-full text-slate-700">
                             {AGENCY_INFO.name} · NIT. {AGENCY_INFO.nit} · {AGENCY_INFO.address}
                         </p>
                     </div>

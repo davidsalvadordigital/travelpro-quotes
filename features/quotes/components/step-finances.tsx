@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useActiveQuote, useQuoteActions } from "@/features/quotes/store/quote-store";
-import { DollarSign, Percent, ArrowRightLeft, FileText, RefreshCw, Coins, TrendingUp, Plus, Calendar, Settings2 } from "lucide-react";
+import { Banknote, HandCoins, Zap, FileText, RefreshCw, Coins, TrendingUp, Calendar, Settings2, DollarSign } from "lucide-react";
 import { SortableSectionList } from "./sortable-section-list";
 import { getTRM } from "@/lib/trm";
 import { formatCOP, formatUSD, formatTRM, cn } from "@/lib/utils";
@@ -21,15 +21,15 @@ export function StepFinances() {
     const isNacional = activeQuote.destinationType === "nacional";
 
     // ── Financials ──────────────────────────────────────────────────────────
-    const pvpUSD = activeQuote.pvpUSD || 0;
-    const pvpCOP = activeQuote.pvpCOP || 0;
+    const netCostUSD = activeQuote.netCostUSD || 0;
+    const netCostCOP = activeQuote.netCostCOP || 0;
     const trm = activeQuote.trmUsed || 4200;
-    const fee = activeQuote.feePercentage ?? 15;
-    const extra = activeQuote.extraMarginPercent ?? 0;
+    const commPercent = activeQuote.providerCommissionPercent ?? 10;
+    const agencyFeePercent = activeQuote.agencyFeePercent ?? 5;
 
-    // ── Cálculos (nueva API: pvp-based) ────────────────────────────────────
-    const calcNac = isNacional ? calculateNacional(pvpCOP, fee, extra) : null;
-    const calcInt = !isNacional ? calculateInternacional(pvpUSD, fee, trm, extra) : null;
+    // ── Cálculos (Modelo Net-Centric) ──────────────────────────────────────
+    const calcNac = isNacional ? calculateNacional(netCostCOP, commPercent, agencyFeePercent) : null;
+    const calcInt = !isNacional ? calculateInternacional(netCostUSD, commPercent, agencyFeePercent, trm) : null;
 
     const fetchTRM = async () => {
         setTrmLoading(true);
@@ -44,7 +44,7 @@ export function StepFinances() {
 
     // Para internacionales: auto-fetch TRM si aún no se tiene
     useEffect(() => {
-        if (!isNacional && (!activeQuote.trmUsed || activeQuote.trmUsed === 4000)) {
+        if (!isNacional && (!activeQuote.trmUsed || activeQuote.trmUsed === 4200)) {
             fetchTRM();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,30 +56,29 @@ export function StepFinances() {
             {/* ── Campos de entrada ─────────────────────────────────────────── */}
             <div className={`grid grid-cols-1 gap-8 ${isNacional ? "md:grid-cols-3" : "md:grid-cols-4"}`}>
 
-                {/* PVP Proveedor — condicional según tipo */}
+                {/* Costo Neto Proveedor — condicional según tipo */}
                 {isNacional ? (
                     <div className="space-y-4">
                         <Label
-                            htmlFor="pvpCOP"
+                            htmlFor="netCostCOP"
                             className={cn(
-                                "flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1",
-                                activeQuote.pvpCOP === 0 ? "text-destructive" : "text-muted-foreground/60"
+                                "flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.15em] ml-1",
+                                activeQuote.netCostCOP === 0 ? "text-destructive" : "text-muted-foreground/70"
                             )}
                         >
-                            <Coins className={cn("h-4 w-4", activeQuote.pvpCOP === 0 ? "text-destructive" : "text-brand-primary")} strokeWidth={3} />
-                            PVP Proveedor (COP)
+                            <Banknote className={cn("h-3.5 w-3.5", activeQuote.netCostCOP === 0 ? "text-destructive" : "text-brand-primary")} strokeWidth={2.5} />
+                            Costo Neto (COP)
                         </Label>
                         <Input
-                            id="pvpCOP"
+                            id="netCostCOP"
                             type="number"
                             min={0}
                             step={1000}
-                            value={pvpCOP || ""}
-                            onChange={(e) => setQuoteField("pvpCOP", parseFloat(e.target.value) || 0)}
-                            data-testid="quote-finances-pvp-cop"
+                            value={netCostCOP || ""}
+                            onChange={(e) => setQuoteField("netCostCOP", parseFloat(e.target.value) || 0)}
                             className={cn(
                                 "h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40",
-                                activeQuote.pvpCOP === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
+                                activeQuote.netCostCOP === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                             )}
                             placeholder="0"
                         />
@@ -87,26 +86,25 @@ export function StepFinances() {
                 ) : (
                     <div className="space-y-4">
                         <Label
-                            htmlFor="pvpUSD"
+                            htmlFor="netCostUSD"
                             className={cn(
-                                "flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1",
-                                activeQuote.pvpUSD === 0 ? "text-destructive" : "text-muted-foreground/60"
+                                "flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.15em] ml-1",
+                                activeQuote.netCostUSD === 0 ? "text-destructive" : "text-muted-foreground/70"
                             )}
                         >
-                            <DollarSign className={cn("h-4 w-4", activeQuote.pvpUSD === 0 ? "text-destructive" : "text-brand-primary")} strokeWidth={3} />
-                            PVP Proveedor (USD)
+                            <Banknote className={cn("h-3.5 w-3.5", activeQuote.netCostUSD === 0 ? "text-destructive" : "text-brand-primary")} strokeWidth={2.5} />
+                            Costo Neto (USD)
                         </Label>
                         <Input
-                            id="pvpUSD"
+                            id="netCostUSD"
                             type="number"
                             min={0}
                             step={0.01}
-                            value={pvpUSD || ""}
-                            onChange={(e) => setQuoteField("pvpUSD", parseFloat(e.target.value) || 0)}
-                            data-testid="quote-finances-pvp-usd"
+                            value={netCostUSD || ""}
+                            onChange={(e) => setQuoteField("netCostUSD", parseFloat(e.target.value) || 0)}
                             className={cn(
                                 "h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40",
-                                activeQuote.pvpUSD === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
+                                activeQuote.netCostUSD === 0 && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                             )}
                             placeholder="0.00"
                         />
@@ -115,37 +113,35 @@ export function StepFinances() {
 
                 {/* Comisión del proveedor */}
                 <div className="space-y-4">
-                    <Label htmlFor="feePercentage" className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                        <Percent className="h-4 w-4 text-brand-primary" strokeWidth={3} />
+                    <Label htmlFor="providerCommissionPercent" className="flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.15em] ml-1 text-muted-foreground/70">
+                        <HandCoins className="h-3.5 w-3.5 text-brand-primary" strokeWidth={2.5} />
                         Comisión Proveedor (%)
                     </Label>
                     <Input
-                        id="feePercentage"
+                        id="providerCommissionPercent"
                         type="number"
                         min={0}
                         max={100}
-                        value={fee}
-                        onChange={(e) => setQuoteField("feePercentage", parseFloat(e.target.value) || 0)}
-                        data-testid="quote-finances-fee"
+                        value={commPercent}
+                        onChange={(e) => setQuoteField("providerCommissionPercent", parseFloat(e.target.value) || 0)}
                         className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40"
                     />
                 </div>
 
-                {/* Margen extra de la agencia */}
+                {/* Fee adicional de la agencia */}
                 <div className="space-y-4">
-                    <Label htmlFor="extraMarginPercent" className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                        <Plus className="h-4 w-4 text-emerald-500" strokeWidth={3} />
-                        Margen Extra Agencia (%)
+                    <Label htmlFor="agencyFeePercent" className="flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.15em] ml-1 text-muted-foreground/70">
+                        <Zap className="h-3.5 w-3.5 text-brand-primary" strokeWidth={2.5} />
+                        Fee Agencia (%)
                     </Label>
                     <Input
-                        id="extraMarginPercent"
+                        id="agencyFeePercent"
                         type="number"
                         min={0}
                         max={100}
                         step={0.5}
-                        value={extra}
-                        onChange={(e) => setQuoteField("extraMarginPercent", parseFloat(e.target.value) || 0)}
-                        data-testid="quote-finances-extra-margin"
+                        value={agencyFeePercent}
+                        onChange={(e) => setQuoteField("agencyFeePercent", parseFloat(e.target.value) || 0)}
                         className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-500/40"
                     />
                 </div>
@@ -153,29 +149,23 @@ export function StepFinances() {
                 {/* TRM — solo para internacionales */}
                 {!isNacional && (
                     <div className="space-y-4">
-                        <Label htmlFor="trmUsed" className="flex items-center justify-between text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                            <span className="flex items-center gap-3">
-                                <ArrowRightLeft className="h-4 w-4 text-brand-secondary" strokeWidth={3} />
-                                TRM Referencial
-                            </span>
-                            <Button
+                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.15em] ml-1 text-muted-foreground/70">
+                            <button
                                 type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 rounded-lg hover:bg-brand-secondary/10 hover:text-brand-secondary transition-all active:scale-90"
                                 onClick={fetchTRM}
-                                title="Actualizar TRM"
+                                className="flex items-center gap-2.5 hover:text-brand-secondary transition-colors group"
+                                title="Click para actualizar TRM"
                             >
-                                <RefreshCw className={`h-4 w-4 ${trmLoading ? "animate-spin" : ""}`} />
-                            </Button>
-                        </Label>
+                                <RefreshCw className={cn("h-3.5 w-3.5 text-brand-secondary group-hover:scale-110 transition-transform", trmLoading && "animate-spin")} strokeWidth={2.5} />
+                                <span>TRM Pactada</span>
+                            </button>
+                        </div>
                         <Input
                             id="trmUsed"
                             type="number"
                             min={0}
                             value={trm}
                             onChange={(e) => setQuoteField("trmUsed", parseFloat(e.target.value) || 0)}
-                            data-testid="quote-finances-trm"
                             className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-bold tabular-nums transition-all focus-visible:ring-2 focus-visible:ring-brand-secondary/20 focus-visible:border-brand-secondary/40"
                         />
                         {trmSource && (
@@ -204,28 +194,32 @@ export function StepFinances() {
                             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                                 <Coins className="h-24 w-24 rotate-12" />
                             </div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio por Pasajero (PAX)</p>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio Cliente (PAX)</p>
                             <p className="text-4xl font-black tabular-nums tracking-tighter">
-                                {formatCOP(calcNac.precioClienteCOP / (activeQuote.numberOfTravelers || 1))}
+                                {formatCOP(calcNac.precioClienteCOP)}
                             </p>
-                            <p className="text-[10px] font-medium opacity-60 mt-2 uppercase tracking-widest">Incluye impuestos y gastos de gestión</p>
+                            <div className="flex items-center gap-4 mt-2 opacity-60 text-[10px] font-medium uppercase tracking-widest">
+                                <span>Costo Base: {formatCOP(calcNac.netCostCOP)}</span>
+                                <span className="h-1 w-1 rounded-full bg-white/40" />
+                                <span>Fee: {formatCOP(calcNac.agencyFeeAmountCOP)}</span>
+                            </div>
                         </div>
 
                         {/* TOTAL GRUPAL */}
                         <div className="p-6 rounded-2xl bg-card border border-border/60 flex flex-col justify-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Total Cotización</p>
                             <p className="text-xl font-bold text-foreground tabular-nums">
-                                {formatCOP(calcNac.precioClienteCOP)}
+                                {formatCOP(calcNac.precioClienteCOP * (activeQuote.numberOfTravelers || 1))}
                             </p>
                         </div>
 
-                        {/* UTILIDAD (Solo visible para la asesora/agencia) */}
+                        {/* UTILIDAD */}
                         <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col justify-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/60 mb-1">Rentabilidad Estimada</p>
                             <p className="text-xl font-bold text-emerald-600 tabular-nums">
-                                {formatCOP(calcNac.utilidadCOP)}
+                                {formatCOP(calcNac.utilidadCOP * (activeQuote.numberOfTravelers || 1))}
                             </p>
-                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Comisión + Margen</p>
+                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Comisión {commPercent}% + Fee {agencyFeePercent}%</p>
                         </div>
                     </div>
                 ) : calcInt ? (
@@ -235,31 +229,35 @@ export function StepFinances() {
                             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
                                 <DollarSign className="h-24 w-24 rotate-12" />
                             </div>
-                            <div className="flex items-center justify-between items-start">
+                            <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio por Pasajero (PAX)</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-80 mb-1">Precio Cliente (PAX)</p>
                                     <p className="text-4xl font-black tabular-nums tracking-tighter">
-                                        {formatUSD(calcInt.precioClienteUSD / (activeQuote.numberOfTravelers || 1))}
+                                        {formatUSD(calcInt.precioClienteUSD)}
                                     </p>
+                                    <div className="flex items-center gap-3 mt-1 opacity-60 text-[9px] font-medium uppercase tracking-widest">
+                                        <span>Costo Base: {formatUSD(calcInt.netCostUSD)}</span>
+                                        <span className="h-1 w-1 rounded-full bg-white/40" />
+                                        <span>Fee: {formatUSD(calcInt.agencyFeeAmountUSD)}</span>
+                                    </div>
                                 </div>
                                 <div className="text-right border-l border-white/20 pl-4">
-                                    <p className="text-[9px] font-bold uppercase tracking-widest opacity-60 mb-1 leading-none">Equivalente</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-widest opacity-60 mb-1 leading-none">En Pesos (TRM)</p>
                                     <p className="text-sm font-bold opacity-90 tabular-nums">
-                                        {formatCOP(calcInt.precioClienteCOP / (activeQuote.numberOfTravelers || 1))}
+                                        {formatCOP(calcInt.precioClienteCOP)}
                                     </p>
                                 </div>
                             </div>
-                            <p className="text-[10px] font-medium opacity-60 mt-2 uppercase tracking-widest">Calculado a TRM {formatTRM(trm)}</p>
                         </div>
 
                         {/* TOTAL GRUPAL */}
                         <div className="p-6 rounded-2xl bg-card border border-border/60 flex flex-col justify-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-1">Total Cotización</p>
                             <p className="text-xl font-bold text-foreground tabular-nums">
-                                {formatUSD(calcInt.precioClienteUSD)}
+                                {formatUSD(calcInt.precioClienteUSD * (activeQuote.numberOfTravelers || 1))}
                             </p>
                             <p className="text-[10px] font-medium text-muted-foreground/40 mt-1 uppercase tracking-tighter">
-                                {formatCOP(calcInt.precioClienteCOP)} Total
+                                ≈ {formatCOP(calcInt.precioClienteCOP * (activeQuote.numberOfTravelers || 1))} Total
                             </p>
                         </div>
 
@@ -267,9 +265,9 @@ export function StepFinances() {
                         <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col justify-center">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-600/60 mb-1">Utilidad Agencia</p>
                             <p className="text-xl font-bold text-emerald-600 tabular-nums">
-                                {formatUSD(calcInt.utilidadUSD)}
+                                {formatUSD(calcInt.utilidadUSD * (activeQuote.numberOfTravelers || 1))}
                             </p>
-                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Margen total acumulado</p>
+                            <p className="text-[10px] font-bold text-emerald-500/60 mt-1">Margen total acumulado ({formatCOP(calcInt.utilidadCOP * (activeQuote.numberOfTravelers || 1))})</p>
                         </div>
                     </div>
                 ) : null}
@@ -297,7 +295,6 @@ export function StepFinances() {
                             type="date"
                             value={activeQuote.validUntil ? new Date(activeQuote.validUntil).toISOString().split('T')[0] : ""}
                             onChange={(e) => setQuoteField("validUntil", new Date(e.target.value))}
-                            data-testid="quote-design-validity"
                             className="h-10 rounded-xl border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40"
                         />
                         <p className="text-[10px] text-muted-foreground/40 uppercase tracking-widest font-black ml-1">
@@ -319,3 +316,4 @@ export function StepFinances() {
         </div>
     );
 }
+

@@ -3,7 +3,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
 import { Quote } from '@/features/quotes/schemas/quote-schema';
-import { upsertQuote, getQuotes, deleteQuoteFromDb } from '@/lib/actions/quotes';
+import { quoteService } from '@/features/quotes/services/quote-service';
+import { calculateQuote } from '@/features/quotes/utils/calculator';
 import { toast } from 'sonner';
 
 type SavedQuote = Partial<Quote> & { id: string; savedAt: string };
@@ -16,6 +17,9 @@ interface QuoteState {
     isSyncing: boolean;
     currentStep: number;
     userId: string | null;
+    _hasHydrated: boolean;
+
+    setHasHydrated: (state: boolean) => void;
 
     setQuoteField: <T extends keyof Quote>(field: T, value: Quote[T]) => void;
     setUserId: (userId: string | null) => void;
@@ -57,10 +61,11 @@ const initialQuote: Partial<Quote> = {
     itinerary: [],
     inclusions: [],
     exclusions: [],
-    pvpUSD: 0,
-    pvpCOP: 0,
-    feePercentage: 15,
-    extraMarginPercent: 0,
+    netCostUSD: 0,
+    netCostCOP: undefined,
+    providerCommissionPercent: 10,
+    agencyFeePercent: 5,
+    trmUsed: 4200,
     status: 'borrador',
     sectionOrder: ['flights', 'hotelOptions', 'itinerary', 'pricing', 'terms'],
 };
@@ -75,6 +80,9 @@ export const useQuoteStore = create<QuoteState>()(
             isSyncing: false,
             currentStep: 0,
             userId: null,
+            _hasHydrated: false,
+
+            setHasHydrated: (state) => set({ _hasHydrated: state }),
 
             setQuoteField: (field, value) =>
                 set((state) => ({
@@ -84,8 +92,9 @@ export const useQuoteStore = create<QuoteState>()(
 
             setUserId: (userId) => {
                 const currentUserId = get().userId;
-                // Si el usuario cambia, limpiamos el borrador local por seguridad
-                if (currentUserId && userId !== currentUserId) {
+                // SOLO reseteamos si ya había un usuario y el nuevo es distinto (cambio de cuenta)
+                // Si currentUserId es null, es la carga inicial y no debemos tocar el progreso.
+                if (currentUserId && userId && userId !== currentUserId) {
                     set({ activeQuote: { ...initialQuote }, userId, isDirty: false, currentStep: 0 });
                 } else {
                     set({ userId });
@@ -107,9 +116,9 @@ export const useQuoteStore = create<QuoteState>()(
                         ...state.activeQuote,
                         destinationType: type,
                         ...(type === 'nacional'
-                            ? { pvpUSD: 0, trmUsed: undefined }
-                            : { pvpCOP: 0 }),
-                    },
+                            ? { netCostUSD: undefined, trmUsed: undefined, netCostCOP: (state.activeQuote as any).netCostCOP || 0 }
+                            : { netCostCOP: undefined, netCostUSD: (state.activeQuote as any).netCostUSD || 0, trmUsed: state.activeQuote.trmUsed || 4200 }),
+                    } as Quote,
                     isDirty: true,
                 })),
 
@@ -202,6 +211,7 @@ export const useQuoteStore = create<QuoteState>()(
                                 roomType: "",
                                 price: 0,
                                 isCOP: false,
+                                status: "Sujeto a Confirmar",
                                 isRecommended: false,
                             },
                         ],
@@ -233,7 +243,7 @@ export const useQuoteStore = create<QuoteState>()(
             /** 🚀 Atomic update for the entire quote - used by AI Extractor */
             setFullQuote: (quote: Partial<Quote>) =>
                 set((state) => ({
-                    activeQuote: { ...state.activeQuote, ...quote },
+                    activeQuote: { ...state.activeQuote, ...quote } as any,
                     isDirty: true,
                 })),
 
@@ -285,11 +295,11 @@ export const useQuoteStore = create<QuoteState>()(
                         payload.id = crypto.randomUUID();
                     }
 
-                    const result = await upsertQuote(payload);
+                    const result = await quoteService.save(payload);
 
                     // Update local state with the DB-generated ID
                     set((s) => {
-                        const updatedQuote = { ...s.activeQuote, id: result.id, savedAt: result.savedAt };
+                        const updatedQuote = { ...s.activeQuote, id: result.id, savedAt: (result as any).savedAt };
                         const existingIdx = s.savedQuotes.findIndex((q) => q.id === result.id);
                         const savedQuotes =
                             existingIdx >= 0
@@ -329,7 +339,7 @@ export const useQuoteStore = create<QuoteState>()(
                 set({ isLoading: true });
 
                 try {
-                    const quotes = await getQuotes();
+                    const quotes = await quoteService.getAll();
                     set({
                         savedQuotes: quotes as SavedQuote[],
                         isLoading: false,
@@ -351,7 +361,7 @@ export const useQuoteStore = create<QuoteState>()(
                 }));
 
                 try {
-                    await deleteQuoteFromDb(id);
+                    await quoteService.delete(id);
                     toast.success("Borrador eliminado ☁️", {
                         description: `Cotización de ${name} eliminada de la nube.`,
                     });
@@ -368,7 +378,12 @@ export const useQuoteStore = create<QuoteState>()(
                 }
             },
         }),
-        { name: 'quote-draft-storage' }
+        { 
+            name: 'quote-draft-storage',
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+            },
+        }
     )
 );
 
@@ -391,6 +406,7 @@ export const useSavedQuotes = () => useQuoteStore((s) => s.savedQuotes);
 /** Loading/syncing flags — used for UI indicators */
 export const useIsLoading = () => useQuoteStore((s) => s.isLoading);
 export const useIsSyncing = () => useQuoteStore((s) => s.isSyncing);
+export const useHasHydrated = () => useQuoteStore((s) => s._hasHydrated);
 
 /** Actions-only selector — never triggers re-renders */
 export const useQuoteActions = () =>
@@ -420,3 +436,34 @@ export const useQuoteActions = () =>
             deleteQuoteWithSync: s.deleteQuoteWithSync,
         }))
     );
+
+// ── Quote Wizard Hook (Orchestrator) ──────────────────────────────────
+
+/**
+ * Custom Hook to handle the Quote Wizard logic.
+ * Integrates the Store with real-time financial calculations.
+ */
+export function useQuoteWizard() {
+    const activeQuote = useActiveQuote();
+    const actions = useQuoteActions();
+    const currentStep = useQuoteStore((s) => s.currentStep);
+
+    // Real-time calculation based on the current state of the active quote
+    const totals = calculateQuote(
+        activeQuote.destinationType || "internacional",
+        {
+            netCostUSD: activeQuote.netCostUSD,
+            netCostCOP: activeQuote.netCostCOP,
+            providerCommissionPercent: activeQuote.providerCommissionPercent || 10,
+            agencyFeePercent: activeQuote.agencyFeePercent || 5,
+            trm: activeQuote.trmUsed || 4200,
+        }
+    );
+
+    return {
+        quote: activeQuote,
+        totals,
+        currentStep,
+        actions,
+    };
+}

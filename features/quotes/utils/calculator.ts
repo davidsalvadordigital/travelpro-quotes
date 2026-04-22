@@ -1,44 +1,46 @@
 /**
- * Quote Calculator — Financial Logic (TravelPro Agency Commission Model)
+ * Quote Calculator — Financial Logic (TravelPro Net-Centric Model)
  *
- * MODELO DE AGENCIA (Comisión Cedida por Proveedor):
+ * MODELO DE AGENCIA (Costo Neto + Margen):
  * ─────────────────────────────────────────────────
- * El mayorista fija un PVP oficial. La agencia puede vender a ese precio
- * y retiene internamente su comisión. El cliente nunca ve el desglose.
+ * El asesor ingresa el costo neto pactado con el mayorista.
+ * Sobre ese neto se aplican dos márgenes:
+ * 1. Comisión Proveedor %: Margen estándar cedido.
+ * 2. Fee Agencia %: Margen adicional propio.
  *
- * FÓRMULAS CANÓNICAS:
- *   comision         = pvp * (feePercent / 100)
- *   costoNeto        = pvp - comision              ← lo que se paga al mayorista
- *   extraAmount      = pvp * (extraPercent / 100)  ← margen adicional (opcional)
- *   precioCliente    = pvp + extraAmount            ← lo que paga el viajero
- *   utilidadAgencia  = comision + extraAmount       ← ganancia total
+ * FÓRMULAS CANÓNICAS (Comisión Cedida):
+ *   commAmount       = netCost * (commPercent / 100)  ← Utilidad cedida por el proveedor
+ *   pvpBase          = netCost                        ← El neto ingresado es el precio base
+ *   agencyFeeAmount  = netCost * (feePercent / 100)   ← Fee adicional sobre el neto
+ *   precioClientePAX = netCost + agencyFeeAmount
+ *   utilidadPAX      = commAmount + agencyFeeAmount
  *
  * FLUJO MULTI-MONEDA:
- *   NACIONAL:        pvpCOP  + extraPercent% → precioClienteCOP
- *   INTERNACIONAL:   pvpUSD  + extraPercent% → precioClienteUSD → ×TRM → COP
+ *   NACIONAL:        netCostCOP + Márgenes → precioClienteCOP
+ *   INTERNACIONAL:   netCostUSD + Márgenes → precioClienteUSD → ×TRM → precioClienteCOP
  */
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 export interface QuoteCalculationInternacional {
   type: "internacional";
-  /** PVP oficial del mayorista en USD */
-  pvpUSD: number;
-  /** Porcentaje de comisión cedido por el proveedor (ej. 15) */
-  feePercent: number;
-  /** Monto de comisión estándar en USD */
-  feeAmountUSD: number;
-  /** Costo neto que la agencia paga al mayorista */
+  /** Costo neto base en USD */
   netCostUSD: number;
-  /** Porcentaje de margen extra que agrega la agencia (ej. 3). Default 0. */
-  extraPercent: number;
-  /** Monto extra en USD */
-  extraAmountUSD: number;
-  /** Precio final que paga el viajero en USD */
+  /** Porcentaje de comisión del proveedor (ej. 10) */
+  providerCommissionPercent: number;
+  /** Monto de comisión en USD */
+  commissionAmountUSD: number;
+  /** Porcentaje de fee adicional de la agencia (ej. 5) */
+  agencyFeePercent: number;
+  /** Monto del fee de agencia en USD */
+  agencyFeeAmountUSD: number;
+  /** PVP Base (Neto + Comisión Proveedor) en USD */
+  pvpUSD: number;
+  /** Precio final que paga el viajero en USD (por persona) */
   precioClienteUSD: number;
   /** Precio final en COP (redondeado) */
   precioClienteCOP: number;
-  /** Utilidad total de la agencia en USD (fee + extra) */
+  /** Utilidad total de la agencia en USD (comm + fee) */
   utilidadUSD: number;
   /** Utilidad total en COP (redondeada) */
   utilidadCOP: number;
@@ -48,21 +50,21 @@ export interface QuoteCalculationInternacional {
 
 export interface QuoteCalculationNacional {
   type: "nacional";
-  /** PVP oficial del mayorista en COP */
-  pvpCOP: number;
-  /** Porcentaje de comisión cedido por el proveedor (ej. 15) */
-  feePercent: number;
-  /** Monto de comisión en COP */
-  feeAmountCOP: number;
-  /** Costo neto que la agencia paga al mayorista */
+  /** Costo neto base en COP */
   netCostCOP: number;
-  /** Porcentaje de margen extra (opcional) */
-  extraPercent: number;
-  /** Monto extra en COP */
-  extraAmountCOP: number;
-  /** Precio final que paga el viajero en COP */
+  /** Porcentaje de comisión del proveedor (ej. 10) */
+  providerCommissionPercent: number;
+  /** Monto de comisión en COP */
+  commissionAmountCOP: number;
+  /** Porcentaje de fee adicional de la agencia (ej. 5) */
+  agencyFeePercent: number;
+  /** Monto del fee de agencia en COP */
+  agencyFeeAmountCOP: number;
+  /** PVP Base (Neto + Comisión Proveedor) en COP */
+  pvpCOP: number;
+  /** Precio final que paga el viajero en COP (por persona) */
   precioClienteCOP: number;
-  /** Utilidad total de la agencia en COP */
+  /** Utilidad total de la agencia en COP (comm + fee) */
   utilidadCOP: number;
 }
 
@@ -73,33 +75,34 @@ export type QuoteCalculation =
 // ─── Calculadoras ─────────────────────────────────────────────────────────────
 
 /**
- * Calcula una cotización INTERNACIONAL.
+ * Calcula una cotización INTERNACIONAL basada en Costo Neto.
  *
- * @param pvpUSD       PVP oficial del mayorista en USD
- * @param feePercent   Comisión del proveedor en % (ej. 15)
- * @param trm          TRM del día (COP por 1 USD)
- * @param extraPercent Margen adicional de la agencia en % (default 0)
+ * @param netCostUSD                Costo neto del proveedor en USD
+ * @param providerCommissionPercent % de comisión del proveedor
+ * @param agencyFeePercent          % de fee extra de la agencia
+ * @param trm                       TRM del día
  */
 export function calculateInternacional(
-  pvpUSD: number,
-  feePercent: number,
-  trm: number,
-  extraPercent = 0
+  netCostUSD: number,
+  providerCommissionPercent: number,
+  agencyFeePercent: number,
+  trm: number
 ): QuoteCalculationInternacional {
-  const feeAmountUSD = pvpUSD * (feePercent / 100);
-  const netCostUSD = pvpUSD - feeAmountUSD;
-  const extraAmountUSD = pvpUSD * (extraPercent / 100);
-  const precioClienteUSD = pvpUSD + extraAmountUSD;
-  const utilidadUSD = feeAmountUSD + extraAmountUSD;
+  const commissionAmountUSD = netCostUSD * (providerCommissionPercent / 100);
+  const agencyFeeAmountUSD = netCostUSD * (agencyFeePercent / 100);
+  
+  const pvpUSD = netCostUSD;
+  const precioClienteUSD = netCostUSD + agencyFeeAmountUSD;
+  const utilidadUSD = commissionAmountUSD + agencyFeeAmountUSD;
 
   return {
     type: "internacional",
-    pvpUSD,
-    feePercent,
-    feeAmountUSD,
     netCostUSD,
-    extraPercent,
-    extraAmountUSD,
+    providerCommissionPercent,
+    commissionAmountUSD,
+    agencyFeePercent,
+    agencyFeeAmountUSD,
+    pvpUSD,
     precioClienteUSD,
     precioClienteCOP: Math.round(precioClienteUSD * trm),
     utilidadUSD,
@@ -109,31 +112,32 @@ export function calculateInternacional(
 }
 
 /**
- * Calcula una cotización NACIONAL.
+ * Calcula una cotización NACIONAL basada en Costo Neto.
  *
- * @param pvpCOP       PVP oficial del mayorista en COP
- * @param feePercent   Comisión del proveedor en % (ej. 15)
- * @param extraPercent Margen adicional de la agencia en % (default 0)
+ * @param netCostCOP                Costo neto del proveedor en COP
+ * @param providerCommissionPercent % de comisión del proveedor
+ * @param agencyFeePercent          % de fee extra de la agencia
  */
 export function calculateNacional(
-  pvpCOP: number,
-  feePercent: number,
-  extraPercent = 0
+  netCostCOP: number,
+  providerCommissionPercent: number,
+  agencyFeePercent: number
 ): QuoteCalculationNacional {
-  const feeAmountCOP = Math.round(pvpCOP * (feePercent / 100));
-  const netCostCOP = pvpCOP - feeAmountCOP;
-  const extraAmountCOP = Math.round(pvpCOP * (extraPercent / 100));
-  const precioClienteCOP = pvpCOP + extraAmountCOP;
-  const utilidadCOP = feeAmountCOP + extraAmountCOP;
+  const commissionAmountCOP = Math.round(netCostCOP * (providerCommissionPercent / 100));
+  const agencyFeeAmountCOP = Math.round(netCostCOP * (agencyFeePercent / 100));
+  
+  const pvpCOP = netCostCOP;
+  const precioClienteCOP = netCostCOP + agencyFeeAmountCOP;
+  const utilidadCOP = commissionAmountCOP + agencyFeeAmountCOP;
 
   return {
     type: "nacional",
-    pvpCOP,
-    feePercent,
-    feeAmountCOP,
     netCostCOP,
-    extraPercent,
-    extraAmountCOP,
+    providerCommissionPercent,
+    commissionAmountCOP,
+    agencyFeePercent,
+    agencyFeeAmountCOP,
+    pvpCOP,
     precioClienteCOP,
     utilidadCOP,
   };
@@ -145,24 +149,24 @@ export function calculateNacional(
 export function calculateQuote(
   destinationType: "nacional" | "internacional",
   opts: {
-    pvpUSD?: number;
-    pvpCOP?: number;
-    feePercent: number;
-    extraPercent?: number;
+    netCostUSD?: number;
+    netCostCOP?: number;
+    providerCommissionPercent: number;
+    agencyFeePercent: number;
     trm?: number;
   }
 ): QuoteCalculation {
   if (destinationType === "nacional") {
     return calculateNacional(
-      opts.pvpCOP ?? 0,
-      opts.feePercent,
-      opts.extraPercent ?? 0
+      opts.netCostCOP ?? 0,
+      opts.providerCommissionPercent,
+      opts.agencyFeePercent
     );
   }
   return calculateInternacional(
-    opts.pvpUSD ?? 0,
-    opts.feePercent,
-    opts.trm ?? 4200,
-    opts.extraPercent ?? 0
+    opts.netCostUSD ?? 0,
+    opts.providerCommissionPercent,
+    opts.agencyFeePercent,
+    opts.trm ?? 4200
   );
 }

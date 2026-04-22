@@ -8,6 +8,7 @@ import {
     Sheet,
     SheetContent,
     SheetTitle,
+    SheetDescription,
 } from "@/components/ui/sheet";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { QuoteTemplate } from "@/features/quotes/components/quote-template";
@@ -31,15 +32,16 @@ export function QuotePreview() {
     const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
     const isNacional = activeQuote.destinationType === "nacional";
-    const fee = activeQuote.feePercentage ?? 15;
+    const commPercent = activeQuote.providerCommissionPercent ?? 10;
+    const agencyFeePercent = activeQuote.agencyFeePercent ?? 5;
     const trm = activeQuote.trmUsed || 4200;
 
-    const calcNac = isNacional ? calculateNacional(activeQuote.pvpCOP || 0, fee, activeQuote.extraMarginPercent ?? 0) : null;
-    const calcInt = !isNacional ? calculateInternacional(activeQuote.pvpUSD || 0, fee, trm, activeQuote.extraMarginPercent ?? 0) : null;
+    const calcNac = isNacional ? calculateNacional(activeQuote.netCostCOP || 0, commPercent, agencyFeePercent) : null;
+    const calcInt = !isNacional ? calculateInternacional(activeQuote.netCostUSD || 0, commPercent, agencyFeePercent, trm) : null;
 
     const hasFinancials = isNacional
-        ? (activeQuote.pvpCOP || 0) > 0
-        : (activeQuote.pvpUSD || 0) > 0;
+        ? (activeQuote.netCostCOP || 0) > 0
+        : (activeQuote.netCostUSD || 0) > 0;
 
     const hasData = activeQuote.travelerName || activeQuote.destination;
 
@@ -189,6 +191,7 @@ export function QuotePreview() {
                 <SheetContent side="right" className="!w-screen !max-w-none p-0 gap-0 overflow-hidden flex flex-col bg-slate-900 border-none shadow-2xl">
                     <VisuallyHidden.Root>
                         <SheetTitle>Previsualización — {activeQuote.travelerName || "Cotización"}</SheetTitle>
+                        <SheetDescription>Vista detallada de la propuesta de viaje en formato A4.</SheetDescription>
                     </VisuallyHidden.Root>
 
                     <div className="flex items-center justify-between px-6 py-3 border-b border-white/5 bg-slate-900/95 backdrop-blur-xl sticky top-0 z-50 shadow-2xl">

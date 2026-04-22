@@ -19,6 +19,7 @@ type ServerQuote = {
     pvpCOP?: number;
     feePercentage?: number;
     trmUsed?: number;
+    locatorCode?: string;
 };
 
 interface DraftsListProps {
@@ -62,6 +63,11 @@ export function DraftsList({ initialQuotes }: DraftsListProps) {
                                     <p className="text-[11px] sm:text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                                         <Plane className="h-3 w-3" />
                                         {q.destination || "Destino sin definir"}
+                                        {q.locatorCode && (
+                                            <span className="bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider ml-1">
+                                                {q.locatorCode}
+                                            </span>
+                                        )}
                                         {q.savedAt && (
                                             <> • {new Date(q.savedAt).toLocaleDateString("es-CO", { dateStyle: "short" })}</>
                                         )}

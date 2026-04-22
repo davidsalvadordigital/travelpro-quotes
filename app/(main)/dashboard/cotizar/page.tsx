@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { createClient } from "@/lib/supabase";
 
 import { Progress } from "@/components/ui/progress";
-import { useQuoteStore } from "@/features/quotes/store/quote-store";
+import { useQuoteStore, useHasHydrated, useQuoteWizard } from "@/features/quotes/store/quote-store";
 import { StepTraveler } from "@/features/quotes/components/step-traveler";
 import { StepFlights } from "@/features/quotes/components/step-flights";
 import { StepHotels } from "@/features/quotes/components/step-hotels";
@@ -19,7 +19,7 @@ import { toast } from "sonner";
 
 import { useRouter } from "next/navigation";
 import { z } from "zod";
-import { quoteSchema } from "@/features/quotes/schemas/quote-schema";
+import { quoteSchema, baseQuoteSchema } from "@/features/quotes/schemas/quote-schema";
 import { cn } from "@/lib/utils";
 
 const STEP_COMPONENTS = [
@@ -33,9 +33,15 @@ const STEP_COMPONENTS = [
 
 export default function QuotePage() {
     const router = useRouter();
-    const isSaving = useQuoteStore(s => s.isSyncing);
+    const hasHydrated = useHasHydrated();
+    
+    // 🧙‍♂️ Use the Wizard Orchestrator
+    const { quote: activeQuote, actions, currentStep } = useQuoteWizard();
+    const isSyncing = useQuoteStore(s => s.isSyncing);
+
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const [isFinalizing, setIsFinalizing] = useState(false);
     const [hasAttemptedNext, setHasAttemptedNext] = useState(false);
-    const { activeQuote, resetQuote, saveQuote, syncToSupabase, currentStep, setCurrentStep, setUserId } = useQuoteStore();
     const hasInitialized = useRef(false);
 
     // 🚀 Sync User Identity with the store
@@ -44,16 +50,33 @@ export default function QuotePage() {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
             if (user?.id) {
-                setUserId(user.id);
+                actions.setUserId(user.id);
             }
         };
         fetchUser();
-    }, [setUserId]);
+    }, [actions]);
 
     // 🚀 Session management
     useEffect(() => {
         hasInitialized.current = true;
     }, []);
+
+    // 🛡️ Prevent hydration flicker
+    if (!hasHydrated) {
+        return (
+            <div className="flex h-[80vh] w-full flex-col items-center justify-center gap-4">
+                <div className="relative">
+                    <Loader2 className="h-10 w-10 animate-spin text-brand-primary" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="h-2 w-2 rounded-full bg-brand-secondary animate-pulse" />
+                    </div>
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 animate-pulse">
+                    Sincronizando sesión...
+                </p>
+            </div>
+        );
+    }
 
     const steps = ["Datos del viajero", "Itinerario", "Hospedaje", "Transporte", "Condiciones", "Tarifas"];
     const safeStep = typeof currentStep === 'number' && currentStep >= 0 && currentStep < steps.length ? currentStep : 0;
@@ -65,7 +88,7 @@ export default function QuotePage() {
         try {
             switch (safeStep) {
                 case 0: // Inicio (Viajero + Destino)
-                    quoteSchema.pick({ 
+                    baseQuoteSchema.pick({ 
                         travelerName: true, 
                         email: true, 
                         destination: true, 
@@ -74,19 +97,22 @@ export default function QuotePage() {
                     }).parse(activeQuote);
                     break;
                 case 1: // El Viaje (Itinerario)
-                    z.object({ itinerary: quoteSchema.shape.itinerary }).parse(activeQuote);
+                    z.object({ itinerary: baseQuoteSchema.shape.itinerary }).parse(activeQuote);
                     break;
                 case 2: // Hospedaje
-                    z.object({ hotelOptions: quoteSchema.shape.hotelOptions }).parse(activeQuote);
+                    z.object({ hotelOptions: baseQuoteSchema.shape.hotelOptions }).parse(activeQuote);
                     break;
                 case 3: // Transporte (Vuelos)
-                    z.object({ flights: quoteSchema.shape.flights }).parse(activeQuote);
+                    z.object({ flights: baseQuoteSchema.shape.flights }).parse(activeQuote);
                     break;
                 case 4: // Condiciones
-                    // (Validación de plantilla)
                     break;
-                case 5: // Inversión (Finanzas + Diseño)
-                    z.object({ pvpCOP: quoteSchema.shape.pvpCOP, pvpUSD: quoteSchema.shape.pvpUSD }).parse(activeQuote);
+                case 5: // Inversión (Finanzas)
+                    if (activeQuote.destinationType === 'nacional') {
+                        z.object({ netCostCOP: z.number().min(1) }).parse(activeQuote);
+                    } else {
+                        z.object({ netCostUSD: z.number().min(1) }).parse(activeQuote);
+                    }
                     break;
             }
             return true;
@@ -104,12 +130,12 @@ export default function QuotePage() {
         if (validateCurrentStep()) {
             setHasAttemptedNext(false);
             const nextStep = Math.min(steps.length - 1, safeStep + 1);
-            setCurrentStep(nextStep);
+            actions.setCurrentStep(nextStep);
             
-            // ☁️ Auto-sync to cloud on step progression
+            // ☁️ Auto-sync
             if (activeQuote.travelerName) {
-                saveQuote();
-                syncToSupabase(); 
+                actions.saveQuote();
+                actions.syncToSupabase(); 
             }
         } else {
             setHasAttemptedNext(true);
@@ -119,19 +145,19 @@ export default function QuotePage() {
     const handleBack = () => {
         setHasAttemptedNext(false);
         const prevStep = Math.max(0, safeStep - 1);
-        setCurrentStep(prevStep);
+        actions.setCurrentStep(prevStep);
         
-        // ☁️ Auto-sync on back too
+        // ☁️ Auto-sync
         if (activeQuote.travelerName) {
-            saveQuote();
-            syncToSupabase();
+            actions.saveQuote();
+            actions.syncToSupabase();
         }
     };
 
     const handleReset = () => {
         if (window.confirm("¿Estás seguro de que deseas limpiar todo el formulario? Esta acción no se puede deshacer.")) {
-            resetQuote();
-            setCurrentStep(0);
+            actions.resetQuote();
+            actions.setCurrentStep(0);
             setHasAttemptedNext(false);
             toast.info("Formulario reiniciado");
         }
@@ -144,12 +170,15 @@ export default function QuotePage() {
             return;
         }
 
+        setIsSavingDraft(true);
         try {
-            saveQuote();
-            await syncToSupabase();
+            actions.saveQuote();
+            await actions.syncToSupabase();
             toast.success("Borrador guardado en la nube ☁️");
         } catch (error) {
             toast.error("Error al guardar", { description: error instanceof Error ? error.message : "Error desconocido" });
+        } finally {
+            setIsSavingDraft(false);
         }
     };
 
@@ -158,30 +187,32 @@ export default function QuotePage() {
 
         if (!result.success) {
             setHasAttemptedNext(true);
-            const firstError = result.error.issues?.[0] || (result.error as { errors?: { message: string }[] }).errors?.[0];
+            const firstError = result.error.issues?.[0];
             toast.error("Datos incompletos", {
                 description: `${firstError?.message || "Revisa que todos los campos requeridos estén llenos."}`
             });
             return;
         }
 
+        setIsFinalizing(true);
         try {
-            useQuoteStore.getState().setQuoteField("status", "enviada");
-            saveQuote();
-            await syncToSupabase();
+            actions.setQuoteField("status", "enviada");
+            actions.saveQuote();
+            await actions.syncToSupabase();
 
             toast.success("¡Cotización finalizada!", {
                 description: `Cotización para ${activeQuote.travelerName} enviada.`,
             });
 
-            // Reset step and possibly store on success redirect
-            setCurrentStep(0);
+            actions.setCurrentStep(0);
 
             setTimeout(() => {
                 router.push("/dashboard");
             }, 1000);
         } catch (error) {
             toast.error("Error al finalizar", { description: error instanceof Error ? error.message : "Error desconocido" });
+        } finally {
+            setIsFinalizing(false);
         }
     };
 
@@ -247,9 +278,15 @@ export default function QuotePage() {
                                 <Button
                                     data-testid="quote-wizard-back"
                                     variant="outline"
-                                    onClick={handleBack}
-                                    disabled={safeStep === 0 || isSaving}
-                                    className="h-10 rounded-xl gap-2 px-5 font-medium text-sm border-border/60 transition-all hover:bg-background active:scale-[0.97]"
+                                    onClick={() => {
+                                        if (isSyncing || isSavingDraft || isFinalizing) return;
+                                        handleBack();
+                                    }}
+                                    disabled={safeStep === 0}
+                                    className={cn(
+                                        "h-10 rounded-xl gap-2 px-5 font-medium text-sm border-border/60 transition-all hover:bg-background active:scale-[0.97]",
+                                        (isSyncing || isSavingDraft || isFinalizing) && "pointer-events-none opacity-100"
+                                    )}
                                 >
                                     <ArrowLeft className="h-3.5 w-3.5" />
                                     Atrás
@@ -258,9 +295,14 @@ export default function QuotePage() {
                                 <Button
                                     data-testid="quote-wizard-reset"
                                     variant="ghost"
-                                    onClick={handleReset}
-                                    disabled={isSaving}
-                                    className="h-10 rounded-xl gap-2 px-4 font-medium text-sm text-muted-foreground/50 transition-all hover:bg-destructive/10 hover:text-destructive active:scale-[0.97]"
+                                    onClick={() => {
+                                        if (isSyncing || isSavingDraft || isFinalizing) return;
+                                        handleReset();
+                                    }}
+                                    className={cn(
+                                        "h-10 rounded-xl gap-2 px-4 font-medium text-sm text-muted-foreground/50 transition-all hover:bg-destructive/10 hover:text-destructive active:scale-[0.97]",
+                                        (isSyncing || isSavingDraft || isFinalizing) && "pointer-events-none opacity-80"
+                                    )}
                                 >
                                     <Trash2 className="h-3.5 w-3.5" />
                                     Limpiar
@@ -273,18 +315,23 @@ export default function QuotePage() {
                                     variant="outline"
                                     className="h-10 rounded-xl gap-2 border-brand-secondary/30 bg-background/50 px-5 font-medium text-sm transition-all hover:border-brand-secondary/50 hover:text-brand-secondary active:scale-[0.97] text-brand-secondary"
                                     onClick={handleSaveDraft}
-                                    disabled={isSaving}
+                                    disabled={isSavingDraft}
                                 >
-                                    {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                                    {isSavingDraft ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                                     Guardar borrador
                                 </Button>
 
                                 {safeStep < steps.length - 1 ? (
                                     <Button
                                         data-testid="quote-wizard-next"
-                                        onClick={handleNext}
-                                        disabled={isSaving}
-                                        className="h-10 rounded-xl gap-2 px-6 font-semibold text-sm bg-brand-primary text-white shadow-md shadow-brand-primary/20 transition-all hover:shadow-brand-primary/30 hover:bg-brand-primary/90 active:scale-[0.97]"
+                                        onClick={() => {
+                                            if (isSyncing || isSavingDraft || isFinalizing) return;
+                                            handleNext();
+                                        }}
+                                        className={cn(
+                                            "h-10 rounded-xl gap-2 px-6 font-semibold text-sm bg-brand-primary text-white shadow-md shadow-brand-primary/20 transition-all hover:shadow-brand-primary/30 hover:bg-brand-primary/90 active:scale-[0.97]",
+                                            (isSyncing || isSavingDraft || isFinalizing) && "pointer-events-none opacity-100"
+                                        )}
                                     >
                                         Continuar
                                         <ArrowRight className="h-3.5 w-3.5" />
@@ -292,11 +339,14 @@ export default function QuotePage() {
                                 ) : (
                                     <Button
                                         data-testid="quote-wizard-submit"
-                                        className="h-10 rounded-xl gap-2 bg-brand-primary px-6 font-semibold text-sm text-white shadow-md shadow-brand-primary/25 transition-all hover:shadow-brand-primary/40 hover:bg-brand-primary/90 active:scale-[0.97]"
+                                        className={cn(
+                                            "h-10 rounded-xl gap-2 bg-brand-primary px-6 font-semibold text-sm text-white shadow-md shadow-brand-primary/25 transition-all hover:shadow-brand-primary/40 hover:bg-brand-primary/90 active:scale-[0.97]",
+                                            (isSyncing || isSavingDraft || isFinalizing) && "pointer-events-none opacity-100"
+                                        )}
                                         onClick={handleFinalize}
-                                        disabled={isSaving}
+                                        disabled={isFinalizing}
                                     >
-                                        {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                                        {isFinalizing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
                                         Finalizar cotización
                                     </Button>
                                 )}

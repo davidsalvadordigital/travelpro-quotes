@@ -37,7 +37,7 @@ export function ImageUploader({ value, onChange, label = "Imagen Principal", cla
                 maxSizeMB: 0.2, // Compress to max 200KB
                 maxWidthOrHeight: 1920,
                 useWebWorker: true,
-                fileType: "image/webp" as const,
+                fileType: "image/jpeg" as const,
             };
 
             const compressedFile = await imageCompression(file, options);

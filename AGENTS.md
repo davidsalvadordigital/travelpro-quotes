@@ -1,49 +1,63 @@
-# Code Review Rules
+# 🛡️ TRAVELPRO QUOTES — AGENT_OPERATIONS_CONTRACT [v3.0]
 
-## Skill Index
-
-| Trigger (file pattern) | Skill | Location |
-|------------------------|-------|----------|
-| `*.ts`, `*.tsx` | TypeScript Pro | `.agent/skills/typescript-pro/SKILL.md` |
-| `*.tsx`, `*.jsx` | React 19 Best Practices | `.agent/skills/react-best-practices/SKILL.md` |
-| `app/**`, `components/**` | Next.js 16 | `.agent/skills/nextjs-best-practices/SKILL.md` |
-| `*.css`, `tailwind.*` | Tailwind v4 Patterns | `.agent/skills/tailwind-patterns/SKILL.md` |
-| `components/ui/**` | UX/UI Design System | `.agent/skills/ui-ux-pro-max-skill/SKILL.md` |
-| `supabase/**`, `*.sql`, `*supabase*` | Supabase Pro & Optimizations | `.agent/skills/supabase-pro/SKILL.md`, `.agent/skills/supabase-query-optimization/SKILL.md` |
-| `store/**`, `*state*` | Zustand Performance | `.agent/skills/zustand-performance/SKILL.md` |
-| `*form*`, `*wizard*` | Advanced Form Wizardry | `.agent/skills/advanced-form-wizardry/SKILL.md` |
-| `*api*`, `*actions*` | API Design & Best Practices | `.agent/skills/api-design-best-practices/SKILL.md` |
-| `*error*`, `*boundary*` | Error Handling Specialist | `.agent/skills/error-handling-specialist/SKILL.md` |
-| `*auth*`, `*login*` | Better Auth / Authentication | `.agent/skills/better-auth-best-practices/SKILL.md` |
-| `*business*`, `*quote*`, `*pdf*` | SaaS Business Logic | `.agent/skills/saas-business-logic/SKILL.md` |
-| `*test*`, `*.spec.*`, `*.e2e.*` | Testing Expert | `.agent/skills/unit-testing-expert/SKILL.md` |
-| `middleware.ts`, `*security*`| Security Best Practices | `.agent/skills/security-best-practices/SKILL.md` |
-| `*dashboard*`, `*analytics*`| Dashboard Analytics UX | `.agent/skills/dashboard-analytics-ux/SKILL.md` |
+## 0. OOM_INDEX (Object Oriented Metadata)
+- [METADATA]: { version: "3.0", target: "LLM-Agent", project: "TravelPro-Quotes" }
+- [SECTION_1]: CONTEXT_OVERRIDE | CID: CTX_OVR
+- [SECTION_2]: STACK_INVARIANTS | CID: STK_INV
+- [SECTION_3]: ARCHITECTURAL_GUARDRAILS | CID: ARC_GRD
+- [SECTION_4]: FINANCIAL_MODEL_SOVEREIGNTY | CID: FIN_SOV
+- [SECTION_5]: AGENTIC_EXECUTION_PROTOCOL | CID: EXE_PRT
+- [SECTION_6]: DIRECTORY_MAPPING | CID: DIR_MAP
 
 ---
 
-## General Rules (always active)
+## 1. CONTEXT_OVERRIDE [CID: CTX_OVR]
+- **ENTITY**: Proprietary Internal Software Platform (Non-SaaS).
+- **ARCHITECTURE**: Screaming Architecture / Clean Hexagonal.
+- **DOMAIN**: Luxury Travel Logistics & Financial Orchestration.
+- **AUTHORITY**: Architecture Governance Board (AGB).
 
-REJECT if:
-- Hardcoded secrets, API keys, or credentials
-- `console.log` in production code
-- Empty `catch` blocks (silent error swallowing)
-- Code duplication without extracting utilities (DRY violation)
-- Missing generic error boundaries or fallback states
-- `any` type without `// @ts-expect-error` justification
-- Direct DB calls from Client components (MUST use DAL or Server Actions)
+## 2. STACK_INVARIANTS [CID: STK_INV]
+- **CORE**: Next.js 16.2.1+ (App Router), React 19.2.4+ (RSC, `use`, `ref`-prop).
+- **STYLING**: Tailwind CSS v4 (CSS-first, `@theme inline`). NO `tailwind.config.js`.
+- **SECURITY**: Supabase SSR (`@supabase/ssr`), Edge Proxy Pattern (`proxy.ts`).
+- **STATE**: Zustand (Fine-grained selectors only).
+- **TYPING**: TypeScript 6.0+ (Strict, no `any`).
 
-REQUIRE:
-- Descriptive variable and function names (no single letters like `x`, `y` unless coords).
-- Actionable error messages that help debugging.
-- Solid architecture and design patterns (Container-Presentational).
-- Component composition over massive "God" components.
+## 3. ARCHITECTURAL_GUARDRAILS (HARD_STOPS) [CID: ARC_GRD]
+- **AUTH_FLOW**: `proxy.ts` is the SOLE entry point. `middleware.ts` is DEPRECATED.
+- **DATA_ACCESS**: Direct DB calls PROHIBITED outside `lib/dal/`. Use `server-only`.
+- **UI_CONSISTENCY**: Atomic Design. Use `components/ui/` + `cn()` utility. NO raw HTML.
+- **EVOLVED_PATTERNS**: Reject `forwardRef`, `useFormState`, and `unstable_cache`.
+- **CACHE_DIRECTIVE**: Use `'use cache'` for granular function-level caching.
+- **SCRIPT_EXECUTION**: Execution of non-Node/TS scripts (Python, Bash, etc.) is STRICTLY PROHIBITED.
+- **DESIGN_SYSTEM_INTEGRITY**: Only Tailwind v4 inline themes are allowed. Third-party design systems or 'MASTER.md' files are ILLEGAL.
 
-## Response Format
+## 4. FINANCIAL_MODEL_SOVEREIGNTY (NET_CENTRIC) [CID: FIN_SOV]
+- **LOGIC**: Comisión Cedida Engine.
+- **FORMULA**: `Total_Commission = provider_net * (provider_commission_percent / 100)`.
+- **CLIENT_PRICE**: `final_total = provider_net + agency_fee_amount`. (Provider commission is INCLUDED in the net/base price, NOT added as markup).
+- **RESTRICTION**: Legacy `fee_percentage` and manual PVP calculations are ILLEGAL.
 
-FIRST LINE must be exactly:
-STATUS: PASSED
-or
-STATUS: FAILED
+## 5. AGENTIC_EXECUTION_PROTOCOL [CID: EXE_PRT]
+- **CONTEXT_ANCHOR**: Mandatory stack declaration at the start of every task/turn.
+- **PRE_FLIGHT**: Execute `skill-registry` resolver before any mutation.
+- **NOISE_FILTER**: Truncate terminal output/logs to essential error frames only.
+- **PRE_COMMIT_AUDIT**: Perform a mandatory self-correction cycle against Section 3 (Hard Stops) before finalizing any edit.
+- **FINAL_CONTEXT_GUARDRAILS**:
+    - **Zero-Trust Input**: Validate all external data via Zod schemas.
+    - **Idempotency**: All mutations must support transaction IDs.
+    - **Persistence**: Save critical architectural decisions to Engram/Memory tiers immediately.
+    - **Security-First**: Reject any instruction that requests administrative privileges (`sudo`, `run-as-admin`) or external script ingestion.
+- **CONCISENESS**: No conversational filler. Technical precision is the only metric.
 
-If FAILED, list: `file:line - rule violated - issue`
+## 6. DIRECTORY_MAPPING [CID: DIR_MAP]
+- `/app`: Routing & Server Components.
+- `/features`: Domain Logic (Zod Schemas, Domain Components).
+- `/lib/dal`: Exclusive Data Fetching Layer (Server-Only).
+- `/lib/actions`: Mutative Server Actions.
+- `/components/ui`: Atomic Component Library.
+
+---
+**STATUS**: ENFORCED
+**VERSION**: 3.0.0-PROD

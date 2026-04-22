@@ -27,10 +27,25 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [],
 
   async headers() {
+    const cspHeader = `
+      default-src 'self';
+      script-src 'self' 'unsafe-eval' 'unsafe-inline' *.supabase.co;
+      connect-src 'self' *.supabase.co *.supabase.in fonts.gstatic.com fonts.googleapis.com cdnjs.cloudflare.com;
+      style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+      img-src 'self' blob: data: *.supabase.co *.supabase.in;
+      font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
     return [
       {
         source: "/(.*)",
         headers: [
+          { key: "Content-Security-Policy", value: cspHeader },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -41,6 +56,10 @@ const nextConfig: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: process.env.NEXT_PUBLIC_SITE_URL || "*",
           },
         ],
       },
