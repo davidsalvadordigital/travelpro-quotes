@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Inbox } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { type ActivityItem } from "@/lib/dal/stats";
 
 export function ActivityFeed({ initialActivity }: { initialActivity: ActivityItem[] }) {
@@ -17,7 +18,11 @@ export function ActivityFeed({ initialActivity }: { initialActivity: ActivityIte
                 {initialActivity.length > 0 ? (
                     <div className="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-brand-primary/10">
                         {initialActivity.map((item, i) => (
-                            <div key={i} className="relative pl-10 group cursor-pointer">
+                            <Link
+                                key={i}
+                                href={`/dashboard/leads/${item.entityId}`}
+                                className="relative pl-10 group cursor-pointer block"
+                            >
                                 <div className="absolute left-0 top-1 h-[24px] w-[24px] rounded-full bg-background border-2 border-brand-primary/20 flex items-center justify-center group-hover:border-brand-primary transition-all duration-300 z-10 shadow-sm group-hover:shadow-brand-primary/20">
                                     <div className="h-2.5 w-2.5 rounded-full bg-brand-primary/30 group-hover:bg-brand-primary transition-all duration-300" />
                                 </div>
@@ -25,7 +30,7 @@ export function ActivityFeed({ initialActivity }: { initialActivity: ActivityIte
                                     <p className="text-sm text-foreground font-bold group-hover:text-brand-primary transition-colors leading-snug">{item.text}</p>
                                     <p className="text-[11px] font-semibold text-muted-foreground/60 mt-1 uppercase tracking-widest">{item.time}</p>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (

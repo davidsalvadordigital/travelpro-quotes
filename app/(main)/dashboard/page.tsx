@@ -87,24 +87,28 @@ function DraftsSkeleton() {
     );
 }
 
+import { getUserProfile } from "@/lib/dal/profiles";
+
 // --- ASYNC DATA FETCHERS ---
-async function KpiSection({ userId }: { userId: string }) {
-    const stats = await getDashboardKpis(userId);
+async function KpiSection({ userId, isAdmin }: { userId: string; isAdmin: boolean }) {
+    // Si es admin, mostramos los KPIs globales de la agencia
+    // Si es asesor, mostramos sus KPIs personales aislados
+    const stats = await getDashboardKpis(userId, isAdmin);
     return <KpiGrid initialStats={stats} />;
 }
 
-async function LeadsSection({ userId }: { userId: string }) {
-    const leads = await getLeads(10, userId);
+async function LeadsSection({ userId, isAdmin }: { userId: string; isAdmin: boolean }) {
+    const leads = await getLeads(10, userId, isAdmin);
     return <RecentLeads initialLeads={leads} />;
 }
 
-async function ActivitySection({ userId }: { userId: string }) {
-    const activity = await getRecentActivity(userId);
+async function ActivitySection({ userId, isAdmin }: { userId: string; isAdmin: boolean }) {
+    const activity = await getRecentActivity(userId, isAdmin);
     return <ActivityFeed initialActivity={activity} />;
 }
 
-async function DraftsSection({ userId }: { userId: string }) {
-    const quotes = await getQuotes(50, userId);
+async function DraftsSection({ userId, isAdmin }: { userId: string; isAdmin: boolean }) {
+    const quotes = await getQuotes(50, userId, isAdmin);
     return <DraftsList initialQuotes={quotes} />;
 }
 
@@ -112,14 +116,24 @@ export default async function DashboardPage() {
     const supabase = await createServerSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
     const userId = user?.id ?? "";
+    
+    // 🛡️ Filtro de Seguridad: Obtener el perfil para determinar privilegios
+    const profile = await getUserProfile(userId);
+    const isAdmin = profile?.role === "admin";
 
     return (
         <div className="flex-1 space-y-10 p-8 pt-10 pb-24">
             {/* Page header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-border/40 pb-10">
                 <div className="space-y-1">
-                    <h2 className="text-xl font-semibold tracking-tight text-foreground">Panel de Control</h2>
-                    <p className="text-sm font-medium text-muted-foreground/70">Cotizaciones activas, seguimiento y estado del equipo.</p>
+                    <h2 className="text-xl font-semibold tracking-tight text-foreground">
+                        {isAdmin ? "Panel de Gerencia" : "Mi Panel de Control"}
+                    </h2>
+                    <p className="text-sm font-medium text-muted-foreground/70">
+                        {isAdmin 
+                            ? "Rendimiento global de la agencia y métricas del equipo." 
+                            : "Tus cotizaciones activas, seguimiento y metas personales."}
+                    </p>
                 </div>
                 <Button asChild className="h-11 rounded-xl bg-brand-primary text-white px-7 shadow-lg shadow-brand-primary/20 transition-all duration-300 hover:bg-brand-primary/90 hover:-translate-y-0.5 active:scale-[0.97] w-full lg:w-auto">
                     <Link href="/dashboard/cotizar" className="flex items-center justify-center gap-2 font-semibold text-sm">
@@ -132,24 +146,24 @@ export default async function DashboardPage() {
             <div className="space-y-10">
                 {/* KPI Stats Suspended */}
                 <Suspense fallback={<KpiSkeleton />}>
-                    <KpiSection userId={userId} />
+                    <KpiSection userId={userId} isAdmin={isAdmin} />
                 </Suspense>
 
                 {/* Main content: Leads + Activity Suspended in Parallel */}
                 <div className="grid gap-8 lg:grid-cols-7">
                     <Suspense fallback={<LeadsSkeleton />}>
-                        <LeadsSection userId={userId} />
+                        <LeadsSection userId={userId} isAdmin={isAdmin} />
                     </Suspense>
                     
                     <Suspense fallback={<ActivitySkeleton />}>
-                        <ActivitySection userId={userId} />
+                        <ActivitySection userId={userId} isAdmin={isAdmin} />
                     </Suspense>
                 </div>
 
                 {/* Saved Drafts Suspended */}
                 <div className="pt-4">
                     <Suspense fallback={<DraftsSkeleton />}>
-                        <DraftsSection userId={userId} />
+                        <DraftsSection userId={userId} isAdmin={isAdmin} />
                     </Suspense>
                 </div>
             </div>

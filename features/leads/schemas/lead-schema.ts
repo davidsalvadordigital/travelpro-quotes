@@ -13,7 +13,7 @@ export const leadSchema = z.object({
     phone: z.string().optional(),
     email: z.string().email({ message: "Email inválido" }).optional(),
     destination: z.string().min(1, { message: "El destino es requerido" }),
-    status: z.enum(["nuevo", "cotizado", "ganado", "perdido"]).default("nuevo"),
+    status: z.enum(["nuevo", "contactado", "cualificado", "propuesta_enviada", "negociacion", "ganado", "perdido"]).default("nuevo"),
     notes: z.string().optional(),
 });
 

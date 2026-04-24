@@ -1,43 +1,54 @@
-# Skill Registry — travelpro-quotes
+# Skill Registry — TravelPro Quotes (v3.0 - Verified)
 
-## Project Standards (auto-resolved)
+**Delegator use only.** Este es el mapa de conciencia del agente. El orquestador usa este archivo para inyectar reglas Senior automáticamente según la tarea.
 
-### Compact Rules
-- **Stack**: Next.js 16.2.1+, React 19.2.4+, Tailwind v4 CSS-first (@theme inline), Supabase SSR, Zustand, TS 6.0+.
-- **Architecture**: Screaming Architecture / Clean Hexagonal. Use `proxy.ts` for auth. Direct DB calls ONLY in `lib/dal/` (server-only).
-- **UI/UX**: Atomic Design in `components/ui/`. No raw HTML. Reject `forwardRef`, `useFormState`. Use `'use cache'`.
-- **Financial**: Net-Centric (Comisin Cedida). Formula: `Total_Commission = provider_net * (provider_commission_percent / 100)`.
-- **Protocol**: Zero-Trust Zod validation. Idempotent mutations. No external scripts. technical precision only.
+## User Skills (Auto-Activation Map)
 
-## User Skills
+| Skill | Trigger Keywords | Target Context |
+| :--- | :--- | :--- |
+| **senior-architect** | arquitectura, Hexagonal, DAL, layers, vertical slicing | Estructura del proyecto, ADRs, escalabilidad. |
+| **project-guardian** | refactor, borrar código, integrity, safety, build, fix bug | Prevención de regresiones y pérdida de código UI. |
+| **saas-business-logic** | cálculos, comisión, fee, TRM, lifecycle, Quote, PDF | Lógica financiera Net-Centric y negocio TravelPro. |
+| **nextjs-best-practices** | app router, server components, proxy.ts, RSC, next 16 | Routing, layouts y optimización Next.js 16. |
+| **react-best-practices** | hooks, React 19, ref, useActionState, useOptimistic | Patrones modernos de React 19. |
+| **tailwind-patterns** | CSS, tailwind 4, @theme, design tokens, glassmorphism | Estilización Diamond Standard (Tailwind v4). |
+| **typescript-pro** | types, interfaces, zod, generics, strict type | Seguridad de tipos y validación de fronteras. |
+| **security-best-practices** | auth, supabase, RLS, middleware, encryption, DAL | Seguridad de datos, acceso y políticas RLS. |
+| **ui-ux-design-pro** | premium UI, Diamond Standard, typography, layout, motion | Diseño de interfaces de alta fidelidad (v2.0). |
+| **zustand-performance** | state, store, global state, selectors | Gestión de estado fino y rendimiento. |
 
-| Skill | Description | Triggers |
-|-------|-------------|----------|
-| advanced-debugging-next | Next.js 16/React 19 debugging | |
-| advanced-form-wizardry | Multi-step form patterns | |
-| ai-integration-patterns | AI/LLM streaming integration | |
-| better-auth-best-practices | Better Auth Edge-ready | |
-| client-side-request-deduplication | Network call deduplication | |
-| frontend-design | Distinctive, production-grade interfaces | UI, beautify, distinctive design |
-| frontend-designer-pro | High-fidelity UI engineering protocol | design pro component, build minimalist UI, optimize UX density, aplicar diseo premium |
-| nextjs-best-practices | Expert App Router guidance | |
-| nextjs-performance-mastery | Advanced caching and streaming | |
-| ocr-extraction | OCR data extraction (Vouchers, etc.) | |
-| project-guardian | Code loss prevention and validation | |
-| prompt-engineering | Advanced prompting techniques | |
-| react-best-practices | Modern React 19 patterns | |
-| react-patterns | Advanced design patterns | |
-| saas-business-logic | TravelPro business rules | |
-| security-best-practices | Data Access Layer and RLS | |
-| senior-architect | Architecture and design patterns | |
-| server-action-idempotency-and-concurrency | Redundant processing protection | |
-| skill-creator | Optimize skill development | create a skill, build a skill, new capability |
-| supabase-mastery | Supabase optimization and RPC | |
-| tailwind-patterns | Tailwind v4 CSS-first patterns | |
-| tanstack-query-nextjs-16 | Server-client state synchronization | |
-| typescript-pro | Advanced TypeScript patterns | |
-| web-worker-offloading-for-calculators | Heavy calculation offloading | |
-| zustand-performance | Fine-grained selectors and actions | |
+## Compact Rules (Senior Injections)
+
+### senior-architect
+- Arquitectura Hexagonal / Screaming obligatoria.
+- Capas: UI -> Actions -> DAL -> Domain (Pure Logic).
+- Acceso a DB **exclusivamente** vía `lib/dal/`.
+- Usar kebab-case para archivos y carpetas.
+
+### project-guardian
+- **PROHIBIDO** borrar componentes de UI o imports sin orden explícita.
+- Ediciones Quirúrgicas: Usar `replace_file_content` para cambios < 50 líneas.
+- Validar build (`npm run build`) y sintaxis antes de finalizar.
+
+### saas-business-logic
+- Modelo **Net-Centric**: PVP = Costo Neto + Agency Fee.
+- Comisión se calcula *dentro* del neto, no se suma.
+- TRM diaria obligatoria para internacionales (USD -> COP).
+- Quotes APPROVED son inmutables. Crear versiones nuevas.
+
+### nextjs-best-practices
+- Next.js 16.2+: `params` son Promise (usar `await`).
+- `proxy.ts` es el único punto de entrada de auth.
+- Opt-in caching con `'use cache'`.
+
+### tailwind-patterns
+- Tailwind v4: Configuración en `globals.css` (@theme inline).
+- No usar `tailwind.config.js`.
+- Usar variables CSS directamente: `bg-(--brand)`.
 
 ## Project Conventions
-- [AGENTS.md](file:///c:/Users/ACER/Documents/travelpro-quotes/AGENTS.md)
+- [AGENTS.md](file:///c:/Users/ACER/Documents/travelpro-quotes/AGENTS.md) — Contrato de Operaciones v3.0
+- [.agent/config.md](file:///c:/Users/ACER/Documents/travelpro-quotes/.agent/config.md) — Consciousness Protocol
+- [.agent/GENTLEMAN_SUPREMACY.md](file:///c:/Users/ACER/Documents/travelpro-quotes/.agent/GENTLEMAN_SUPREMACY.md) — Ley de Jerarquía Senior
+
+**STATUS**: SYNCED & ACTIVE

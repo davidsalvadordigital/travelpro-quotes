@@ -7,6 +7,7 @@ import { useQuoteActions } from "@/features/quotes/store/quote-store";
 import { useRouter } from "next/navigation";
 import { formatCOP, formatUSD } from "@/lib/utils";
 import { toast } from "sonner";
+import { deleteQuoteFromDb } from "@/lib/actions/quotes";
 
 type ServerQuote = {
     id: string;
@@ -27,7 +28,7 @@ interface DraftsListProps {
 }
 
 export function DraftsList({ initialQuotes }: DraftsListProps) {
-    const { loadQuote, deleteQuoteWithSync } = useQuoteActions();
+    const { loadQuote, deleteQuote: deleteFromStore } = useQuoteActions();
     const router = useRouter();
 
     const handleLoad = (id: string) => {
@@ -36,8 +37,17 @@ export function DraftsList({ initialQuotes }: DraftsListProps) {
         router.push("/dashboard/cotizar");
     };
 
-    const handleDelete = (id: string) => {
-        deleteQuoteWithSync(id);
+    const handleDelete = async (id: string) => {
+        const promise = deleteQuoteFromDb(id);
+        
+        toast.promise(promise, {
+            loading: "Eliminando borrador...",
+            success: () => {
+                deleteFromStore(id);
+                return "Borrador eliminado correctamente";
+            },
+            error: "No se pudo eliminar el borrador de la nube",
+        });
     };
 
     if (initialQuotes.length === 0) return null;

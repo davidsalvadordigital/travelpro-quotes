@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plane, ArrowUpRight, Sparkles } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,10 +8,12 @@ import { type LeadRow } from "@/lib/dal/leads";
 
 const STATUS_VARIANTS: Record<string, "brand" | "warning" | "success" | "outline" | "secondary"> = {
     nuevo: "brand",
-    cotizado: "warning",
+    contactado: "secondary",
+    cualificado: "secondary",
+    propuesta_enviada: "warning",
+    negociacion: "warning",
     ganado: "success",
     perdido: "outline",
-    en_proceso: "secondary",
 };
 
 export function RecentLeads({ initialLeads }: { initialLeads: LeadRow[] }) {
@@ -23,13 +24,15 @@ export function RecentLeads({ initialLeads }: { initialLeads: LeadRow[] }) {
                     <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">Flujo de Leads</CardTitle>
                     <p className="text-[13px] font-bold text-muted-foreground/70">Prospectos activos en el radar.</p>
                 </div>
-                <Button variant="ghost" size="sm" className="font-extrabold text-[10px] uppercase tracking-[0.2em] text-brand-primary">Ver todo</Button>
+                <Button asChild variant="ghost" size="sm" className="font-extrabold text-[10px] uppercase tracking-[0.2em] text-brand-primary">
+                    <Link href="/dashboard/leads">Ver todo</Link>
+                </Button>
             </CardHeader>
             <CardContent className="px-8 pb-8">
                 <div className="space-y-3.5">
                     {initialLeads.length > 0 ? (
                         initialLeads.map((lead) => (
-                            <div key={lead.id} className="flex items-center justify-between p-4 rounded-[1.5rem] bg-background/40 border border-transparent hover:border-brand-primary/20 hover:bg-background hover:shadow-xl hover:shadow-brand-primary/5 transition-all duration-500 group cursor-pointer">
+                            <Link key={lead.id} href={`/dashboard/leads/${lead.id}`} className="flex items-center justify-between p-4 rounded-[1.5rem] bg-background/40 border border-transparent hover:border-brand-primary/20 hover:bg-background hover:shadow-xl hover:shadow-brand-primary/5 transition-all duration-500 group cursor-pointer">
                                 <div className="flex items-center gap-5">
                                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-primary/10 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-all duration-500 shadow-sm font-extrabold text-xl italic">
                                         {lead.traveler_name.charAt(0)}
@@ -50,7 +53,7 @@ export function RecentLeads({ initialLeads }: { initialLeads: LeadRow[] }) {
                                         <ArrowUpRight className="h-5 w-5" strokeWidth={3} />
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))
                     ) : (
                         <div className="flex h-[280px] flex-col items-center justify-center space-y-4 text-center">

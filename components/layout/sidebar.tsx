@@ -12,7 +12,6 @@ import {
     Plane,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     Tooltip,
@@ -20,6 +19,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { createClient } from "@/lib/supabase";
+import { type UserProfile } from "./app-shell";
 
 interface NavItem {
     label: string;
@@ -38,21 +39,12 @@ const navItems: NavItem[] = [
 interface SidebarProps {
     collapsed?: boolean;
     onToggle?: () => void;
+    profile?: UserProfile | null;
 }
 
-export function Sidebar({ collapsed = false }: SidebarProps) {
+export function Sidebar({ collapsed = false, profile = null }: SidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
-    const [profile, setProfile] = useState<{ full_name: string; email: string; role: string; avatar_url: string | null } | null>(null);
-
-    useEffect(() => {
-        const supabase = createClient();
-        supabase.auth.getUser().then(({ data: { user } }) => {
-            if (!user) return;
-            supabase.from("profiles").select("full_name, email, role, avatar_url").eq("id", user.id).single()
-                .then(({ data }) => { if (data) setProfile(data); });
-        });
-    }, []);
 
     async function handleLogout() {
         // Redirigir de inmediato para UX instantáneo
@@ -143,43 +135,42 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             <div className="mt-auto p-4">
                 <div
                     className={cn(
-                        "flex items-center gap-3 rounded-xl p-2 transition-all duration-200 hover:bg-sidebar-accent/50 cursor-pointer",
-                        collapsed && "justify-center"
+                        "flex items-center gap-3 rounded-2xl border border-sidebar-border/10 bg-sidebar-accent/30 p-2 transition-all duration-200 hover:bg-sidebar-accent/50",
+                        collapsed && "justify-center p-1.5"
                     )}
                 >
-                    <Avatar className="h-10 w-10 shrink-0 ring-1 ring-sidebar-border/20">
+                    <Avatar className="h-9 w-9 shrink-0 ring-1 ring-sidebar-border/20">
                         <AvatarImage src={profile?.avatar_url || ""} alt="Usuario" />
-                        <AvatarFallback className="bg-brand text-brand-foreground text-sm font-semibold">
+                        <AvatarFallback className="bg-brand text-brand-foreground text-xs font-bold">
                             {initials}
                         </AvatarFallback>
                     </Avatar>
                     {!collapsed && (
-                        <div className="flex flex-1 flex-col justify-center overflow-hidden min-h-[36px]">
+                        <div className="flex flex-1 flex-col justify-center overflow-hidden min-h-[32px]">
                             {profile ? (
                                 <>
-                                    <span className="truncate text-sm font-medium text-sidebar-foreground">
-                                        Hola, {profile.full_name?.split(" ")[0] || "Usuario"}
+                                    <span className="truncate text-[13px] font-bold text-sidebar-foreground">
+                                        {profile.full_name || "Usuario"}
                                     </span>
-                                    <span className="truncate text-xs text-sidebar-foreground/50">
-                                        {profile.email || ""}
+                                    <span className="truncate text-[11px] text-sidebar-foreground/40 font-medium">
+                                        {profile.role === "admin" ? "Administrador" : "Agente de Viajes"}
                                     </span>
                                 </>
                             ) : (
                                 <div className="flex flex-col gap-1.5">
-                                    <div className="h-4 w-20 rounded bg-sidebar-foreground/10 animate-pulse" />
-                                    <div className="h-3 w-28 rounded bg-sidebar-foreground/5 animate-pulse" />
+                                    <div className="h-3.5 w-20 rounded bg-sidebar-foreground/10 animate-pulse" />
+                                    <div className="h-2.5 w-28 rounded bg-sidebar-foreground/5 animate-pulse" />
                                 </div>
                             )}
                         </div>
                     )}
-                    {!collapsed && (
+                    {!collapsed && profile && (
                         <button
                             onClick={handleLogout}
                             title="Cerrar sesión"
-                            className="shrink-0 rounded-md p-1.5 text-sidebar-foreground/40 transition-colors hover:bg-destructive/10 hover:text-destructive"
+                            className="shrink-0 rounded-lg p-1.5 text-sidebar-foreground/30 transition-colors hover:bg-destructive/10 hover:text-destructive"
                         >
                             <LogOut className="h-4 w-4" />
-                            <span className="sr-only">Cerrar sesión</span>
                         </button>
                     )}
                 </div>

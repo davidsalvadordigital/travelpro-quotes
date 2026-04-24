@@ -44,7 +44,7 @@ const MOCK_LEAD_ROWS = [
 const MOCK_LEADS_STATUS = [
     { status: "nuevo" },
     { status: "nuevo" },
-    { status: "cotizado" },
+    { status: "propuesta_enviada" },
     { status: "ganado" },
 ];
 
@@ -161,13 +161,13 @@ describe("DAL Serialización — Leads", () => {
         const result = await getLeadCountsByStatus(MOCK_ACCESS_TOKEN);
 
         expect(isJsonSerializable(result)).toBe(true);
-        const keys = ["nuevo", "cotizado", "ganado", "perdido", "en_proceso"];
+        const keys = ["nuevo", "contactado", "cualificado", "propuesta_enviada", "negociacion", "ganado", "perdido"];
         keys.forEach((k) => {
             expect(typeof result[k]).toBe("number");
             expect(Number.isFinite(result[k])).toBe(true);
         });
         expect(result.nuevo).toBe(2);
-        expect(result.cotizado).toBe(1);
+        expect(result.propuesta_enviada).toBe(1);
         expect(result.ganado).toBe(1);
     });
 });
