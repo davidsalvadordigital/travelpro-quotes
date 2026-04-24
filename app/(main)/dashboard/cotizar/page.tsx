@@ -71,7 +71,7 @@ export default function QuotePage() {
                         <div className="h-2 w-2 rounded-full bg-brand-secondary animate-pulse" />
                     </div>
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 animate-pulse">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-muted-foreground/60 animate-pulse">
                     Sincronizando sesión...
                 </p>
             </div>
@@ -220,7 +220,7 @@ export default function QuotePage() {
         <div className="mx-auto max-w-6xl flex-1 space-y-8 p-6 pb-24 pt-8 animate-fade-in">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border/40 pb-8">
                 <div className="space-y-1">
-                    <h2 className="text-2xl font-black tracking-tighter text-foreground">
+                    <h2 className="text-2xl font-extrabold tracking-tighter text-foreground">
                         Nueva Cotización
                     </h2>
                     <p className="text-sm font-medium text-muted-foreground">

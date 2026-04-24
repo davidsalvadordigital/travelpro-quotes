@@ -58,20 +58,10 @@ const getFontPath = (name: string) => {
 };
 
 Font.register({
-    family: 'Outfit',
+    family: 'Plus Jakarta Sans',
     fonts: [
-        { src: getFontPath('Outfit-Regular.ttf'), fontWeight: 400 },
-        { src: getFontPath('Outfit-Bold.ttf'), fontWeight: 700 }
-    ]
-});
-
-// We keep Playfair Display for the "Diamond" touch if needed, 
-// but Outfit is now the primary corporate font.
-Font.register({
-    family: 'Playfair Display',
-    fonts: [
-        { src: 'https://cdnjs.cloudflare.com/ajax/libs/playfair-display/1.1.2/fonts/PlayfairDisplay-Regular.ttf', fontWeight: 400 },
-        { src: 'https://cdnjs.cloudflare.com/ajax/libs/playfair-display/1.1.2/fonts/PlayfairDisplay-Bold.ttf', fontWeight: 700 }
+        { src: getFontPath('PlusJakartaSans-Regular.ttf'), fontWeight: 400 },
+        { src: getFontPath('PlusJakartaSans-Bold.ttf'), fontWeight: 700 }
     ]
 });
 
@@ -80,7 +70,7 @@ const styles = StyleSheet.create({
     page: {
         padding: TOKENS.spacing.page,
         backgroundColor: TOKENS.colors.white,
-        fontFamily: 'Outfit', // Switched to Outfit
+        fontFamily: 'Plus Jakarta Sans', // Monofamily Diamond Standard
         color: TOKENS.colors.slate[800]
     },
     coverPage: {
@@ -88,7 +78,7 @@ const styles = StyleSheet.create({
         backgroundColor: TOKENS.colors.slate[900],
         color: TOKENS.colors.white,
         position: 'relative',
-        fontFamily: 'Outfit'
+        fontFamily: 'Plus Jakarta Sans'
     },
     backgroundContainer: {
         position: 'absolute',
@@ -157,7 +147,7 @@ const styles = StyleSheet.create({
     coverTitle: {
         fontSize: 72,
         fontWeight: 700,
-        fontFamily: 'Playfair Display',
+        fontFamily: 'Plus Jakarta Sans',
         letterSpacing: -1,
         textTransform: 'uppercase'
     },
@@ -175,7 +165,7 @@ const styles = StyleSheet.create({
     coverRecipientName: {
         fontSize: 32,
         fontWeight: 700,
-        fontFamily: 'Playfair Display',
+        fontFamily: 'Plus Jakarta Sans',
         borderBottomWidth: 5,
         borderBottomColor: TOKENS.colors.accent,
         paddingBottom: 4
@@ -274,8 +264,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     tableHeaderText: {
-        fontSize: 9, // Matched to text-[9px]
-        fontWeight: 900,
+        fontSize: 9, 
+        fontWeight: 700,
         color: TOKENS.colors.white,
         letterSpacing: 2,
         textTransform: 'uppercase'
@@ -291,18 +281,18 @@ const styles = StyleSheet.create({
     priceCard: {
         backgroundColor: TOKENS.colors.slate[900],
         borderRadius: 25,
-        padding: 40, // Increased for impact
+        padding: 40,
         marginTop: 20
     },
     priceTag: {
-        fontSize: 9, // Matched
+        fontSize: 9,
         fontWeight: 700,
         color: 'rgba(255, 255, 255, 0.4)',
         letterSpacing: 4,
         textTransform: 'uppercase'
     },
     priceMain: {
-        fontSize: 48, // Matched to text-5xl
+        fontSize: 48,
         fontWeight: 700,
         color: TOKENS.colors.white
     },
@@ -421,7 +411,7 @@ export const QuoteDocument = ({ quote }: { quote: Quote & { id?: string } }) => 
                                         </TableRow>
                                         {h.notes && (
                                             <View style={{ padding: 12, backgroundColor: '#FAFAFA' }}>
-                                                <Text style={{ fontSize: 8, color: TOKENS.colors.slate[600], lineHeight: 1.4, fontStyle: 'italic' }}>
+                                                <Text style={{ fontSize: 8, color: TOKENS.colors.slate[600], lineHeight: 1.4 }}>
                                                     {h.notes}
                                                 </Text>
                                             </View>
@@ -562,7 +552,7 @@ export const QuoteDocument = ({ quote }: { quote: Quote & { id?: string } }) => 
                             <Text style={{ fontSize: 8, color: 'rgba(255, 255, 255, 0.4)', marginTop: 4 }}>NIT. {AGENCY_INFO.nit} · RNT {AGENCY_INFO.rnt}</Text>
                         </View>
                         <View style={{ backgroundColor: TOKENS.colors.white, paddingVertical: 6, paddingHorizontal: 15, borderRadius: 8 }}>
-                            <Text style={{ fontSize: 9, fontWeight: 900, color: TOKENS.colors.slate[900], letterSpacing: 2 }}>Documento Oficial</Text>
+                            <Text style={{ fontSize: 9, fontWeight: 700, color: TOKENS.colors.slate[900], letterSpacing: 2 }}>Documento Oficial</Text>
                         </View>
                     </View>
                 </View>

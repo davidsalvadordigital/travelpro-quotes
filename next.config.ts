@@ -30,10 +30,10 @@ const nextConfig: NextConfig = {
     const cspHeader = `
       default-src 'self';
       script-src 'self' 'unsafe-eval' 'unsafe-inline' *.supabase.co;
-      connect-src 'self' *.supabase.co *.supabase.in fonts.gstatic.com fonts.googleapis.com cdnjs.cloudflare.com;
-      style-src 'self' 'unsafe-inline' fonts.googleapis.com;
+      connect-src 'self' data: blob: *.supabase.co *.supabase.in;
+      style-src 'self' 'unsafe-inline';
       img-src 'self' blob: data: *.supabase.co *.supabase.in;
-      font-src 'self' fonts.gstatic.com cdnjs.cloudflare.com;
+      font-src 'self';
       object-src 'none';
       base-uri 'self';
       form-action 'self';

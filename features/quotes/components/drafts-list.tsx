@@ -43,17 +43,17 @@ export function DraftsList({ initialQuotes }: DraftsListProps) {
     if (initialQuotes.length === 0) return null;
 
     return (
-        <Card variant="glass" className="h-full border border-glass-border shadow-xl shadow-black/5">
+        <Card variant="glass" className="h-full border border-border/50 shadow-xl shadow-black/5">
             <CardHeader className="flex flex-row items-center justify-between pt-8 pb-5 px-8">
                 <div>
-                    <CardTitle className="text-2xl font-black tracking-tight text-foreground">Mis Borradores</CardTitle>
+                    <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">Mis Borradores</CardTitle>
                     <p className="text-[13px] font-bold text-muted-foreground/70">{initialQuotes.length} cotización(es) guardada(s)</p>
                 </div>
             </CardHeader>
             <CardContent className="px-8 pb-8">
                 <div className="space-y-3.5">
                     {initialQuotes.map((q) => (
-                        <div key={q.id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border border-glass-border/30 hover:border-brand-primary/30 hover:bg-background hover:shadow-xl hover:shadow-brand-primary/5 transition-all duration-500 group cursor-pointer">
+                        <div key={q.id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/40 border border-border/50 hover:border-brand-primary/30 hover:bg-card shadow-sm transition-all duration-300 group cursor-pointer">
                             <div className="flex items-center gap-3 sm:gap-4">
                                 <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center group-hover:bg-brand-primary group-hover:text-white transition-colors duration-300">
                                     <FileText className="h-5 w-5 text-brand-primary group-hover:text-white transition-colors duration-300" />
@@ -64,7 +64,7 @@ export function DraftsList({ initialQuotes }: DraftsListProps) {
                                         <Plane className="h-3 w-3" />
                                         {q.destination || "Destino sin definir"}
                                         {q.locatorCode && (
-                                            <span className="bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider ml-1">
+                                            <span className="bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded text-[10px] font-extrabold tracking-wider ml-1">
                                                 {q.locatorCode}
                                             </span>
                                         )}

@@ -1,11 +1,14 @@
+"use server";
+
+import { z } from "zod";
+
 /**
  * TRM (Tasa Representativa del Mercado) — Colombia
  *
  * Consulta la TRM oficial del Banco de la República
  * a través de la API pública de datos.gov.co.
- *
- * In-memory cache with 1-hour TTL to avoid repeated
- * external API calls during the same session.
+ * 
+ * Refactored: Next.js 16.2 "use cache" implementation.
  */
 
 const TRM_API_URL =
@@ -17,57 +20,47 @@ export interface TRMData {
     fuente: string;
 }
 
-// ── In-Memory Session Cache ─────────────────────────────────────────────
+const TrmResponseSchema = z.array(
+    z.object({
+        valor: z.string(),
+        vigenciadesde: z.string(),
+    })
+).min(1);
 
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-
-let _cachedTRM: TRMData | null = null;
-let _cachedAt = 0;
-
-/**
- * Get today's TRM with 1-hour in-memory cache.
- * Avoids repeated calls to the external API within the same session.
- *
- * Cache saves ~200-400ms per subsequent call.
- */
-export async function getTRM(): Promise<TRMData> {
-    // Return cached value if still valid
-    if (_cachedTRM && Date.now() - _cachedAt < CACHE_TTL_MS) {
-        return _cachedTRM;
+export async function fetchTRMFromAPI(): Promise<TRMData> {
+    const response = await fetch(TRM_API_URL);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const data = await response.json();
+    const parsed = TrmResponseSchema.parse(data);
 
-    try {
-        const response = await fetch(TRM_API_URL);
-        const data = await response.json();
-
-        if (data && data.length > 0) {
-            _cachedTRM = {
-                valor: parseFloat(data[0].valor),
-                fecha: data[0].vigenciadesde,
-                fuente: "Banco de la República (datos.gov.co)",
-            };
-            _cachedAt = Date.now();
-            return _cachedTRM;
-        }
-    } catch (error) {
-        console.error("Error fetching TRM:", error);
-    }
-
-    // Fallback — also cached to avoid repeated failures
-    const fallback: TRMData = {
-        valor: 4200,
-        fecha: new Date().toISOString(),
-        fuente: "fallback",
+    return {
+        valor: parseFloat(parsed[0].valor),
+        fecha: parsed[0].vigenciadesde,
+        fuente: "Banco de la República (datos.gov.co)",
     };
-    _cachedTRM = fallback;
-    _cachedAt = Date.now();
-    return fallback;
+}
+
+async function fetchCachedTRM(): Promise<TRMData> {
+    "use cache";
+    return fetchTRMFromAPI();
 }
 
 /**
- * Force-refresh the TRM cache (for admin use or manual refresh).
+ * Get today's TRM with function-level cache.
+ * Avoids repeated calls to the external API within the same session.
  */
-export function invalidateTRMCache() {
-    _cachedTRM = null;
-    _cachedAt = 0;
+export async function getTRM(): Promise<TRMData> {
+    try {
+        return await fetchCachedTRM();
+    } catch (error) {
+        console.error("Error fetching TRM:", error);
+        // Fallback — not cached
+        return {
+            valor: 4200,
+            fecha: new Date().toISOString(),
+            fuente: "fallback",
+        };
+    }
 }

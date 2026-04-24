@@ -112,12 +112,12 @@ export default function RegisterPage() {
     return (
         <div className="space-y-8">
             {/* Mobile logo */}
-            <div className="flex items-center gap-2 lg:hidden">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-brand-foreground">
-                    <Plane className="h-4 w-4" />
+            <div className="flex items-center gap-3 lg:hidden">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary text-white shadow-lg shadow-brand-primary/20">
+                    <Plane className="h-5 w-5" />
                 </div>
-                <span className="font-bold tracking-tight">
-                    TravelPro<span className="text-brand">Quotes</span>
+                <span className="text-xl font-extrabold tracking-tighter">
+                    Trapp<span className="text-brand-primary italic">vel</span>
                 </span>
             </div>
 
@@ -181,9 +181,9 @@ export default function RegisterPage() {
                             type="button"
                             onClick={() => setRole("asesora")}
                             className={cn(
-                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200 hover:border-brand/50",
+                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200 hover:border-brand-primary/50",
                                 role === "asesora"
-                                    ? "border-brand bg-brand/5 shadow-sm shadow-brand/10"
+                                    ? "border-brand-primary bg-brand-primary/5 shadow-sm shadow-brand-primary/10"
                                     : "border-border bg-background"
                             )}
                         >
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                                 className={cn(
                                     "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
                                     role === "asesora"
-                                        ? "bg-brand/15 text-brand"
+                                        ? "bg-brand-primary/15 text-brand-primary"
                                         : "bg-muted text-muted-foreground"
                                 )}
                             >
@@ -200,7 +200,7 @@ export default function RegisterPage() {
                             <span
                                 className={cn(
                                     "text-sm font-medium transition-colors",
-                                    role === "asesora" ? "text-brand" : "text-muted-foreground"
+                                    role === "asesora" ? "text-brand-primary" : "text-muted-foreground"
                                 )}
                             >
                                 Asesor(a)
@@ -211,9 +211,9 @@ export default function RegisterPage() {
                             type="button"
                             onClick={() => setRole("admin")}
                             className={cn(
-                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200 hover:border-brand/50",
+                                "flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200 hover:border-brand-primary/50",
                                 role === "admin"
-                                    ? "border-brand bg-brand/5 shadow-sm shadow-brand/10"
+                                    ? "border-brand-primary bg-brand-primary/5 shadow-sm shadow-brand-primary/10"
                                     : "border-border bg-background"
                             )}
                         >
@@ -221,7 +221,7 @@ export default function RegisterPage() {
                                 className={cn(
                                     "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
                                     role === "admin"
-                                        ? "bg-brand/15 text-brand"
+                                        ? "bg-brand-primary/15 text-brand-primary"
                                         : "bg-muted text-muted-foreground"
                                 )}
                             >
@@ -230,7 +230,7 @@ export default function RegisterPage() {
                             <span
                                 className={cn(
                                     "text-sm font-medium transition-colors",
-                                    role === "admin" ? "text-brand" : "text-muted-foreground"
+                                    role === "admin" ? "text-brand-primary" : "text-muted-foreground"
                                 )}
                             >
                                 Admin
@@ -323,7 +323,7 @@ export default function RegisterPage() {
 
                     <Button
                         type="submit"
-                        className="w-full h-11 bg-brand text-brand-foreground hover:bg-brand/90 font-semibold"
+                        className="w-full h-11 bg-brand-primary text-white hover:bg-brand-primary/90 font-semibold shadow-lg shadow-brand-primary/10"
                         disabled={loading}
                     >
                         {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
@@ -337,7 +337,7 @@ export default function RegisterPage() {
                 ¿Ya tienes una cuenta?{" "}
                 <Link
                     href="/login"
-                    className="font-medium text-brand hover:text-brand/80 transition-colors"
+                    className="font-medium text-brand-primary hover:text-brand-primary/80 transition-colors"
                 >
                     Inicia sesión
                 </Link>

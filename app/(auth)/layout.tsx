@@ -31,7 +31,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-2xl">
                         <Plane className="h-6 w-6 text-white" />
                     </div>
-                    <span className="text-2xl font-black text-white tracking-tighter">
+                    <span className="text-2xl font-extrabold text-white tracking-tighter">
                         Trapp<span className="text-white/80 font-light italic">vel</span>
                     </span>
                 </div>
@@ -39,7 +39,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 {/* Main center content — clean abstract branding */}
                 <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-6 text-center">
                     <div className="space-y-3">
-                        <h2 className="text-5xl font-black leading-[1] tracking-tighter text-white">
+                        <h2 className="text-5xl font-extrabold leading-[1] tracking-tighter text-white">
                             Plataforma de<br />
                             <span className="text-white/70 font-light">Cotizaciones</span>
                         </h2>

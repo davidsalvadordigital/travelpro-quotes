@@ -128,7 +128,7 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
                             <h2 className="text-lg font-semibold tracking-tight text-foreground">{fullName || "Agente Trappvel"}</h2>
                             <p className="text-sm font-bold text-muted-foreground/80 tracking-tight">{profile.email}</p>
                         </div>
-                        <span className="inline-flex items-center rounded-full bg-brand-primary/10 px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/20">
+                        <span className="inline-flex items-center rounded-full bg-brand-primary/10 px-4 py-1 text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-primary border border-brand-primary/20">
                             {profile.role}
                         </span>
                     </div>
@@ -198,7 +198,7 @@ export function ProfileForm({ initialProfile }: { initialProfile: Profile }) {
                     <div className="flex justify-end pt-4">
                         <Button
                             type="submit"
-                            className="h-13 px-10 rounded-2xl bg-brand-primary text-white font-black uppercase tracking-widest text-[11px] shadow-xl shadow-brand-primary/20 hover:shadow-brand-primary/30 transition-all active:scale-[0.97] border-t border-white/20"
+                            className="h-13 px-10 rounded-2xl bg-brand-primary text-white font-extrabold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-primary/20 hover:shadow-brand-primary/30 transition-all active:scale-[0.97] border-t border-white/20"
                             disabled={saving}
                         >
                             {saving ? (

@@ -48,7 +48,7 @@ export function Topbar({ onMenuClick, onToggleSidebar }: TopbarProps) {
                     <input
                         type="text"
                         placeholder="Buscar cotizaciones..."
-                        className="h-10 w-full rounded-xl border border-border/40 bg-muted/20 pl-10 pr-4 text-[13px] font-medium transition-all placeholder:text-muted-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/10 focus-visible:border-brand-primary/40 focus-visible:bg-background"
+                        className="h-10 w-full rounded-xl border border-border/40 bg-muted/20 pl-10 pr-4 text-sm font-medium transition-all placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/10 focus-visible:border-brand-primary/40 focus-visible:bg-background"
                     />
                 </div>
             </div>

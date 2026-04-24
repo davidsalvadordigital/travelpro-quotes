@@ -93,7 +93,10 @@ export function ImageUploader({ value, onChange, label = "Imagen Principal", cla
     return (
         <div className={cn("space-y-4", className)}>
             {label && (
-                <label className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
+                <label 
+                    htmlFor="destination-image-upload"
+                    className="flex items-center gap-3 text-[11px] font-extrabold uppercase tracking-[0.2em] ml-1 text-muted-foreground/60 cursor-pointer hover:text-brand-primary transition-colors"
+                >
                     <ImageIcon className="h-4 w-4 text-brand-primary" strokeWidth={3} />
                     {label}
                 </label>
@@ -112,6 +115,7 @@ export function ImageUploader({ value, onChange, label = "Imagen Principal", cla
             >
                 <input
                     type="file"
+                    id="destination-image-upload"
                     ref={fileInputRef}
                     onChange={handleChange}
                     accept="image/png, image/jpeg, image/jpg, image/webp"

@@ -25,7 +25,7 @@ export function KpiGrid({ initialStats }: { initialStats: DashboardKpi[] }) {
                                     <Icon className="h-7 w-7" strokeWidth={2.5} />
                                 </div>
                                 <div className={cn(
-                                    "flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-2xl shadow-inner transition-all duration-300",
+                                    "flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-2xl shadow-inner transition-all duration-300",
                                     isPositive ? "text-emerald-600 bg-emerald-500/10 dark:text-emerald-400" :
                                         isNegative ? "text-rose-600 bg-rose-500/10 dark:text-rose-400" : "text-muted-foreground bg-muted/40"
                                 )}>
@@ -33,8 +33,8 @@ export function KpiGrid({ initialStats }: { initialStats: DashboardKpi[] }) {
                                     {isPositive ? "↑" : isNegative ? "↓" : "—"} 
                                 </div>
                             </div>
-                            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.25em] mb-2">{stat.label}</p>
-                            <h3 className="text-3xl font-black text-foreground tabular-nums tracking-tighter">
+                            <p className="text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-[0.25em] mb-2">{stat.label}</p>
+                            <h3 className="text-3xl font-extrabold text-foreground tabular-nums tracking-tighter">
                                 {stat.value}
                             </h3>
                             <div className="mt-5 flex items-center gap-2.5 border-t border-glass-border/40 pt-5">

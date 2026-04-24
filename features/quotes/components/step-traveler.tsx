@@ -90,19 +90,22 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
 
                 {/* 1. SECCIÓN VIAJERO */}
                 <div className="space-y-8 relative">
-                    <div className="flex items-center gap-3 border-b border-border/40 pb-4">
-                        <div className="h-6 w-6 rounded-lg bg-brand-primary/10 flex items-center justify-center">
-                            <User className="h-3.5 w-3.5 text-brand-primary" strokeWidth={3} />
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-10 w-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary shadow-sm ring-1 ring-brand-primary/20">
+                            <User className="h-5 w-5" />
                         </div>
-                        <h4 className="text-sm font-black uppercase tracking-widest text-foreground">Perfil del Cliente</h4>
+                        <div className="space-y-0.5">
+                            <h4 className="text-base font-bold tracking-tight text-foreground">Perfil del Cliente</h4>
+                            <p className="text-xs text-muted-foreground">Información básica del titular de la cotización.</p>
+                        </div>
                     </div>
 
                     <div className="space-y-4 animate-slide-up" ref={dropdownRef}>
                         <Label
                             htmlFor="travelerName"
                             className={cn(
-                                "flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ml-0.5",
-                                nameError ? "text-destructive" : "text-muted-foreground/60"
+                                "flex items-center gap-2 text-xs font-semibold tracking-wide ml-0.5 cursor-pointer hover:text-brand-primary transition-colors",
+                                nameError ? "text-destructive" : "text-muted-foreground"
                             )}
                         >
                             Nombre Completo
@@ -120,25 +123,25 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 }}
                                 onFocus={() => setShowDropdown(true)}
                                 className={cn(
-                                    "h-10 pl-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20 focus-visible:border-brand-primary/40 focus-visible:bg-background",
+                                    "h-11 rounded-xl border-border bg-background px-4 text-sm font-medium transition-all focus-visible:ring-brand-primary/20",
                                     nameError && "border-destructive/40 bg-destructive/5 focus-visible:border-destructive focus-visible:ring-destructive/10"
                                 )}
                             />
-                            <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40 group-focus-within:text-brand-primary transition-all duration-300" strokeWidth={2.5} />
+                            <Search className="absolute left-4.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-brand-primary transition-all duration-300" strokeWidth={2.5} />
 
                             {/* Floating Search Results */}
                             {showDropdown && (isSearching || (hasSearched && searchQuery.length >= 3)) && (
                                 <div className="absolute z-50 w-full mt-2 bg-card backdrop-blur-sm border border-border/60 shadow-lg rounded-xl overflow-hidden animate-scale-in">
                                     {isSearching ? (
-                                        <div className="p-8 text-center text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex flex-col items-center gap-3">
+                                        <div className="p-8 text-center text-xs font-semibold text-muted-foreground flex flex-col items-center gap-3">
                                             <Loader2 className="h-5 w-5 animate-spin text-brand-secondary" />
                                             Buscando histórico...
                                         </div>
                                     ) : searchResults.length > 0 ? (
                                         <div className="max-h-72 overflow-y-auto">
-                                            <div className="p-3 border-b border-glass-border bg-muted/20 flex justify-between items-center">
-                                                <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-muted-foreground px-2">Registros Encontrados</p>
-                                                <button onClick={() => setShowDropdown(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
+                                            <div className="p-3 border-b border-border bg-muted/20 flex justify-between items-center">
+                                                <p className="text-xs font-bold text-muted-foreground px-2">Registros Encontrados</p>
+                                                <button onClick={() => setShowDropdown(false)} className="p-1 hover:bg-muted rounded-lg transition-colors">
                                                     <X className="h-3 w-3" />
                                                 </button>
                                             </div>
@@ -146,11 +149,11 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                                 <button
                                                     key={lead.id}
                                                     onClick={() => handleSelectLead(lead)}
-                                                    className="w-full text-left px-5 py-4 hover:bg-brand-secondary/5 transition-all flex items-center justify-between group border-b border-glass-border last:border-0"
+                                                    className="w-full text-left px-5 py-4 hover:bg-brand-secondary/5 transition-all flex items-center justify-between group border-b border-border last:border-0"
                                                 >
                                                     <div>
-                                                        <p className="text-sm font-extrabold group-hover:text-brand-secondary transition-colors">{lead.traveler_name}</p>
-                                                        <p className="text-[11px] font-medium text-muted-foreground/70">{lead.email || 'Sin correo'} • {lead.destination || 'Sin viaje histórico'}</p>
+                                                        <p className="text-sm font-semibold group-hover:text-brand-secondary transition-colors">{lead.traveler_name}</p>
+                                                        <p className="text-xs font-medium text-subtle-foreground">{lead.email || 'Sin correo'} • {lead.destination || 'Sin viaje histórico'}</p>
                                                     </div>
                                                     <Check className="h-4 w-4 text-brand-secondary opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-110" />
                                                 </button>
@@ -161,7 +164,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                             <p className="font-semibold">Nuevo cliente.</p>
                                             <button
                                                 onClick={() => setShowDropdown(false)}
-                                                className="text-[10px] font-extrabold uppercase tracking-widest text-brand-secondary hover:underline"
+                                                className="text-xs font-semibold text-brand-secondary hover:underline"
                                             >
                                                 Continuar registrando
                                             </button>
@@ -175,8 +178,8 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Correo */}
                         <div className="space-y-4">
-                            <Label htmlFor="email" className={cn("flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1", emailError ? "text-destructive" : "text-muted-foreground/60")}>
-                                <Mail className={cn("h-4 w-4", emailError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Correo
+                            <Label htmlFor="email" className={cn("flex items-center gap-2 text-xs font-semibold tracking-wide ml-1", emailError ? "text-destructive" : "text-muted-foreground")}>
+                                <Mail className={cn("h-4 w-4", emailError ? "text-destructive" : "text-brand-primary")} /> Correo
                             </Label>
                             <Input
                                 data-testid="quote-traveler-email"
@@ -190,8 +193,8 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         </div>
                         {/* Teléfono */}
                         <div className="space-y-4">
-                            <Label htmlFor="phone" className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
-                                <Phone className="h-4 w-4 text-brand-primary" strokeWidth={3} /> Teléfono
+                            <Label htmlFor="phone" className="flex items-center gap-2 text-xs font-semibold tracking-wide ml-1 text-muted-foreground">
+                                <Phone className="h-4 w-4 text-brand-primary" /> Teléfono
                             </Label>
                             <Input
                                 data-testid="quote-traveler-phone"
@@ -200,7 +203,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                 placeholder="+57 310 234 5678"
                                 value={activeQuote.phone || ""}
                                 onChange={(e) => setQuoteField("phone", e.target.value)}
-                                className="h-10 rounded-xl border border-border/60 bg-background/50 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/20"
+                                className="h-11 rounded-xl border-border bg-background px-4 text-sm font-medium transition-all focus-visible:ring-brand-primary/20"
                             />
                         </div>
                     </div>
@@ -215,18 +218,18 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         {/* Estrategia: Nacional / Internacional */}
                         <div className="space-y-4 md:col-span-2">
-                            <Label className="text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">Cobertura</Label>
+                            <Label htmlFor="destinationType" className="text-xs font-semibold tracking-wide ml-1 text-muted-foreground">Cobertura</Label>
                             <div className="grid grid-cols-2 gap-4">
                                 <button
                                     type="button"
                                     onClick={() => setDestinationType("nacional")}
                                     className={cn(
                                         "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 transition-all p-4 active:scale-95",
-                                        isNacional ? "border-brand-primary/40 bg-brand-primary/5 text-brand-primary shadow-lg" : "border-glass-border bg-muted/20 text-muted-foreground/50 hover:bg-muted/40"
+                                        isNacional ? "border-brand-primary/40 bg-brand-primary/5 text-brand-primary shadow-lg" : "border-border bg-muted/20 text-subtle-foreground hover:bg-muted/40"
                                     )}
                                 >
                                     <Home className="h-6 w-6 mb-1" strokeWidth={isNacional ? 2.5 : 2} />
-                                    <span className="text-sm font-black tracking-tight">Nacional (COP)</span>
+                                    <span className="text-sm font-semibold tracking-tight">Nacional (COP)</span>
                                     {isNacional && (
                                         <div className="absolute right-3 top-3"><Check className="h-4 w-4 stroke-[4px]" /></div>
                                     )}
@@ -236,11 +239,11 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                     onClick={() => setDestinationType("internacional")}
                                     className={cn(
                                         "relative flex flex-col items-center justify-center gap-2 rounded-2xl border-2 transition-all p-4 active:scale-95",
-                                        !isNacional ? "border-brand-secondary/40 bg-brand-secondary/5 text-brand-secondary shadow-lg" : "border-glass-border bg-muted/20 text-muted-foreground/50 hover:bg-muted/40"
+                                        !isNacional ? "border-brand-secondary/40 bg-brand-secondary/5 text-brand-secondary shadow-lg" : "border-border bg-muted/20 text-subtle-foreground hover:bg-muted/40"
                                     )}
                                 >
                                     <Globe className="h-6 w-6 mb-1" strokeWidth={!isNacional ? 2.5 : 2} />
-                                    <span className="text-sm font-black tracking-tight">Internacional (USD)</span>
+                                    <span className="text-sm font-semibold tracking-tight">Internacional (USD)</span>
                                     {!isNacional && (
                                         <div className="absolute right-3 top-3"><Check className="h-4 w-4 stroke-[4px]" /></div>
                                     )}
@@ -249,8 +252,8 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         </div>
 
                         <div className="space-y-4 md:col-span-2">
-                            <Label htmlFor="destination" className={cn("flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1", destinationError ? "text-destructive" : "text-muted-foreground/60")}>
-                                <MapPin className={cn("h-4 w-4", destinationError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Destino
+                            <Label htmlFor="destination" className={cn("flex items-center gap-2 text-xs font-semibold tracking-wide ml-1", destinationError ? "text-destructive" : "text-muted-foreground")}>
+                                <MapPin className={cn("h-4 w-4", destinationError ? "text-destructive" : "text-brand-primary")} /> Destino
                             </Label>
                             <Input
                                 data-testid="quote-dest-name"
@@ -263,8 +266,8 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         </div>
 
                         <div className="space-y-4">
-                            <Label htmlFor="departureDate" className={cn("flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1", departureError ? "text-destructive" : "text-muted-foreground/60")}>
-                                <CalendarDays className={cn("h-4 w-4", departureError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Ida
+                            <Label htmlFor="departureDate" className={cn("flex items-center gap-2 text-xs font-semibold tracking-wide ml-1", departureError ? "text-destructive" : "text-muted-foreground")}>
+                                <CalendarDays className={cn("h-4 w-4", departureError ? "text-destructive" : "text-brand-primary")} /> Ida
                             </Label>
                             <Input
                                 data-testid="quote-dest-departure"
@@ -277,8 +280,8 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         </div>
 
                         <div className="space-y-4">
-                            <Label htmlFor="returnDate" className={cn("flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1", returnError ? "text-destructive" : "text-muted-foreground/60")}>
-                                <CalendarDays className={cn("h-4 w-4", returnError ? "text-destructive" : "text-brand-primary")} strokeWidth={3} /> Regreso
+                            <Label htmlFor="returnDate" className={cn("flex items-center gap-2 text-xs font-semibold tracking-wide ml-1", returnError ? "text-destructive" : "text-muted-foreground")}>
+                                <CalendarDays className={cn("h-4 w-4", returnError ? "text-destructive" : "text-brand-primary")} /> Regreso
                             </Label>
                             <Input
                                 data-testid="quote-dest-return"
@@ -291,7 +294,7 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                         </div>
 
                         <div className="space-y-4 md:col-span-2">
-                            <Label className="text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">Pasajeros</Label>
+                            <Label htmlFor="numberOfTravelers" className="text-xs font-semibold tracking-wide ml-1 text-muted-foreground">Pasajeros</Label>
                             <div className="flex gap-4 items-center">
                                 <Input
                                     data-testid="quote-traveler-count"
@@ -300,9 +303,9 @@ export function StepTraveler({ showErrors = false }: StepTravelerProps) {
                                     min={1}
                                     value={activeQuote.numberOfTravelers || 1}
                                     onChange={(e) => setQuoteField("numberOfTravelers", parseInt(e.target.value) || 1)}
-                                    className="h-10 w-20 rounded-xl border border-border/60 bg-background/50 text-sm font-black text-center"
+                                    className="h-10 w-20 rounded-xl border border-border/60 bg-background/50 text-sm font-semibold text-center"
                                 />
-                                <span className="text-sm font-semibold text-muted-foreground/70">Pasajeros viajando juntos</span>
+                                <span className="text-sm font-medium text-subtle-foreground">Pasajeros viajando juntos</span>
                             </div>
                         </div>
                     </div>

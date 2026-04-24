@@ -116,7 +116,7 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                                         isActive ? "scale-105" : "group-hover:scale-110"
                                     )}
                                 />
-                                {!collapsed && <span className="text-[14px] tracking-tight">{item.label}</span>}
+                                {!collapsed && <span className="text-sm tracking-tight">{item.label}</span>}
                                 {isActive && !collapsed && (
                                     <div className="absolute right-3 w-1.5 h-1.5 bg-white rounded-full my-auto animate-pulse" />
                                 )}
@@ -154,13 +154,22 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
                         </AvatarFallback>
                     </Avatar>
                     {!collapsed && (
-                        <div className="flex flex-1 flex-col overflow-hidden">
-                            <span className="truncate text-sm font-medium text-sidebar-foreground">
-                                Hola, {profile?.full_name?.split(" ")[0] || "…"}
-                            </span>
-                            <span className="truncate text-xs text-sidebar-foreground/50">
-                                {profile?.email || ""}
-                            </span>
+                        <div className="flex flex-1 flex-col justify-center overflow-hidden min-h-[36px]">
+                            {profile ? (
+                                <>
+                                    <span className="truncate text-sm font-medium text-sidebar-foreground">
+                                        Hola, {profile.full_name?.split(" ")[0] || "Usuario"}
+                                    </span>
+                                    <span className="truncate text-xs text-sidebar-foreground/50">
+                                        {profile.email || ""}
+                                    </span>
+                                </>
+                            ) : (
+                                <div className="flex flex-col gap-1.5">
+                                    <div className="h-4 w-20 rounded bg-sidebar-foreground/10 animate-pulse" />
+                                    <div className="h-3 w-28 rounded bg-sidebar-foreground/5 animate-pulse" />
+                                </div>
+                            )}
                         </div>
                     )}
                     {!collapsed && (

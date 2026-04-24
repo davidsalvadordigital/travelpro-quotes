@@ -4,19 +4,17 @@
 
 @theme inline {
   /* === Typography (Diamond Standard Mapping) === */
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --font-inter: var(--font-inter);
-  --font-playfair: var(--font-playfair);
+  --font-sans: var(--font-plus-jakarta);
 
   /* === Premium SaaS B2B Tokens (Tailwind v4) === */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
-  --color-brand-action: var(--brand-action);
+  --color-brand-tertiary: var(--brand-tertiary);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
 
   /* Elevaciones de Cristal (Diamond Standard) */
   --color-card: var(--card);
@@ -48,19 +46,40 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
   /* === Refined Border Radius === */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.85rem;
-  --radius-xl: 1.25rem;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+
+  /* === Diamond Type Scale (8pt Grid) === */
+  --text-xxs: 0.625rem;
+  /* 10px */
+  --text-xs: 0.75rem;
+  /* 12px */
+  --text-sm: 0.875rem;
+  /* 14px */
+  --text-base: 1rem;
+  /* 16px */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.25rem;
+  /* 20px */
+  --text-2xl: 1.5rem;
+  /* 24px */
+  --text-3xl: 1.875rem;
+  /* 30px */
+  --text-4xl: 2.25rem;
+  /* 36px */
+  --text-5xl: 3rem;
+  /* 48px */
 
   /* === Diamond Elevation Shadows (Clean Code) === */
-  --shadow-sm: 0 2px 4px oklch(0 0 0 / 0.05);
-  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.08);
-  --shadow-lg: 0 12px 24px -4px oklch(0 0 0 / 0.12);
-  --shadow-xl: 0 20px 40px -8px oklch(0 0 0 / 0.15);
-  --shadow-premium: 0 0 0 1px var(--glass-border), 0 20px 50px oklch(var(--brand-primary) / 0.1);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.1), 0 8px 10px -6px oklch(0 0 0 / 0.1);
+  --shadow-premium: 0 0 0 1px var(--glass-border), 0 20px 50px oklch(var(--brand-primary) / 0.12);
 
   /* === Pro Max Micro-Animations === */
   --animate-fade-in: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -72,96 +91,99 @@
 
 @layer base {
   :root {
-    /* Modo Claro: Aireado y Utilitario B2B */
-    --background: oklch(0.99 0.005 220); /* Casi blanco puro */
-    --foreground: oklch(0.12 0.02 240); /* Negro SaaS profundo */
+    /* Base Colors - Slate Chromatic (Hue: 240) */
+    --background: oklch(0.985 0.005 240);
+    --foreground: oklch(0.145 0.015 240);
 
-    /* Trappvel Brand Colors - Magenta como protagonista */
-    --brand-primary: oklch(0.62 0.22 7.5); /* Magenta TravelPro (#E33A7A) */
-    --brand-secondary: oklch(0.65 0.18 210); /* Cian como acento / secundario */
-    --brand-action: oklch(0.62 0.22 7.5); /* Botones en Magenta */
-    --brand-accent: oklch(0.97 0.01 7.5); /* Rosa ultra pálido para fondos */
-
-    --muted: oklch(0.96 0.01 240);
-    --muted-foreground: oklch(0.45 0.03 240);
-
-    /* Clean UI Base */
+    /* UI Surfaces */
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.12 0.02 240);
-    --glass: oklch(1 0 0 / 0.85);
-    --glass-border: oklch(0.12 0.02 240 / 0.06);
+    --card-foreground: var(--foreground);
+    --glass: oklch(1 0 0 / 0.88);
+    --glass-border: oklch(0.145 0.015 240 / 0.08);
 
-    --border: oklch(0.12 0.02 240 / 0.08);
-    --input: oklch(0.12 0.02 240 / 0.05);
-    --ring: oklch(0.62 0.22 7.5 / 0.2); /* Magenta ring */
+    /* Form & Borders */
+    --border: oklch(0.920 0.010 240);
+    --input: oklch(0.920 0.010 240);
+    --ring: oklch(0.60 0.24 7.5 / 0.25);
 
+    /* Brand Tokens (Diamond Standard) */
+    --brand-primary: oklch(0.60 0.24 7.5);   
+    --brand-secondary: oklch(0.60 0.20 210); 
+    --brand-tertiary: oklch(0.55 0.18 320);  
+
+    /* Semantic Feedback */
     --success: oklch(0.65 0.15 145);
-    --warning: oklch(0.82 0.15 75);
-    --danger: oklch(0.55 0.20 25);
+    --warning: oklch(0.85 0.15 85);
+    --danger: oklch(0.55 0.22 25);
 
+    /* Action Mapping */
     --primary: var(--brand-primary);
     --primary-foreground: oklch(1 0 0);
-
-    --accent: oklch(0.62 0.22 7.5 / 0.08); /* Fondo magenta sutil */
+    
+    --accent: oklch(0.965 0.010 240);
     --accent-foreground: var(--brand-primary);
 
-    --destructive: oklch(0.55 0.20 25);
+    --muted: oklch(0.965 0.010 240);
+    --muted-foreground: oklch(0.45 0.015 240);
+    --subtle-foreground: oklch(0.56 0.014 240);
+
+    --destructive: var(--danger);
     --destructive-foreground: oklch(1 0 0);
 
-    --sidebar-background: oklch(1 0 0);
-    --sidebar-foreground: oklch(0.12 0.02 240);
+    /* Sidebar - Chromatic Slate */
+    --sidebar-background: oklch(0.965 0.010 240);
+    --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--brand-primary);
     --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.98 0.005 240);
+    --sidebar-accent: oklch(0.940 0.012 240);
     --sidebar-accent-foreground: var(--brand-primary);
-    --sidebar-border: oklch(0.12 0.02 240 / 0.06);
+    --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
   }
 
   .dark {
-    /* Modo Oscuro: Sólido B2B */
-    --background: oklch(0.12 0.02 240); /* Fondo casi negro */
-    --foreground: oklch(0.98 0.01 220);
+    /* Base Colors - Slate Chromatic */
+    --background: oklch(0.145 0.015 240);
+    --foreground: oklch(0.985 0.005 240);
 
-    /* Trappvel Brand Colors - Dark Magenta */
-    --brand-primary: oklch(0.68 0.20 7.5); /* Magenta vibrante en dark */
-    --brand-secondary: oklch(0.72 0.16 210); /* Cian de acento */
-    --brand-action: oklch(0.68 0.20 7.5);
-    --brand-accent: oklch(0.20 0.04 7.5);
-
-    --muted: oklch(1 0 0 / 0.04);
-    --muted-foreground: oklch(0.70 0.03 240);
-
-    /* UI Oscura Plana */
-    --card: oklch(0.15 0.02 240);
-    --card-foreground: oklch(0.98 0.01 220);
-    --glass: oklch(0.15 0.02 240 / 0.6);
+    /* UI Surfaces */
+    --card: oklch(0.165 0.015 240);
+    --card-foreground: var(--foreground);
+    --glass: oklch(0.165 0.015 240 / 0.6);
     --glass-border: oklch(1 0 0 / 0.1);
 
-    --border: oklch(1 0 0 / 0.08);
-    --input: oklch(1 0 0 / 0.06);
-    --ring: oklch(0.68 0.20 7.5 / 0.3);
+    /* Form & Borders */
+    --border: oklch(0.250 0.015 240);
+    --input: oklch(0.250 0.015 240);
+    --ring: oklch(0.70 0.24 7.5 / 0.3);
 
-    --success: oklch(0.65 0.15 145);
-    --warning: oklch(0.82 0.15 75);
-    --danger: oklch(0.55 0.20 25);
+    /* Brand Tokens - Luminosity Adjusted for Dark Mode */
+    --brand-primary: oklch(0.70 0.24 7.5);   
+    --brand-secondary: oklch(0.70 0.20 210); 
+    --brand-tertiary: oklch(0.72 0.18 320);  
 
+    /* Action Mapping */
     --primary: var(--brand-primary);
-    --primary-foreground: oklch(0.12 0.02 240);
-
-    --accent: oklch(1 0 0 / 0.06);
+    --primary-foreground: oklch(0.145 0.015 240);
+    
+    --accent: oklch(0.200 0.015 240);
     --accent-foreground: var(--brand-primary);
 
-    --destructive: oklch(0.40 0.15 25);
-    --destructive-foreground: oklch(0.98 0.01 220);
+    --muted: oklch(0.200 0.015 240);
+    --muted-foreground: oklch(0.70 0.015 240);
+    --subtle-foreground: oklch(0.65 0.015 240);
 
-    --sidebar-background: oklch(0.14 0.02 240);
-    --sidebar-foreground: oklch(0.98 0.01 220);
+    --destructive: oklch(0.40 0.15 25);
+    --destructive-foreground: oklch(0.985 0.005 240);
+
+    /* Sidebar - Chromatic Slate */
+    --sidebar-background: oklch(0.165 0.015 240);
+    --sidebar-foreground: var(--foreground);
     --sidebar-primary: var(--brand-primary);
-    --sidebar-primary-foreground: oklch(0.12 0.02 240);
-    --sidebar-accent: oklch(1 0 0 / 0.04);
-    --sidebar-accent-foreground: oklch(0.98 0.01 220);
-    --sidebar-border: oklch(1 0 0 / 0.08);
+    --sidebar-primary-foreground: oklch(0.145 0.015 240);
+    --sidebar-accent: oklch(0.200 0.015 240);
+    --sidebar-accent-foreground: var(--brand-primary);
+    --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
   }
 }
@@ -174,50 +196,142 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
-    @apply antialiased selection:bg-brand-primary/20 selection:text-brand-primary;
+    @apply font-sans antialiased selection:bg-brand-primary/20 selection:text-brand-primary;
   }
 
-  h1, h2, h3, h4, .font-display {
-    font-family: var(--font-sans);
-    letter-spacing: -0.03em;
-    font-weight: 700;
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    @apply font-sans;
+    letter-spacing: -0.02em;
   }
 
-  h1 { @apply text-4xl lg:text-5xl font-black; }
-  h2 { @apply text-2xl lg:text-3xl font-bold; }
-  h3 { @apply text-xl font-bold; }
-  h4 { @apply text-lg font-semibold; }
+  h1 {
+    @apply text-4xl lg:text-5xl font-extrabold tracking-tighter;
+  }
+
+  h2 {
+    @apply text-2xl lg:text-3xl font-bold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl font-bold;
+  }
+
+  h4 {
+    @apply text-lg font-semibold;
+  }
 
   /* Smooth scrollbar para estética Pro */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { 
-    background: var(--border); 
-    border-radius: 10px; 
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
     transition: background 0.3s;
   }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
 }
 
 /* Base Keyframes */
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slide-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-@keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-@keyframes shimmer { 100% { transform: translateX(100%); } }
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-subtle {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
 
 /* Staggered Entrance Utilities */
-.stagger-enter > * {
+.stagger-enter>* {
   opacity: 0;
   animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.stagger-enter > *:nth-child(1) { animation-delay: 50ms; }
-.stagger-enter > *:nth-child(2) { animation-delay: 100ms; }
-.stagger-enter > *:nth-child(3) { animation-delay: 150ms; }
-.stagger-enter > *:nth-child(4) { animation-delay: 200ms; }
-.stagger-enter > *:nth-child(5) { animation-delay: 250ms; }
-.stagger-enter > *:nth-child(6) { animation-delay: 300ms; }
-.stagger-enter > *:nth-child(7) { animation-delay: 350ms; }
-.stagger-enter > *:nth-child(8) { animation-delay: 400ms; }
+.stagger-enter>*:nth-child(1) {
+  animation-delay: 50ms;
+}
+
+.stagger-enter>*:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.stagger-enter>*:nth-child(3) {
+  animation-delay: 150ms;
+}
+
+.stagger-enter>*:nth-child(4) {
+  animation-delay: 200ms;
+}
+
+.stagger-enter>*:nth-child(5) {
+  animation-delay: 250ms;
+}
+
+.stagger-enter>*:nth-child(6) {
+  animation-delay: 300ms;
+}
+
+.stagger-enter>*:nth-child(7) {
+  animation-delay: 350ms;
+}
+
+.stagger-enter>*:nth-child(8) {
+  animation-delay: 400ms;
+}

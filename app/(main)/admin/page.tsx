@@ -71,7 +71,7 @@ async function AdminKpiSection({ userId }: { userId: string }) {
                                     <Icon className="h-7 w-7" strokeWidth={2.5} />
                                 </div>
                                 <span className={cn(
-                                    "flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-2xl shadow-inner transition-all duration-300",
+                                    "flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-2xl shadow-inner transition-all duration-300",
                                     isPositive ? "text-emerald-600 bg-emerald-500/10 dark:text-emerald-400" :
                                         isNegative ? "text-rose-600 bg-rose-500/10 dark:text-rose-400" : "text-muted-foreground bg-muted/40"
                                 )}>
@@ -79,10 +79,10 @@ async function AdminKpiSection({ userId }: { userId: string }) {
                                     {kpi.delta}
                                 </span>
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 mb-2">
+                            <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-muted-foreground/60 mb-2">
                                 {kpi.label}
                             </p>
-                            <h3 className="text-3xl font-black text-foreground tabular-nums tracking-tighter">
+                            <h3 className="text-3xl font-extrabold text-foreground tabular-nums tracking-tighter">
                                 {kpi.value}
                             </h3>
                             <div className="mt-5 flex items-center gap-2.5 border-t border-glass-border/40 pt-5">
@@ -122,7 +122,7 @@ async function LeadDistributionSection({ userId }: { userId: string }) {
         <Card variant="glass" className="lg:col-span-3 h-full border-glass-border/30">
             <CardHeader className="flex flex-row items-center justify-between pt-8 pb-5 px-8 border-b border-glass-border/30 bg-muted/10">
                 <div className="space-y-1">
-                    <CardTitle className="text-2xl font-black tracking-tight text-foreground">Embudo de Leads</CardTitle>
+                    <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">Embudo de Leads</CardTitle>
                     <p className="text-[13px] font-bold text-muted-foreground/70">Distribución de salud del pipeline.</p>
                 </div>
             </CardHeader>
@@ -139,7 +139,7 @@ async function WeeklyTrendSection({ userId }: { userId: string }) {
         <Card variant="glass" className="h-full border-glass-border/30">
             <CardHeader className="flex flex-row items-center justify-between pt-8 pb-5 px-8 border-b border-glass-border/30 bg-muted/10">
                 <div className="space-y-1">
-                    <CardTitle className="text-2xl font-black tracking-tight text-foreground">Tendencia de Crecimiento</CardTitle>
+                    <CardTitle className="text-2xl font-extrabold tracking-tight text-foreground">Tendencia de Crecimiento</CardTitle>
                     <p className="text-[13px] font-bold text-muted-foreground/70">Análisis comparativo de volumen vs éxito semanal.</p>
                 </div>
             </CardHeader>

@@ -37,15 +37,15 @@ export function AppBreadcrumb() {
 
     return (
         <Breadcrumb className="mb-10">
-            <BreadcrumbList className="flex items-center gap-1">
+            <BreadcrumbList className="flex items-center gap-2">
                 <BreadcrumbItem>
                     <BreadcrumbLink
                         asChild
-                        className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 hover:text-brand-primary transition-all flex items-center gap-2"
+                        className="text-xs font-medium text-muted-foreground hover:text-brand-primary transition-all flex items-center gap-2"
                     >
                         <Link href="/dashboard">
-                            <Home className="h-3 w-3" />
-                            PLATAFORMA
+                            <Home className="h-4 w-4" />
+                            Plataforma
                         </Link>
                     </BreadcrumbLink>
                 </BreadcrumbItem>
@@ -59,18 +59,16 @@ export function AppBreadcrumb() {
 
                     return (
                         <Fragment key={path}>
-                            <BreadcrumbSeparator className="text-muted-foreground/10 mx-1">
-                                <span className="scale-75 text-[8px] font-thin">/</span>
-                            </BreadcrumbSeparator>
+                            <BreadcrumbSeparator className="text-muted-foreground/40 mx-1" />
                             <BreadcrumbItem>
                                 {isLast ? (
-                                    <BreadcrumbPage className="text-[9px] font-black uppercase tracking-[0.3em] text-brand-primary bg-brand-primary/5 px-4 py-1.5 rounded-full border border-brand-primary/10 select-none">
+                                    <BreadcrumbPage className="text-sm font-semibold text-brand-primary bg-brand-primary/10 px-3 py-1 rounded-full select-none">
                                         {label}
                                     </BreadcrumbPage>
                                 ) : (
                                     <BreadcrumbLink
                                         asChild
-                                        className="text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground/30 hover:text-foreground transition-all px-2"
+                                        className="text-xs font-medium text-muted-foreground hover:text-foreground transition-all px-2"
                                     >
                                         <Link href={href}>{label}</Link>
                                     </BreadcrumbLink>

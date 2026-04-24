@@ -55,7 +55,7 @@ export function SortableSectionList() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                    <Label className="flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground/60">
+                    <Label className="flex items-center gap-2 text-xs font-semibold tracking-wide ml-1 text-muted-foreground">
                         <Layout className="h-4 w-4 text-brand-primary" strokeWidth={3} />
                         Arquitectura de la Propuesta
                     </Label>

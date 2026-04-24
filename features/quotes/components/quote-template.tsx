@@ -1,7 +1,6 @@
 "use client";
 
-// Typography: Playfair Display (display/editorial) + Inter (body/data)
-// Fuente recomendada por UI Pro Max Skill → "Classic Elegant" — Luxury B2B Documents
+// Typography: Plus Jakarta Sans (Monofamily Diamond Standard)
 import { useEffect } from "react";
 import { useActiveQuote } from "@/features/quotes/store/quote-store";
 import { formatCOP, formatUSD, formatTRM } from "@/lib/utils";
@@ -37,32 +36,30 @@ const A4PageWrapper = ({
 }) => (
     <div
         className={cn(
-            // Base A4 — fuente corporativa Outfit
-            "relative w-[210mm] min-h-[297mm] bg-white mx-auto overflow-hidden flex flex-col shrink-0 mb-12",
-            "shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5",
+            "relative w-[210mm] min-h-[297mm] bg-white mx-auto overflow-hidden flex flex-col shrink-0 mb-12 font-sans",
+            "shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-foreground/5",
             "print:shadow-none print:ring-0 print:m-0 print:w-full print:min-h-screen print:break-after-page",
             className
         )}
-        style={{ fontFamily: "'Outfit', system-ui, sans-serif" }}
     >
         {children}
 
         {/* Footer corporativo en páginas de contenido */}
         {pageNumber && pageNumber > 1 && (
-            <div className="mt-auto px-16 py-8 border-t border-slate-50 flex justify-between items-end bg-white">
+            <div className="mt-auto px-16 py-8 border-t border-border/50 flex justify-between items-end bg-card">
                 <div className="flex flex-col gap-1">
-                    <span className="text-[8px] font-black text-slate-800 uppercase tracking-tighter">
+                    <span className="text-[8px] font-extrabold text-foreground uppercase tracking-tighter">
                         {AGENCY_INFO.name}
                     </span>
-                    <span className="text-[7px] font-bold text-slate-400 uppercase tracking-widest">
+                    <span className="text-[7px] font-bold text-muted-foreground uppercase tracking-widest">
                         Nit. {AGENCY_INFO.nit} · RNT {AGENCY_INFO.rnt}
                     </span>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                    <span className="text-[8px] font-black text-slate-400 tabular-nums uppercase tracking-widest">
+                    <span className="text-[8px] font-extrabold text-muted-foreground tabular-nums uppercase tracking-widest">
                         Página {pageNumber}
                     </span>
-                    <span className="text-[6px] font-bold text-slate-300 uppercase tracking-tighter">
+                    <span className="text-[6px] font-bold text-border uppercase tracking-tighter">
                         {AGENCY_INFO.web}
                     </span>
                 </div>
@@ -71,20 +68,7 @@ const A4PageWrapper = ({
     </div>
 );
 
-// ─── Document Font Loader (injected once, isolated from app shell) ──────────
-function DocumentFonts() {
-    useEffect(() => {
-        const id = "travelpro-doc-fonts";
-        if (document.getElementById(id)) return;
-        const link = document.createElement("link");
-        link.id = id;
-        link.rel = "stylesheet";
-        link.href =
-            "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700&display=swap";
-        document.head.appendChild(link);
-    }, []);
-    return null;
-}
+
 
 // ─── Section Header ────────────────────────────────────────────────────────
 const SectionHeader = ({
@@ -96,15 +80,15 @@ const SectionHeader = ({
     icon?: React.ElementType;
     subtitle?: string;
 }) => (
-    <div className="mb-8 border-l-[3px] border-[#E33A7A] pl-5 break-inside-avoid">
+    <div className="mb-8 border-l-[3px] border-brand-primary pl-5 break-inside-avoid">
         <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-[12px] font-black uppercase tracking-[0.25em] text-slate-800">
+            <h2 className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-foreground">
                 {title}
             </h2>
-            {Icon && <Icon className="h-4 w-4 text-[#E33A7A]" strokeWidth={2.5} />}
+            {Icon && <Icon className="h-4 w-4 text-brand-primary" strokeWidth={2.5} />}
         </div>
         {subtitle && (
-            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+            <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.15em] leading-none">
                 {subtitle}
             </p>
         )}
@@ -118,39 +102,39 @@ function FlightsSection({ flights }: { flights: NonNullable<ReturnType<typeof us
     return (
         <section className="mb-16 break-inside-avoid">
             <SectionHeader title="Detalle de Vuelos" icon={Plane} subtitle="Conexiones Aéreas" />
-            <div className="overflow-hidden shadow-sm rounded-2xl border border-slate-100">
+            <div className="overflow-hidden shadow-sm rounded-2xl border border-border">
                 <table className="w-full text-left border-collapse">
-                    <thead className="bg-[#E33A7A]">
+                    <thead className="bg-brand-primary">
                         <tr>
-                            <th className="px-6 py-4 text-[9px] font-black text-white uppercase tracking-[0.2em]">Aerolínea</th>
-                            <th className="px-6 py-4 text-[9px] font-black text-white uppercase tracking-[0.2em]">Ruta</th>
-                            <th className="px-6 py-4 text-[9px] font-black text-white uppercase tracking-[0.2em] text-center">Salida</th>
-                            <th className="px-6 py-4 text-[9px] font-black text-white uppercase tracking-[0.2em] text-right">Llegada</th>
+                            <th className="px-6 py-4 text-[10px] font-extrabold text-primary-foreground uppercase tracking-[0.2em]">Aerolínea</th>
+                            <th className="px-6 py-4 text-[10px] font-extrabold text-primary-foreground uppercase tracking-[0.2em]">Ruta</th>
+                            <th className="px-6 py-4 text-[10px] font-extrabold text-primary-foreground uppercase tracking-[0.2em] text-center">Salida</th>
+                            <th className="px-6 py-4 text-[10px] font-extrabold text-primary-foreground uppercase tracking-[0.2em] text-right">Llegada</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50">
+                    <tbody className="divide-y divide-border/30">
                         {flights.map((flight, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
+                            <tr key={idx} className="hover:bg-muted/30 transition-colors">
                                 <td className="px-6 py-4">
-                                    <div className="text-[11px] font-black text-slate-900 uppercase tracking-tighter">{flight.airline}</div>
+                                    <div className="text-[11px] font-extrabold text-foreground uppercase tracking-tighter">{flight.airline}</div>
                                     {flight.flightNumber && (
-                                        <div className="text-[9px] text-[#E33A7A] font-bold tabular-nums">{flight.flightNumber}</div>
+                                        <div className="text-[10px] text-brand-primary font-bold tabular-nums">{flight.flightNumber}</div>
                                     )}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <div className="text-[10px] font-bold text-slate-700 flex items-center gap-3">
-                                        {flight.origin} <ArrowRight className="h-3 w-3 text-slate-300" /> {flight.destination}
+                                    <div className="text-[10px] font-bold text-muted-foreground flex items-center gap-3">
+                                        {flight.origin} <ArrowRight className="h-3 w-3 text-border" /> {flight.destination}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <div className="text-[10px] font-bold text-slate-700 tabular-nums">{flight.departureTime}</div>
-                                    <div className="text-[8px] font-semibold text-slate-400 uppercase">
+                                    <div className="text-[10px] font-bold text-foreground tabular-nums">{flight.departureTime}</div>
+                                    <div className="text-[8px] font-semibold text-muted-foreground uppercase">
                                         {new Date(flight.date).toLocaleDateString("es-CO", { day: "2-digit", month: "short" })}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <div className="text-[10px] font-bold text-slate-900 tabular-nums">{flight.arrivalTime}</div>
-                                    <div className="text-[8px] font-semibold text-slate-400 uppercase">Hora Local</div>
+                                    <div className="text-[10px] font-bold text-foreground tabular-nums">{flight.arrivalTime}</div>
+                                    <div className="text-[8px] font-semibold text-muted-foreground uppercase">Hora Local</div>
                                 </td>
                             </tr>
                         ))}
@@ -173,23 +157,23 @@ function HotelsSection({ hotelOptions }: { hotelOptions: NonNullable<ReturnType<
                         className={cn(
                             "p-6 rounded-[2rem] border relative overflow-hidden break-inside-avoid",
                             hotel.isRecommended
-                                ? "bg-slate-50/50 border-[#E33A7A]/30 shadow-sm"
-                                : "bg-white border-slate-100"
+                                ? "bg-brand-primary/5 border-brand-primary/20 shadow-sm"
+                                : "bg-card border-border"
                         )}
                     >
                         {hotel.isRecommended && (
-                            <div className="absolute top-0 right-12 bg-[#E33A7A] text-white text-[8px] font-black px-5 py-2 uppercase tracking-[0.2em] rounded-b-xl shadow-lg ring-2 ring-white/20">
+                            <div className="absolute top-0 right-12 bg-brand-primary text-primary-foreground text-[8px] font-extrabold px-5 py-2 uppercase tracking-[0.2em] rounded-b-xl shadow-lg ring-2 ring-white/20">
                                 Opción Sugerida
                             </div>
                         )}
                         <div className="flex gap-8">
-                            <div className="h-20 w-20 bg-[#E33A7A]/5 rounded-3xl flex items-center justify-center shrink-0 border border-[#E33A7A]/10 shadow-sm">
-                                <Hotel className="h-8 w-8 text-[#E33A7A]" strokeWidth={1.5} />
+                            <div className="h-20 w-20 bg-brand-primary/5 rounded-3xl flex items-center justify-center shrink-0 border border-brand-primary/10 shadow-sm">
+                                <Hotel className="h-8 w-8 text-brand-primary" strokeWidth={1.5} />
                             </div>
                             <div className="flex-1">
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="space-y-2">
-                                        <h3 className="text-[15px] font-black text-slate-900 uppercase tracking-tight font-playfair italic">
+                                        <h3 className="text-[15px] font-extrabold text-foreground uppercase tracking-tight italic">
                                             {hotel.name}
                                         </h3>
                                         <div className="flex gap-1">
@@ -200,38 +184,38 @@ function HotelsSection({ hotelOptions }: { hotelOptions: NonNullable<ReturnType<
                                                         "h-3.5 w-3.5",
                                                         i < (parseInt(hotel.category) || 5)
                                                             ? "fill-amber-400 text-amber-400 drop-shadow-sm"
-                                                            : "fill-slate-100 text-slate-100"
+                                                            : "fill-border text-border"
                                                     )}
                                                 />
                                             ))}
                                         </div>
-                                        <div className="flex items-center gap-2 text-[10px] font-black text-[#E33A7A] uppercase tracking-widest">
+                                        <div className="flex items-center gap-2 text-[10px] font-extrabold text-brand-primary uppercase tracking-widest">
                                             <MapPin className="h-3 w-3" /> {hotel.location}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-8 mt-6">
                                     <div>
-                                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-1.5">
+                                        <span className="text-[8px] font-extrabold text-muted-foreground uppercase tracking-[0.3em] block mb-1.5">
                                             Categoría de Habitación
                                         </span>
-                                        <span className="text-[10px] font-bold text-slate-800 uppercase">
+                                        <span className="text-[10px] font-bold text-foreground uppercase">
                                             {hotel.roomType || "Estándar"}
                                         </span>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-1.5">
+                                        <span className="text-[10px] font-extrabold text-muted-foreground uppercase tracking-[0.3em] block mb-1.5">
                                             Estado
                                         </span>
-                                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.1em]">
+                                        <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-[0.1em]">
                                             Sujeto a Disponibilidad
                                         </span>
                                     </div>
                                 </div>
                                 {hotel.notes && (
-                                    <div className="mt-6 flex gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm transition-all hover:border-[#E33A7A]/20">
-                                        <Info className="h-3.5 w-3.5 text-[#E33A7A] shrink-0 mt-0.5 fill-[#E33A7A]/10" />
-                                        <p className="text-[9.5px] text-slate-700 leading-relaxed font-semibold">
+                                    <div className="mt-6 flex gap-4 bg-muted/20 p-5 rounded-2xl border border-border shadow-sm transition-all hover:border-brand-primary/20">
+                                        <Info className="h-3.5 w-3.5 text-brand-primary shrink-0 mt-0.5 fill-brand-primary/10" />
+                                        <p className="text-[9.5px] text-muted-foreground leading-relaxed font-semibold">
                                             {hotel.notes}
                                         </p>
                                     </div>
@@ -250,17 +234,17 @@ function ItinerarySection({ itinerary }: { itinerary: NonNullable<ReturnType<typ
     return (
         <section className="mb-16">
             <SectionHeader title="Cronograma del Viaje" icon={Calendar} subtitle="Itinerario Detallado" />
-            <div className="relative pl-12 space-y-12 before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-100/80">
+            <div className="relative pl-12 space-y-12 before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-[2px] before:bg-border/60">
                 {itinerary.map((day, i) => (
                     <div key={i} className="relative break-inside-avoid pb-2">
-                        <div className="absolute -left-[45px] top-0 h-9 w-9 rounded-full border-[4px] border-white bg-slate-900 flex items-center justify-center text-white text-[11px] font-black tabular-nums shadow-md z-10">
+                        <div className="absolute -left-[45px] top-0 h-9 w-9 rounded-full border-[4px] border-white bg-foreground flex items-center justify-center text-primary-foreground text-[11px] font-extrabold tabular-nums shadow-md z-10">
                             {day.day}
                         </div>
                         <div className="space-y-3">
-                            <h3 className="text-[13px] font-black text-slate-900 uppercase tracking-tight border-b border-slate-50 pb-2.5">
+                            <h3 className="text-[13px] font-extrabold text-foreground uppercase tracking-tight border-b border-border pb-2.5">
                                 {day.title || `Día ${day.day}`}
                             </h3>
-                            <p className="text-[10px] text-slate-700 leading-[1.7] text-pretty max-w-2xl font-medium tracking-normal">
+                            <p className="text-[10px] text-muted-foreground leading-[1.7] text-pretty max-w-2xl font-medium tracking-normal">
                                 {day.description}
                             </p>
                         </div>
@@ -290,17 +274,17 @@ function PricingSection({
 }) {
     return (
         <section className="mb-16">
-            <div className="bg-slate-900 text-white rounded-[2rem] overflow-hidden p-10 relative break-inside-avoid shadow-2xl">
+            <div className="bg-foreground text-primary-foreground rounded-[2rem] overflow-hidden p-10 relative break-inside-avoid shadow-2xl">
                 <div className="absolute top-0 right-0 p-12 opacity-5">
                     <DollarSign className="h-40 w-40" />
                 </div>
 
                 <div className="flex justify-between items-end mb-10 border-b border-white/5 pb-8">
                     <div>
-                        <span className="text-[9px] font-black text-[#E33A7A] uppercase tracking-[0.4em] block mb-2">
+                        <span className="text-[11px] font-extrabold text-brand-primary uppercase tracking-[0.3em] block mb-2">
                             Desglose de Inversión
                         </span>
-                        <h2 className="text-2xl font-bold uppercase tracking-tight">
+                        <h2 className="text-2xl font-bold uppercase tracking-tight text-white">
                             Presupuesto Final
                         </h2>
                     </div>
@@ -309,8 +293,8 @@ function PricingSection({
                             <span className="text-[8px] font-bold text-white/30 uppercase tracking-[0.3em] block mb-1">
                                 Cotización Válida Hasta
                             </span>
-                            <div className="flex items-center gap-2 text-[10px] font-black text-white/90 uppercase">
-                                <Clock className="h-3 w-3 text-[#E33A7A]" />
+                            <div className="flex items-center gap-2 text-[10px] font-extrabold text-white/90 uppercase">
+                                <Clock className="h-3 w-3 text-brand-primary" />
                                 {new Date(validUntil).toLocaleDateString("es-CO", { day: "2-digit", month: "long" })}
                             </div>
                         </div>
@@ -320,11 +304,11 @@ function PricingSection({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16 relative z-10">
                     <div className="space-y-8">
                         <div className="space-y-2">
-                            <span className="text-[10px] font-bold text-[#E33A7A]/60 uppercase tracking-wider block">
+                            <span className="text-[10px] font-bold text-brand-primary/60 uppercase tracking-wider block">
                                 Tarifa por Persona
                             </span>
                             <div className="flex items-baseline gap-3">
-                                <span className="text-5xl font-black text-white tabular-nums tracking-tighter leading-none">
+                                <span className="text-5xl font-extrabold text-white tabular-nums tracking-tighter leading-none">
                                     {isNacional && calcNac
                                         ? formatCOP(calcNac.precioClienteCOP)
                                         : calcInt
@@ -340,7 +324,7 @@ function PricingSection({
                         {!isNacional && calcInt && (
                             <div className="pt-8 border-t border-white/5">
                                 <div className="flex items-center gap-3 mb-2 opacity-60">
-                                    <span className="text-[9px] font-bold text-white/80 uppercase tracking-widest">
+                                    <span className="text-[11px] font-bold text-white/80 uppercase tracking-[0.1em]">
                                         Equivalente Local
                                     </span>
                                     <div className="h-px w-8 bg-white/10" />
@@ -349,7 +333,7 @@ function PricingSection({
                                     <span className="text-2xl font-bold text-white tracking-tight tabular-nums opacity-90">
                                         ≈ {formatCOP(calcInt.precioClienteCOP)}
                                     </span>
-                                    <span className="text-[10px] text-white/30 font-black tracking-[0.3em] uppercase">
+                                    <span className="text-[10px] text-white/30 font-extrabold tracking-[0.3em] uppercase">
                                         COP
                                     </span>
                                 </div>
@@ -364,17 +348,17 @@ function PricingSection({
                         <div className="bg-white/5 rounded-2xl p-8 border border-white/10 space-y-6">
                             <div className="grid grid-cols-2 gap-8">
                                 <div>
-                                    <span className="text-[8px] font-black text-white/20 uppercase block tracking-[0.4em] mb-1.5">
+                                    <span className="text-[8px] font-extrabold text-white/20 uppercase block tracking-[0.4em] mb-1.5">
                                         Fee Gestión
                                     </span>
-                                    <span className="text-[12px] font-black text-[#E33A7A]">{(commPercent + agencyFeePercent).toFixed(1)}%</span>
+                                    <span className="text-[12px] font-extrabold text-brand-primary">{(commPercent + agencyFeePercent).toFixed(1)}%</span>
                                 </div>
                                 {!isNacional && (
                                     <div className="text-right">
-                                        <span className="text-[8px] font-black text-white/20 uppercase block tracking-[0.4em] mb-1.5">
+                                        <span className="text-[8px] font-extrabold text-white/20 uppercase block tracking-[0.4em] mb-1.5">
                                             TRM Base
                                         </span>
-                                        <span className="text-[12px] font-black text-white/80 tabular-nums">
+                                        <span className="text-[12px] font-extrabold text-white/80 tabular-nums">
                                             {formatTRM(trm)}
                                         </span>
                                     </div>
@@ -404,18 +388,18 @@ function TermsSection({
     return (
         <section className="mb-16">
             <SectionHeader title="Términos y Condiciones" subtitle="Condiciones de la Propuesta" />
-            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 break-inside-avoid">
+            <div className="bg-muted rounded-2xl p-8 border border-border break-inside-avoid">
                 <div className="grid grid-cols-2 gap-12">
                     <div className="space-y-5">
                         <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-[#E33A7A]/5 rounded-lg border border-[#E33A7A]/10">
-                                <CheckCircle2 className="h-4 w-4 text-[#E33A7A]" />
+                            <div className="p-1.5 bg-brand-primary/5 rounded-lg border border-brand-primary/10">
+                                <CheckCircle2 className="h-4 w-4 text-brand-primary" />
                             </div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">Lo que Incluye</h4>
+                            <h4 className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand-primary">Lo que Incluye</h4>
                         </div>
                         <ul className="space-y-3">
                             {inclusions?.map((item, i) => (
-                                <li key={i} className="text-[9.5px] font-bold text-slate-700 leading-tight border-l-2 border-[#E33A7A]/20 pl-4 py-0.5">
+                                <li key={i} className="text-[9.5px] font-bold text-muted-foreground leading-tight border-l-2 border-brand-primary/20 pl-4 py-0.5">
                                     {item}
                                 </li>
                             ))}
@@ -423,14 +407,14 @@ function TermsSection({
                     </div>
                     <div className="space-y-5">
                         <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-[#E33A7A]/5 rounded-lg border border-[#E33A7A]/10">
-                                <XCircle className="h-4 w-4 text-[#E33A7A]" />
+                            <div className="p-1.5 bg-brand-primary/5 rounded-lg border border-brand-primary/10">
+                                <XCircle className="h-4 w-4 text-brand-primary" />
                             </div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">No Incluye</h4>
+                            <h4 className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand-primary">No Incluye</h4>
                         </div>
                         <ul className="space-y-3">
                             {exclusions?.map((item, i) => (
-                                <li key={i} className="text-[9.5px] font-bold text-slate-600 leading-tight border-l-2 border-[#E33A7A]/20 pl-4 py-0.5">
+                                <li key={i} className="text-[9.5px] font-bold text-muted-foreground leading-tight border-l-2 border-brand-primary/20 pl-4 py-0.5">
                                     {item}
                                 </li>
                             ))}
@@ -439,25 +423,25 @@ function TermsSection({
                 </div>
 
                 {(legalConditions || paymentTerms || cancellationPolicy) && (
-                    <div className="mt-8 pt-6 border-t border-slate-200 space-y-4">
+                    <div className="mt-8 pt-6 border-t border-border space-y-4">
                         {paymentTerms && (
                             <div>
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block mb-1">
+                                <span className="text-[8px] font-extrabold text-subtle-foreground uppercase tracking-[0.3em] block mb-1">
                                     Condiciones de Pago
                                 </span>
-                                <p className="text-[8px] text-slate-400 leading-relaxed">{paymentTerms}</p>
+                                <p className="text-[8px] text-muted-foreground leading-relaxed">{paymentTerms}</p>
                             </div>
                         )}
                         {cancellationPolicy && (
                             <div>
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] block mb-1">
+                                <span className="text-[8px] font-extrabold text-subtle-foreground uppercase tracking-[0.3em] block mb-1">
                                     Política de Cancelación
                                 </span>
-                                <p className="text-[8px] text-slate-400 leading-relaxed">{cancellationPolicy}</p>
+                                <p className="text-[8px] text-muted-foreground leading-relaxed">{cancellationPolicy}</p>
                             </div>
                         )}
                         {legalConditions && (
-                            <p className="text-[9px] text-slate-700 leading-relaxed text-justify font-semibold bg-white p-4 rounded-xl border border-slate-100 shadow-sm italic">
+                            <p className="text-[11px] text-muted-foreground leading-relaxed text-justify font-semibold bg-card p-4 rounded-xl border border-border shadow-sm italic">
                                 {legalConditions}
                             </p>
                         )}
@@ -538,11 +522,11 @@ export function QuoteTemplate() {
 
     return (
         <>
-        <DocumentFonts />
-        <div className="flex flex-col items-center bg-slate-50 py-16 text-slate-900">
+
+        <div className="flex flex-col items-center bg-muted py-16 text-foreground">
 
             {/* ── HOJA 1: PORTADA CORPORATIVA ─────────────────────────── */}
-            <A4PageWrapper className="bg-slate-900 border-none group/cover">
+            <A4PageWrapper className="bg-foreground border-none group/cover">
                 {/* Background Image */}
                 {activeQuote.destinationImage && (
                     <div className="absolute inset-0 z-0">
@@ -551,7 +535,7 @@ export function QuoteTemplate() {
                             alt={activeQuote.destination}
                             className="w-full h-full object-cover grayscale-[40%] brightness-[0.35]"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900/40 to-slate-950" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black via-foreground/40 to-black" />
                     </div>
                 )}
 
@@ -559,8 +543,8 @@ export function QuoteTemplate() {
                 <div className="relative z-20 w-full px-16 py-10 flex justify-between items-start">
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                            <Shield className="h-4 w-4 text-[#E33A7A]" strokeWidth={2.5} />
-                            <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                            <Shield className="h-4 w-4 text-brand-primary" strokeWidth={2.5} />
+                            <span className="text-[10px] font-extrabold text-white uppercase tracking-[0.3em]">
                                 Verified Technical Document
                             </span>
                         </div>
@@ -569,7 +553,7 @@ export function QuoteTemplate() {
                         </span>
                     </div>
                     <div className="px-5 py-2 bg-white/5 border border-white/10 rounded-full">
-                        <span className="text-[9px] font-black text-[#E33A7A] uppercase tracking-[0.3em]">
+                        <span className="text-[11px] font-extrabold text-brand-primary uppercase tracking-[0.2em]">
                             Edición 2026
                         </span>
                     </div>
@@ -579,18 +563,16 @@ export function QuoteTemplate() {
                 <div className="relative z-10 flex-1 flex flex-col justify-center items-center px-20">
                     <div className="space-y-16 w-full text-center">
                         <div className="flex flex-col items-center gap-6">
-                            <div className="h-px w-24 bg-gradient-to-r from-transparent via-[#E33A7A] to-transparent" />
+                            <div className="h-px w-24 bg-gradient-to-r from-transparent via-brand-primary to-transparent" />
                             {/* Inter — label de clasificación */}
                             <span
-                                className="text-[11px] font-semibold text-[#E33A7A] uppercase tracking-[0.5em]"
-                                style={{ fontFamily: "'Outfit', sans-serif" }}
+                                className="text-[11px] font-semibold text-brand-primary uppercase tracking-[0.5em]"
                             >
                                 Propuesta de viajes
                             </span>
                             {/* Playfair Display — título editorial del destino */}
                             <h1
                                 className="text-7xl font-bold text-white leading-[0.9] drop-shadow-[0_10px_30px_rgba(227,58,122,0.3)]"
-                                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                             >
                                 {activeQuote.destination || "Global"}
                             </h1>
@@ -599,7 +581,6 @@ export function QuoteTemplate() {
                         <div className="space-y-4 py-8">
                             <span
                                 className="text-[8px] font-semibold text-white/40 uppercase tracking-[0.5em] block"
-                                style={{ fontFamily: "'Outfit', sans-serif" }}
                             >
                                 Diseñado Exclusivamente Para
                             </span>
@@ -607,11 +588,10 @@ export function QuoteTemplate() {
                                 {/* Playfair Display — nombre del cliente como titular editorial */}
                                 <h2
                                     className="text-[2.8rem] font-bold text-white relative z-10 px-4 leading-tight"
-                                    style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
                                 >
                                     {activeQuote.travelerName || "Pasajero"}
                                 </h2>
-                                <div className="absolute -bottom-1 left-0 w-full h-[5px] bg-[#E33A7A]/40 -skew-x-12 z-0" />
+                                <div className="absolute -bottom-1 left-0 w-full h-[5px] bg-brand-primary/40 -skew-x-12 z-0" />
                             </div>
                         </div>
 
@@ -619,8 +599,8 @@ export function QuoteTemplate() {
                         <div className="flex justify-center">
                             <div className="flex items-center gap-10 px-10 py-6 bg-white/5 border border-white/10 rounded-[2.5rem] backdrop-blur-xl shadow-2xl">
                                 <div className="text-center">
-                                    <p className="text-[8px] font-black text-[#E33A7A] uppercase tracking-[0.3em] mb-1">Salida</p>
-                                    <p className="text-[14px] font-black text-white tabular-nums">
+                                    <p className="text-[8px] font-extrabold text-brand-primary uppercase tracking-[0.3em] mb-1">Salida</p>
+                                    <p className="text-[14px] font-extrabold text-white tabular-nums">
                                         {activeQuote.departureDate
                                             ? new Date(activeQuote.departureDate).toLocaleDateString("es-CO", { month: "short", day: "2-digit" })
                                             : "TBA"}
@@ -628,8 +608,8 @@ export function QuoteTemplate() {
                                 </div>
                                 <div className="h-8 w-px bg-white/10" />
                                 <div className="text-center">
-                                    <p className="text-[8px] font-black text-[#E33A7A] uppercase tracking-[0.3em] mb-1">Duración</p>
-                                    <p className="text-[14px] font-black text-white tabular-nums">
+                                    <p className="text-[8px] font-extrabold text-brand-primary uppercase tracking-[0.3em] mb-1">Duración</p>
+                                    <p className="text-[14px] font-extrabold text-white tabular-nums">
                                         {activeQuote.itinerary?.length
                                             ? `${activeQuote.itinerary.length} DÍAS`
                                             : "TBA"}
@@ -637,8 +617,8 @@ export function QuoteTemplate() {
                                 </div>
                                 <div className="h-8 w-px bg-white/10" />
                                 <div className="text-center">
-                                    <p className="text-[8px] font-black text-[#E33A7A] uppercase tracking-[0.3em] mb-1">Viajeros</p>
-                                    <p className="text-[14px] font-black text-white tabular-nums">
+                                    <p className="text-[8px] font-extrabold text-brand-primary uppercase tracking-[0.3em] mb-1">Viajeros</p>
+                                    <p className="text-[14px] font-extrabold text-white tabular-nums">
                                         {activeQuote.numberOfTravelers || 1} PAX
                                     </p>
                                 </div>
@@ -648,23 +628,23 @@ export function QuoteTemplate() {
                 </div>
 
                 {/* Footer Authority */}
-                <div className="relative z-10 w-full px-20 py-12 flex justify-between items-end bg-gradient-to-t from-slate-950/80 to-transparent">
+                <div className="relative z-10 w-full px-20 py-12 flex justify-between items-end bg-gradient-to-t from-black/80 to-transparent">
                     <div className="space-y-2">
                         <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-[#E33A7A] rounded-lg">
+                            <div className="p-1.5 bg-brand-primary rounded-lg">
                                 <Plane className="h-3 w-3 text-white fill-white" />
                             </div>
-                            <span className="text-[14px] font-black text-white uppercase tracking-tighter">
+                            <span className="text-[14px] font-extrabold text-white uppercase tracking-tighter">
                                 {AGENCY_INFO.name}
                             </span>
                         </div>
-                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-9">
+                        <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-[0.2em] ml-9">
                             NIT. {AGENCY_INFO.nit} · RNT {AGENCY_INFO.rnt}
                         </p>
                     </div>
                     <div className="flex flex-col items-end gap-2 text-right">
                         <div className="px-4 py-1.5 bg-white rounded-lg">
-                            <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">
+                            <span className="text-[10px] font-extrabold text-foreground uppercase tracking-widest">
                                 Documento Oficial
                             </span>
                         </div>
@@ -682,8 +662,8 @@ export function QuoteTemplate() {
                     .map((sectionId) => renderSection(sectionId))}
 
                 {/* Info de continuación */}
-                <div className="mt-auto pt-6 border-t border-slate-100">
-                    <p className="text-[10px] text-slate-400 font-black uppercase text-center tracking-[0.3em] italic">
+                <div className="mt-auto pt-6 border-t border-border">
+                    <p className="text-[10px] text-muted-foreground font-extrabold uppercase text-center tracking-[0.3em] italic">
                         Esta propuesta continúa en la siguiente página con términos y condiciones.
                     </p>
                 </div>
@@ -696,12 +676,12 @@ export function QuoteTemplate() {
                 </div>
 
                 {/* Legal Footer Final */}
-                <div className="mt-auto pt-10 border-t border-slate-100">
-                    <div className="flex flex-col items-center gap-6 text-[10px] text-slate-500 leading-relaxed uppercase font-black text-center tracking-[0.4em]">
-                        <p className="text-[11px] text-slate-900 border-b border-slate-300 pb-3 max-w-2xl px-4">
+                <div className="mt-auto pt-10 border-t border-border">
+                    <div className="flex flex-col items-center gap-6 text-[10px] text-subtle-foreground leading-relaxed uppercase font-extrabold text-center tracking-[0.4em]">
+                        <p className="text-[11px] text-foreground border-b border-border pb-3 max-w-2xl px-4">
                             Esta propuesta es un documento informativo y está sujeta a disponibilidad y cambios de tarifa sin previo aviso hasta que se realice el pago total.
                         </p>
-                        <p className="pt-2 w-full text-slate-700">
+                        <p className="pt-2 w-full text-muted-foreground">
                             {AGENCY_INFO.name} · NIT. {AGENCY_INFO.nit} · {AGENCY_INFO.address}
                         </p>
                     </div>

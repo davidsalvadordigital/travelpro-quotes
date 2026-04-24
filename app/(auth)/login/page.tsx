@@ -64,14 +64,14 @@ export default function LoginPage() {
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary text-white shadow-lg shadow-brand-primary/20">
                     <Plane className="h-5 w-5" />
                 </div>
-                <span className="text-xl font-black tracking-tighter">
+                <span className="text-xl font-extrabold tracking-tighter">
                     Trapp<span className="text-brand-primary italic">vel</span>
                 </span>
             </div>
 
             {/* Header */}
             <div className="space-y-2">
-                <h1 className="text-3xl font-black tracking-tighter text-foreground">
+                <h1 className="text-3xl font-extrabold tracking-tighter text-foreground">
                     Iniciar sesión
                 </h1>
                 <p className="text-sm text-muted-foreground font-medium">
@@ -112,8 +112,8 @@ export default function LoginPage() {
                     <div className="absolute inset-0 flex items-center">
                         <span className="w-full border-t border-border" />
                     </div>
-                    <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em]">
-                        <span className="bg-background px-6 text-muted-foreground/50">
+                    <div className="relative flex justify-center">
+                        <span className="bg-background px-6 text-[10px] font-extrabold uppercase tracking-[0.2em] text-muted-foreground/50">
                             o credenciales internas
                         </span>
                     </div>
@@ -122,7 +122,7 @@ export default function LoginPage() {
                 {/* Form */}
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div className="space-y-2.5">
-                        <label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80 ml-1">
+                        <label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">
                             Email Corporativo
                         </label>
                         <div className="relative group">
@@ -143,12 +143,12 @@ export default function LoginPage() {
 
                     <div className="space-y-2.5">
                         <div className="flex items-center justify-between ml-1">
-                            <label htmlFor="password" className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/80">
+                            <label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                 Contraseña
                             </label>
                             <button
                                 type="button"
-                                className="text-[10px] font-bold text-brand-primary hover:text-brand-primary/80 transition-colors"
+                                className="text-xs font-bold text-brand-primary hover:text-brand-primary/80 transition-colors"
                             >
                                 ¿Olvidaste tu contraseña?
                             </button>
@@ -191,7 +191,7 @@ export default function LoginPage() {
                 ¿Nuevo en el equipo?{" "}
                 <Link
                     href="/register"
-                    className="font-black text-brand-primary hover:underline transition-all"
+                    className="font-extrabold text-brand-primary hover:underline transition-all"
                 >
                     Solicita una cuenta
                 </Link>
@@ -200,7 +200,7 @@ export default function LoginPage() {
             {/* Quick Access — Test Credentials */}
             {process.env.NODE_ENV === "development" && (
                 <div className="pt-6 border-t border-border/40 space-y-4">
-                    <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40">
+                    <p className="text-center text-[10px] font-extrabold uppercase tracking-[0.2em] text-muted-foreground/40">
                         Entornos de Prueba
                     </p>
                     <div className="grid grid-cols-2 gap-3">
@@ -209,7 +209,7 @@ export default function LoginPage() {
                             variant="outline"
                             size="sm"
                             disabled={loading}
-                            className={cn("h-11 text-[10px] font-black uppercase tracking-widest border-border/80 hover:border-brand-primary/40 hover:text-brand-primary hover:bg-brand-primary/5 transition-all shadow-sm")}
+                            className={cn("h-11 text-xs font-bold uppercase tracking-wider border-border/80 hover:border-brand-primary/40 hover:text-brand-primary hover:bg-brand-primary/5 transition-all shadow-sm")}
                             onClick={() => {
                                 setEmail("test-asesor@travelpro.com");
                                 setPassword("Travel123!");
@@ -226,7 +226,7 @@ export default function LoginPage() {
                             variant="outline"
                             size="sm"
                             disabled={loading}
-                            className={cn("h-11 text-[10px] font-black uppercase tracking-widest border-border/80 hover:border-brand-action/40 hover:text-brand-action hover:bg-brand-action/5 transition-all shadow-sm")}
+                            className={cn("h-11 text-xs font-bold uppercase tracking-wider border-border/80 hover:border-brand-action/40 hover:text-brand-action hover:bg-brand-action/5 transition-all shadow-sm")}
                             onClick={() => {
                                 setEmail("test-admin@travelpro.com");
                                 setPassword("Admin123!");

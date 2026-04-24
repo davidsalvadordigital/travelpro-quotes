@@ -77,7 +77,7 @@ El pago se liquida a la TRM oficial del día del abono.`
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-border/40 pb-8">
                 <div className="space-y-1">
                     <h3 className="text-base font-bold tracking-tight text-foreground">Cláusulas y Condiciones</h3>
-                    <p className="text-xs text-muted-foreground/70">
+                    <p className="text-xs text-subtle-foreground">
                         Define inclusiones, exclusiones y políticas legales de la propuesta.
                     </p>
                 </div>
@@ -110,16 +110,16 @@ El pago se liquida a la TRM oficial del día del abono.`
                     {/* INCLUSIONES */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600/80">
-                                <CheckCircle2 className="h-4 w-4 text-emerald-500" strokeWidth={3} />
+                            <span className="flex items-center gap-2 text-xs font-semibold tracking-wide text-success">
+                                <CheckCircle2 className="h-4 w-4 text-success" />
                                 Inclusiones
-                            </Label>
+                            </span>
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={handleAddInclusion}
-                                className="h-8 px-3 rounded-lg text-xs font-bold gap-2 text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 hover:text-emerald-700 hover:border-emerald-300 transition-all cursor-pointer"
+                                className="h-8 px-3 rounded-lg text-xs font-bold gap-2 text-success border-success/20 bg-success/5 hover:bg-success/10 hover:border-success/30 transition-all cursor-pointer"
                             >
                                 <ListPlus className="h-3 w-3" /> Añadir Inclusión
                             </Button>
@@ -130,14 +130,14 @@ El pago se liquida a la TRM oficial del día del abono.`
                             ) : (
                                 inclusions.map((inc, i) => (
                                     <div key={i} className="flex gap-3 group animate-in slide-in-from-top-2">
-                                        <div className="h-12 w-10 shrink-0 flex items-center justify-center font-bold text-emerald-600/30 uppercase text-[10px]">
+                                        <div className="h-12 w-10 shrink-0 flex items-center justify-center font-bold text-emerald-600/40 text-xs">
                                             IN.{i + 1}
                                         </div>
                                         <Input
                                             value={inc}
                                             onChange={(e) => handleUpdateInclusion(i, e.target.value)}
                                             placeholder="Tiquetes aéreos ida y vuelta..."
-                                            className="h-12 rounded-xl bg-background/50 focus-visible:ring-emerald-500/20 focus-visible:border-emerald-500/40"
+                                            className="h-12 rounded-xl bg-background/50 focus-visible:ring-success/20 focus-visible:border-success/40"
                                         />
                                         <Button
                                             type="button"
@@ -156,16 +156,16 @@ El pago se liquida a la TRM oficial del día del abono.`
                     {/* EXCLUSIONES */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-red-600/80">
-                                <AlertCircle className="h-4 w-4 text-red-500" strokeWidth={3} />
+                            <span className="flex items-center gap-2 text-xs font-semibold tracking-wide text-destructive">
+                                <AlertCircle className="h-4 w-4 text-destructive" />
                                 Exclusiones
-                            </Label>
+                            </span>
                             <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={handleAddExclusion}
-                                className="h-8 px-3 rounded-lg text-xs font-bold gap-2 text-red-600 border-red-200 bg-red-50 hover:bg-red-100 hover:text-red-700 hover:border-red-300 transition-all cursor-pointer"
+                                className="h-8 px-3 rounded-lg text-xs font-bold gap-2 text-destructive border-destructive/20 bg-destructive/5 hover:bg-destructive/10 hover:border-destructive/30 transition-all cursor-pointer"
                             >
                                 <ListPlus className="h-3 w-3" /> Añadir Exclusión
                             </Button>
@@ -176,14 +176,14 @@ El pago se liquida a la TRM oficial del día del abono.`
                             ) : (
                                 exclusions.map((exc, i) => (
                                     <div key={i} className="flex gap-3 group animate-in slide-in-from-top-2">
-                                        <div className="h-12 w-10 shrink-0 flex items-center justify-center font-bold text-red-600/30 uppercase text-[10px]">
+                                        <div className="h-12 w-10 shrink-0 flex items-center justify-center font-bold text-red-600/40 text-xs">
                                             EX.{i + 1}
                                         </div>
                                         <Input
                                             value={exc}
                                             onChange={(e) => handleUpdateExclusion(i, e.target.value)}
                                             placeholder="Gastos no especificados en el plan..."
-                                            className="h-12 rounded-xl bg-background/50 focus-visible:ring-red-500/20 focus-visible:border-red-500/40"
+                                            className="h-12 rounded-xl bg-background/50 focus-visible:ring-destructive/20 focus-visible:border-destructive/40"
                                         />
                                         <Button
                                             type="button"
@@ -206,7 +206,7 @@ El pago se liquida a la TRM oficial del día del abono.`
 
                     {/* Requisitos y Migración */}
                     <div className="space-y-3">
-                        <Label htmlFor="reqDocs" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 text-muted-foreground">
+                        <Label htmlFor="reqDocs" className="flex items-center gap-2 text-xs font-semibold tracking-wide ml-1 text-muted-foreground">
                             Documentación y Requisitos
                         </Label>
                         <Textarea
@@ -220,8 +220,8 @@ El pago se liquida a la TRM oficial del día del abono.`
 
                     {/* Pagos y Recaudo */}
                     <div className="space-y-3">
-                        <Label htmlFor="paymentParams" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 text-brand-secondary">
-                            <Banknote className="h-3.5 w-3.5" />
+                        <Label htmlFor="paymentParams" className="flex items-center gap-2 text-xs font-semibold tracking-wide ml-1 text-brand-secondary">
+                            <Banknote className="h-4 w-4" />
                             Canales de Recaudo y Abonos
                         </Label>
                         <Textarea
@@ -235,8 +235,8 @@ El pago se liquida a la TRM oficial del día del abono.`
 
                     {/* Respaldo Legal */}
                     <div className="space-y-3">
-                        <Label htmlFor="legalConditions" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest ml-0.5 text-muted-foreground/60">
-                            <FileText className="h-3.5 w-3.5" />
+                        <Label htmlFor="legalConditions" className="flex items-center gap-2 text-xs font-semibold tracking-wide ml-0.5 text-muted-foreground">
+                            <FileText className="h-4 w-4" />
                             Cláusulas Legales y Generales
                         </Label>
                         <Textarea

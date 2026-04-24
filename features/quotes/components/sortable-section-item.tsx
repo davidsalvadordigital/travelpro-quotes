@@ -62,7 +62,7 @@ export function SortableSectionItem({ id }: SortableSectionItemProps) {
                 className="p-2 rounded-xl hover:bg-muted transition-colors cursor-grab active:cursor-grabbing"
                 title="Reordenar sección"
             >
-                <GripVertical className="h-5 w-5 text-muted-foreground/70" />
+                <GripVertical className="h-5 w-5 text-muted-foreground/50" />
             </div>
 
             <div className={cn(
@@ -76,7 +76,7 @@ export function SortableSectionItem({ id }: SortableSectionItemProps) {
                 <span className="text-sm font-bold tracking-tight text-foreground">
                     {getSectionLabel(id)}
                 </span>
-                <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground/40 mt-0.5">
+                <p className="text-xs font-semibold text-subtle-foreground mt-0.5">
                     Sección de Cotización
                 </p>
             </div>

@@ -14,7 +14,7 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { QuoteTemplate } from "@/features/quotes/components/quote-template";
 import type { Quote } from "@/features/quotes/schemas/quote-schema";
 import {
-    User, MapPin, Eye, Printer, Download, Loader2, X, FileText, Info
+    User, MapPin, Eye, Printer, Download, Loader2, X, FileText
 } from "lucide-react";
 import { formatCOP, formatUSD, formatTRM } from "@/lib/utils";
 import { calculateNacional, calculateInternacional } from "@/features/quotes/utils/calculator";
@@ -70,8 +70,6 @@ export function QuotePreview() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeQuote, open]);
 
-    const handlePrint = () => { window.print(); };
-
     // ── Estado vacío ──────────────────────────────────────────────────────────
     if (!hasData) {
         return (
@@ -100,7 +98,7 @@ export function QuotePreview() {
                     {/* Header del panel */}
                     <div className="flex items-center gap-2 border-b border-border/40 pb-4">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                        <h3 className="text-xxs font-bold uppercase tracking-[0.1em] text-muted-foreground/60">
                             Vista previa
                         </h3>
                     </div>
@@ -124,17 +122,17 @@ export function QuotePreview() {
                     {/* Métricas */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="bg-muted/40 p-4 rounded-xl border border-border/50">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Pasajeros</p>
-                            <div className="text-lg font-black text-foreground tabular-nums">
+                            <p className="text-xxs font-bold uppercase tracking-[0.1em] text-muted-foreground/50 mb-1">Pasajeros</p>
+                            <div className="text-lg font-extrabold text-foreground tabular-nums">
                                 {activeQuote.numberOfTravelers || 1}
-                                <span className="text-[10px] font-medium text-muted-foreground/40 ml-1">PAX</span>
+                                <span className="text-xs font-medium text-muted-foreground/40 ml-1">PAX</span>
                             </div>
                         </div>
                         <div className="bg-muted/40 p-4 rounded-xl border border-border/50">
-                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50 mb-1">Días</p>
-                            <div className="text-lg font-black text-foreground tabular-nums">
+                            <p className="text-xxs font-bold uppercase tracking-[0.1em] text-muted-foreground/50 mb-1">Días</p>
+                            <div className="text-lg font-extrabold text-foreground tabular-nums">
                                 {activeQuote.itinerary?.length || 0}
-                                <span className="text-[10px] font-medium text-muted-foreground/40 ml-1">noches</span>
+                                <span className="text-xs font-medium text-muted-foreground/40 ml-1">Noches</span>
                             </div>
                         </div>
                     </div>
@@ -144,20 +142,20 @@ export function QuotePreview() {
                         <div className="pt-4 border-t border-border/40 space-y-3">
                             {isNacional && calcNac ? (
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Precio total</p>
-                                    <p className="text-2xl font-black text-brand-primary tabular-nums tracking-tight">
+                                    <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/50">Precio total</p>
+                                    <p className="text-2xl font-extrabold text-brand-primary tabular-nums tracking-tight">
                                         {formatCOP(calcNac.precioClienteCOP)}
                                         <span className="text-xs font-medium text-muted-foreground/40 ml-1.5">COP</span>
                                     </p>
-                                    <p className="text-[10px] text-muted-foreground/50">
+                                    <p className="text-xxs text-muted-foreground/50">
                                         Utilidad: {formatCOP(calcNac.utilidadCOP)}
                                     </p>
                                 </div>
                             ) : calcInt ? (
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Precio total</p>
-                                        <p className="text-xl font-black text-foreground tabular-nums tracking-tight">
+                                        <p className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground/50">Inversión estimada</p>
+                                        <p className="text-xl font-extrabold text-foreground tabular-nums tracking-tight">
                                             {formatUSD(calcInt.precioClienteUSD)}
                                         </p>
                                     </div>
@@ -165,7 +163,7 @@ export function QuotePreview() {
                                         <p className="text-sm font-bold text-brand-primary tabular-nums">
                                             {formatCOP(calcInt.precioClienteCOP)}
                                         </p>
-                                        <p className="text-[9px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+                                        <p className="text-xxs font-bold text-muted-foreground/40 uppercase tracking-[0.1em]">
                                             TRM {formatTRM(trm)}
                                         </p>
                                     </div>
@@ -188,28 +186,28 @@ export function QuotePreview() {
 
             {/* ── Slide-over Document ──────────────────────────────────────── */}
             <Sheet open={open} onOpenChange={setOpen}>
-                <SheetContent side="right" className="!w-screen !max-w-none p-0 gap-0 overflow-hidden flex flex-col bg-slate-900 border-none shadow-2xl">
+                <SheetContent side="right" className="!w-screen !max-w-none p-0 gap-0 overflow-hidden flex flex-col bg-background border-none shadow-2xl">
                     <VisuallyHidden.Root>
                         <SheetTitle>Previsualización — {activeQuote.travelerName || "Cotización"}</SheetTitle>
                         <SheetDescription>Vista detallada de la propuesta de viaje en formato A4.</SheetDescription>
                     </VisuallyHidden.Root>
 
-                    <div className="flex items-center justify-between px-6 py-3 border-b border-white/5 bg-slate-900/95 backdrop-blur-xl sticky top-0 z-50 shadow-2xl">
+                    <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-50 shadow-sm">
                         <div className="flex items-center gap-6">
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#E33A7A]">
+                                <span className="text-xxs font-extrabold uppercase tracking-[0.2em] text-brand-primary">
                                     Propuesta de viajes
                                 </span>
-                                <h2 className="text-sm font-bold text-white uppercase tracking-tight">
+                                <h2 className="text-sm font-bold text-foreground uppercase tracking-tight">
                                     {activeQuote.destination || "Sin Destino"}
                                 </h2>
                             </div>
-                            
+
                             <div className="h-8 w-px bg-white/10 hidden md:block" />
-                            
+
                             <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-white/5 rounded-full border border-white/10">
                                 <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.15em]">
+                                <span className="text-xxs font-extrabold text-muted-foreground uppercase tracking-[0.1em]">
                                     Previsualización de documento PDF
                                 </span>
                             </div>
@@ -218,7 +216,7 @@ export function QuotePreview() {
                         <div className="flex items-center gap-3">
                             <div className="hidden sm:flex items-center gap-2 mr-4 px-3 py-1 bg-white/5 rounded-lg border border-white/10">
                                 <div className={cn("h-1.5 w-1.5 rounded-full", activeQuote.id ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-amber-500 animate-pulse")} />
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span className="text-xxs font-bold text-muted-foreground/60 uppercase tracking-wider">
                                     {activeQuote.id ? "Sincronizado con Servidor" : "Sesión Local / Borrador"}
                                 </span>
                             </div>
@@ -227,7 +225,7 @@ export function QuotePreview() {
                                 asChild
                                 variant="secondary"
                                 size="sm"
-                                className="h-9 px-5 rounded-xl bg-white text-slate-900 font-bold text-[11px] uppercase tracking-wider hover:bg-slate-100 shadow-xl"
+                                className="h-9 px-5 rounded-xl bg-brand-primary text-white font-bold text-xxs uppercase tracking-wider hover:bg-brand-primary/90 shadow-lg shadow-brand-primary/20"
                             >
                                 <a
                                     href={pdfUrl || "#"}
@@ -246,52 +244,58 @@ export function QuotePreview() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setOpen(false)}
-                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+                                className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
                             >
                                 <X className="h-5 w-5" />
                             </Button>
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto bg-[#0a0f1a] p-4 md:p-12 scrollbar-premium flex flex-col items-center">
-                        
+                    <div className="flex-1 overflow-y-auto bg-muted/30 p-4 md:p-12 scrollbar-premium flex flex-col items-center">
+
                         {/* Status bar sutil sobre el documento */}
+                        <div className="flex flex-col items-center gap-1.5 opacity-50 mb-4">
+                            <div className="h-10 w-10 rounded-full border-2 border-dashed border-border flex items-center justify-center">
+                                <span className="text-xxs font-bold text-muted-foreground/40">TP</span>
+                            </div>
+                            <p className="text-xxs font-extrabold uppercase tracking-widest text-muted-foreground/40">TravelPro 2026</p>
+                        </div>
+
                         <div className="w-[210mm] flex items-center justify-between px-1 mb-2">
-                             <div className="flex items-center gap-2">
-                                <FileText className="h-3 w-3 text-slate-500" />
-                                <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                            <div className="flex items-center gap-2">
+                                <FileText className="h-3 w-3 text-muted-foreground/40" />
+                                <span className="text-xxs font-extrabold text-muted-foreground/50 uppercase tracking-[0.2em]">
                                     A4 Vertical · {isNacional ? 'Nacional' : 'Internacional'}
                                 </span>
-                             </div>
-                             <span className="text-[8px] font-black text-slate-600 uppercase tracking-[0.2em]">
+                            </div>
+                            <span className="text-xxs font-extrabold text-muted-foreground/30 uppercase tracking-[0.2em]">
                                 v3.0 · {new Date().toLocaleDateString()}
-                             </span>
+                            </span>
                         </div>
 
                         {/* Multi-Page Document Canvas (A4 Pages) */}
                         <div className="flex flex-col items-center gap-0 pb-20 w-full">
                             {/* Seamless integration of the Quote Template which contains multiple A4 pages */}
                             <QuoteTemplate />
-                            
+
                             {/* Signatures Page attached to the end */}
-                            <div className="relative w-[210mm] bg-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-slate-900/5 mx-auto overflow-hidden min-h-[150mm] flex flex-col print:shadow-none print:ring-0 print:break-after-page">
+                            <div className="relative w-[210mm] bg-white shadow-2xl ring-1 ring-border/50 mx-auto overflow-hidden min-h-[150mm] flex flex-col print:shadow-none print:ring-0 print:break-after-page">
                                 <div className="px-10 pb-20 pt-10 bg-white flex-1 flex flex-col justify-end">
-                                    <div className="mt-auto pt-16 flex justify-between gap-16 border-t border-slate-100">
+                                    <div className="mt-auto pt-16 flex justify-between gap-16 border-t border-border">
                                         <div className="flex-1">
-                                            <div className="h-px bg-slate-300 w-full mb-3" />
-                                            <p className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">Asesor Encargado</p>
-                                            <p className="text-[8px] text-slate-400 mt-1 italic">Trappvel Travel Systems</p>
+                                            <div className="h-px bg-border w-full mb-3" />
+                                            <p className="text-xs font-bold text-foreground uppercase tracking-[0.1em]">Asesor Encargado</p>
+                                            <p className="text-xxs text-muted-foreground/80 leading-relaxed">Trappvel</p>
                                         </div>
                                         <div className="flex-1">
-                                            <div className="h-px bg-slate-300 w-full mb-3" />
-                                            <p className="text-[9px] font-bold text-slate-900 uppercase tracking-wider text-right">Aceptación Cliente</p>
-                                            <p className="text-[8px] text-slate-400 mt-1 italic text-right">Firma Digital / Escrita</p>
+                                            <div className="h-px bg-border w-full mb-3" />
+                                            <p className="text-xs font-bold text-foreground uppercase tracking-[0.1em] text-right">Aceptación Cliente</p>
+                                            <p className="text-xxs text-muted-foreground mt-1 text-right">Firma Digital / Escrita</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </SheetContent>
             </Sheet>
