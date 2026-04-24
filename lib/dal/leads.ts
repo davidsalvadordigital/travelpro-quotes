@@ -8,9 +8,28 @@
  *    RLS enforces multi-tenant: asesora only sees her own leads; admin sees all.
  */
 
+import "server-only";
 import { createServerSupabaseClient, createServiceClient } from "@/lib/supabase-server";
 import { cacheTag, cacheLife, revalidateTag } from "next/cache";
 import { withTenantIsolation } from "./isolation";
+import { z } from "zod";
+
+// ── Schemas ─────────────────────────────────────────────────────────────
+
+export const leadRowSchema = z.object({
+    id: z.string().uuid(),
+    created_by: z.string().uuid().nullable(),
+    traveler_name: z.string(),
+    email: z.string().email().nullable(),
+    phone: z.string().nullable(),
+    destination: z.string().nullable(),
+    status: z.enum(["nuevo", "contactado", "cualificado", "propuesta_enviada", "negociacion", "ganado", "perdido"]),
+    notes: z.string().nullable(),
+    agency_id: z.string().uuid().nullable(),
+    transaction_id: z.string().nullable(),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -21,7 +40,7 @@ export interface LeadRow {
     email: string | null;
     phone: string | null;
     destination: string | null;
-    status: "nuevo" | "cotizado" | "ganado" | "perdido" | "en_proceso";
+    status: "nuevo" | "contactado" | "cualificado" | "propuesta_enviada" | "negociacion" | "ganado" | "perdido";
     notes: string | null;
     agency_id: string | null;
     transaction_id: string | null;
@@ -40,6 +59,7 @@ export type LeadUpdate = Partial<Omit<LeadRow, "id" | "created_at" | "created_by
  */
 export async function getLeads(limit: number, userId: string, isAdmin = false) {
     'use cache';
+    if (!userId) return []; // 🛡️ Safety guard: no hay usuario, no hay leads.
 
     const supabase = createServiceClient();
 
@@ -57,9 +77,16 @@ export async function getLeads(limit: number, userId: string, isAdmin = false) {
     );
 
     const { data, error } = await query;
-
     if (error) throw new Error(`Error fetching leads: ${error.message}`);
-    return (data ?? []) as LeadRow[];
+
+    // 🛡️ Zero-Trust Input: Validate via Zod
+    const validated = z.array(leadRowSchema.partial()).safeParse(data);
+    if (!validated.success) {
+        console.error("Leads validation error:", validated.error.format());
+        return [];
+    }
+
+    return validated.data as LeadRow[];
 }
 
 /**
@@ -68,6 +95,7 @@ export async function getLeads(limit: number, userId: string, isAdmin = false) {
  */
 export async function getLeadById(id: string, userId: string, isAdmin = false) {
     'use cache';
+    if (!id || !userId) throw new Error("ID de lead o usuario no proporcionado");
 
     const supabase = createServiceClient();
 
@@ -84,9 +112,16 @@ export async function getLeadById(id: string, userId: string, isAdmin = false) {
     );
 
     const { data, error } = await query.single();
-
     if (error) throw new Error(`Error fetching lead: ${error.message}`);
-    return data as LeadRow;
+
+    // 🛡️ Zero-Trust Input: Validate via Zod
+    const validated = leadRowSchema.safeParse(data);
+    if (!validated.success) {
+        console.error(`Lead ${id} validation error:`, validated.error.format());
+        throw new Error("Invalid lead data structure from database");
+    }
+
+    return validated.data;
 }
 
 // ── Mutations ───────────────────────────────────────────────────────────
@@ -103,21 +138,30 @@ export async function createLead(
 
     const transactionId = lead.transaction_id || crypto.randomUUID();
 
-    const { data, error } = await supabase
+    // 🏗️ RPC atómica: crea el lead Y registra el evento en lead_activity
+    // en una sola transacción. Si falla cualquiera, hay rollback total.
+    const { data: leadId, error } = await supabase
+        .rpc("create_lead_with_activity", {
+            p_traveler_name:  lead.traveler_name,
+            p_created_by:     user.id,
+            p_transaction_id: transactionId,
+            p_destination:    lead.destination ?? null,
+            p_email:          lead.email ?? null,
+            p_phone:          lead.phone ?? null,
+        });
+
+    if (error) throw new Error(`Error creating lead: ${error.message}`);
+
+    // Fetch del lead creado para retornar el objeto completo
+    const { data, error: fetchError } = await supabase
         .from("leads")
-        .insert({ ...lead, transaction_id: transactionId, created_by: user.id })
-        .select()
+        .select("id, created_by, traveler_name, email, phone, destination, status, notes, agency_id, transaction_id, created_at, updated_at")
+        .eq("id", leadId)
         .single();
 
-    if (error) {
-        // En Postgres Unique Violation error code es 23505
-        if (error.code === '23505' && error.message.includes('transaction_id')) {
-            throw new Error("duplicate_transaction");
-        }
-        throw new Error(`Error creating lead: ${error.message}`);
-    }
+    if (fetchError) throw new Error(`Error fetching created lead: ${fetchError.message}`);
 
-    // 🔄 Purgar caché del DAL — purga inmediata con perfil 'max'
+    // 🔄 Purgar caché granular
     revalidateTag(`leads-${user.id}`, "max");
     revalidateTag(`dashboard-kpis-${user.id}`, "max");
     revalidateTag(`admin-kpis-${user.id}`, "max");
@@ -126,14 +170,21 @@ export async function createLead(
     return data as LeadRow;
 }
 
+
 /**
  * Update an existing lead.
  */
-export async function updateLead(id: string, updates: LeadUpdate) {
+export async function updateLead(id: string, updates: LeadUpdate, transactionId?: string) {
     const supabase = await createServerSupabaseClient();
+    
+    // 🛡️ Idempotencia: Si viene un transactionId, lo usamos (o podríamos validarlo contra un log)
     const { data, error } = await supabase
         .from("leads")
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ 
+            ...updates, 
+            transaction_id: transactionId,
+            updated_at: new Date().toISOString() 
+        })
         .eq("id", id)
         .select()
         .single();
@@ -181,17 +232,26 @@ export async function deleteLead(id: string) {
  * Search leads by name for the auto-fill feature.
  */
 export async function searchLeads(query: string) {
+    'use cache';
     if (!query || query.length < 2) return [];
 
     const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
         .from("leads")
-        .select("id, traveler_name, email, phone, destination")
+        .select("id, traveler_name, email, phone, destination, status, created_at, updated_at")
         .ilike("traveler_name", `%${query}%`)
         .limit(5);
 
     if (error) throw new Error(`Error searching leads: ${error.message}`);
-    return data as LeadRow[];
+
+    // 🛡️ Zero-Trust Input: Validate via Zod
+    const validated = z.array(leadRowSchema.partial()).safeParse(data);
+    if (!validated.success) {
+        console.error("Search leads validation error:", validated.error.format());
+        return [];
+    }
+
+    return validated.data as LeadRow[];
 }
 
 /**
@@ -218,10 +278,12 @@ export async function getLeadCountsByStatus(userId: string, isAdmin = false) {
 
     const counts: Record<string, number> = {
         nuevo: 0,
-        cotizado: 0,
+        contactado: 0,
+        cualificado: 0,
+        propuesta_enviada: 0,
+        negociacion: 0,
         ganado: 0,
         perdido: 0,
-        en_proceso: 0,
     };
 
     (data ?? []).forEach((row: { status: string }) => {

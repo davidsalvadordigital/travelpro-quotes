@@ -11,6 +11,7 @@
  *    the Service Role client when needed.
  */
 
+import "server-only";
 import { createServiceClient } from "@/lib/supabase-server";
 import { cacheTag, cacheLife } from "next/cache";
 import { withTenantIsolation } from "./isolation";
@@ -27,7 +28,7 @@ async function getRawStatsData(userId: string, isAdmin: boolean) {
     const quotesQuery = withTenantIsolation(
         supabase
             .from("quotes")
-            .select("status, net_cost_usd, net_cost_cop, fee_percentage, trm_used, destination_type, created_at, created_by"),
+            .select("lead_id, status, net_cost_usd, net_cost_cop, fee_percentage, trm_used, destination_type, created_at, created_by"),
         userId,
         isAdmin
     );
@@ -35,7 +36,7 @@ async function getRawStatsData(userId: string, isAdmin: boolean) {
     const leadsQuery = withTenantIsolation(
         supabase
             .from("leads")
-            .select("status, created_at"),
+            .select("id, status, created_at"),
         userId,
         isAdmin
     );
@@ -62,27 +63,45 @@ export interface DashboardKpi {
     trend: "up" | "down" | "neutral";
 }
 
-export async function getDashboardKpis(userId: string): Promise<DashboardKpi[]> {
+export async function getDashboardKpis(userId: string, isAdmin = false): Promise<DashboardKpi[]> {
     'use cache';
+    if (!userId) return [];
     cacheTag(`dashboard-kpis-${userId}`);
     cacheTag(`stats-${userId}`);
     cacheLife("minutes");
 
-    // SECURE: En lugar de usar la vista global, procesamos los datos brutos aislados
-    // garantizando que el Asesor solo vea sus números reales.
-    const { quotes, leads } = await getRawStatsData(userId, false);
+    // SECURE: Procesamos los datos brutos aislados (o totales si es admin)
+    const { quotes, leads } = await getRawStatsData(userId, isAdmin);
 
-    const activeLeads = leads.filter(l => ['nuevo', 'en_proceso', 'cotizado'].includes(l.status)).length;
+    const activeLeads = leads.filter(l => ['nuevo', 'contactado', 'cualificado', 'propuesta_enviada', 'negociacion'].includes(l.status)).length;
     const totalQuotes = quotes.length;
     const totalLeads = leads.length;
     const wonLeads = leads.filter(l => l.status === 'ganado').length;
     const conversionRate = totalLeads > 0 ? Math.round((wonLeads / totalLeads) * 100) : 0;
 
+    const totalRevenue = quotes.reduce((acc, q: any) => {
+        // DOBLE FACTOR: Quote aprobada + Lead Ganado
+        const lead = leads.find(l => l.id === q.lead_id);
+        if (q.status !== 'aprobada' || lead?.status !== 'ganado') return acc;
+        
+        if (q.destination_type === 'internacional') {
+            const usd = Number(q.net_cost_usd) || 0;
+            const trm = Number(q.trm_used) || 4200;
+            return acc + (usd * trm);
+        } else {
+            return acc + (Number(q.net_cost_cop) || 0);
+        }
+    }, 0);
+
+    const formattedRevenue = totalRevenue > 1_000_000 
+        ? `$${(totalRevenue / 1_000_000).toFixed(1)}M` 
+        : `$${totalRevenue.toLocaleString("es-CO")}`;
+
     return [
         {
             label: "Leads Activos",
             value: String(activeLeads),
-            description: "Prospectos activos",
+            description: "Prospectos en seguimiento",
             trend: activeLeads > 0 ? "up" : "neutral",
         },
         {
@@ -99,9 +118,9 @@ export async function getDashboardKpis(userId: string): Promise<DashboardKpi[]> 
         },
         {
             label: "Ventas Totales",
-            value: "$0",
-            description: "Cotizaciones ganadas",
-            trend: "neutral",
+            value: formattedRevenue,
+            description: "Ventas aprobadas (COP)",
+            trend: totalRevenue > 0 ? "up" : "neutral",
         },
     ];
 }
@@ -173,7 +192,7 @@ export async function getAdminKpis(userId: string): Promise<AdminKpi[]> {
                 : totalRevenueCOP > 0
                     ? `$${totalRevenueCOP.toLocaleString("es-CO")}`
                     : "—",
-            sub: "Valor total cotizado",
+            sub: "Ventas verificadas (Doble Factor)",
             trend: totalRevenueCOP > 0 ? "up" : "neutral",
             delta: totalRevenueCOP > 0 ? "+" : "—",
         },
@@ -187,6 +206,7 @@ async function getTRM_Internal() {
 
 export async function getAdvisorPerformance(userId: string, isAdmin = true) {
     'use cache';
+    if (!userId) return [];
 
     cacheTag(`advisor-performance-${userId}`);
     cacheTag(`stats-${userId}`);
@@ -237,10 +257,12 @@ export async function getLeadDistribution(userId: string, isAdmin = true) {
 
     const COLORS: Record<string, string> = {
         nuevo: "#3b82f6",
-        cotizado: "#f59e0b",
+        contactado: "#6366f1",
+        cualificado: "#8b5cf6",
+        propuesta_enviada: "#f59e0b",
+        negociacion: "#ec4899",
         ganado: "#10b981",
         perdido: "#6b7280",
-        en_proceso: "#8b5cf6",
     };
 
     return Object.entries(counts).map(([name, value]) => ({
@@ -291,10 +313,13 @@ export async function getWeeklyTrend(userId: string, isAdmin = true) {
 export interface ActivityItem {
     text: string;
     time: string;
+    entityId: string;
+    entityType: "lead" | "quote";
 }
 
 export async function getRecentActivity(userId: string, isAdmin = false): Promise<ActivityItem[]> {
     'use cache';
+    if (!userId) return [];
 
     const supabase = createServiceClient();
 
@@ -302,56 +327,36 @@ export async function getRecentActivity(userId: string, isAdmin = false): Promis
     cacheTag(`stats-${userId}`);
     cacheLife("minutes");
 
-    const quotesQuery = withTenantIsolation(
-        supabase
-            .from("quotes")
-            .select("traveler_name, destination, status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(3),
-        userId,
-        isAdmin
-    );
+    // 🏗️ Consulta la tabla de eventos reales (lead_activity) con JOIN a leads
+    // para obtener el nombre del prospecto y el destino.
+    // Para asesoras: filtramos por actor_id. Para admin: todo.
+    const query = supabase
+        .from("lead_activity")
+        .select(`
+            id,
+            lead_id,
+            event_type,
+            description,
+            created_at,
+            leads(traveler_name, destination)
+        `)
+        .order("created_at", { ascending: false })
+        .limit(5);
 
-    const leadsQuery = withTenantIsolation(
-        supabase
-            .from("leads")
-            .select("traveler_name, destination, status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(3),
-        userId,
-        isAdmin
-    );
+    const filteredQuery = isAdmin ? query : query.eq("actor_id", userId);
 
-    const [quotesRes, leadsRes] = await Promise.all([quotesQuery, leadsQuery]);
+    const { data, error } = await filteredQuery;
 
-    const STATUS_LABELS: Record<string, string> = {
-        borrador: "Borrador guardado",
-        enviada: "Cotización enviada",
-        aprobada: "Cotización aprobada",
-        rechazada: "Cotización rechazada",
-        nuevo: "Nuevo prospecto",
-        cotizado: "Prospecto cotizado",
-        ganado: "Prospecto ganado",
-        perdido: "Prospecto perdido",
-    };
+    if (error) throw new Error(`Error fetching activity: ${error.message}`);
 
-    const items: ActivityItem[] = [];
-
-    (quotesRes.data ?? []).forEach((q: { status: string; destination?: string; updated_at: string; traveler_name: string }) => {
-        items.push({
-            text: `${STATUS_LABELS[q.status] ?? q.status}: ${q.destination ?? "Sin destino"}`,
-            time: formatRelativeTime(q.updated_at) + ` • ${q.traveler_name}`,
-        });
-    });
-
-    (leadsRes.data ?? []).forEach((l: { status: string; traveler_name: string; updated_at: string; destination?: string }) => {
-        items.push({
-            text: `${STATUS_LABELS[l.status] ?? l.status}: ${l.traveler_name}`,
-            time: formatRelativeTime(l.updated_at) + ` • ${l.destination ?? ""}`,
-        });
-    });
-
-    return items.slice(0, 5);
+    return (data ?? []).map((item: any) => ({
+        entityId: item.lead_id,
+        entityType: "lead" as const,
+        text: item.description,
+        time: formatRelativeTime(item.created_at)
+            + (item.leads?.traveler_name ? ` • ${item.leads.traveler_name}` : "")
+            + (item.leads?.destination ? ` • ${item.leads.destination}` : ""),
+    }));
 }
 
 function formatRelativeTime(dateStr: string): string {
